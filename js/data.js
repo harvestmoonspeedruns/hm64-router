@@ -1,8 +1,23 @@
-const _RICK_MUSBOX_FIX = 33;
+const _SICK_EVENT_MIN = 120;
+const _DREAM_EVENT_MIN = 160;
+const _ANKLE_EVENT_MIN = 180;
+const _PHOTO_MIN = 200;
+const _PROPOSE_MIN = 220;
+const _RICK_FIX_MIN = 33;
+
+const _SICK_EVENT_AFF = 10;
+const _DREAM_EVENT_AFF = 8;
+const _ANKLE_EVENT_AFF = 10;
 
 var month_names = ["Spring", "Summer", "Fall", "Winter"];
 var day_names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday",
 				"SUN", "MON", "TUES", "WED", "THURS", "FRI", "SAT"];
+var bet_colors = ["lightgray", "black", "red", "blue", "yellow", "green"];
+var route_affs = [
+	[],
+	['elli', 'rick'],
+	['karen']
+];
 
 var actions = [];
 var npcs = ["Ann", "Baby", "Basil", "Carpenter Top", "Carpenter Bot", "Cliff", "Doug",
@@ -12,22 +27,24 @@ var npcs = ["Ann", "Baby", "Basil", "Carpenter Top", "Carpenter Bot", "Cliff", "
 			"Rick", "Saibara", "Shipper", "Sprite", "Stu", "horse", "dog", "chicken", "cow"];
 
 var crops = ["Edible", "Berry", "Clover", "Walnut", "Mango", "Grapes", "Mushroom", "Pois Mush",
-				"Ore", "Moonlight", "Blue Rock", "Pontata", "Rare Metal", "Fish S", "Fish M", "Fish L"];
+				"Ore", "Moonlight", "Blue Rock", "Pontata", "Rare Metal",
+				"Fish S", "Fish M", "Fish L"];
 var crop_prices = [30, 40, 70, 40, 70, 50, 60, 100,
-					100, 500, 700, 800, 1000, 30, 100, 180];
+					100, 500, 700, 800, 1000,
+					30, 100, 180];
 var crop_seasons = [[0, 1, 2], [0, 2, 3, 4], [0, 2, 5, 6, 7], [8, 9, 10, 11, 12]];
 			
 var aff = {};
-var route_id;
+var route_id = null;
 
-var vars = {"chickens":0, "gold":300, "lumber":0, "day":3,
-			"bridge_days_worked" : 0, "springs_days_worked" : 0 }
+var vars = { "chickens":0, "gold":300, "lumber":0, "day":3, "medals":0,
+			"bridge_days_worked":0, "springs_days_worked":0 }
 
-var flags = {"treasure_map" : 0, "new_mus_box" : 0, "old_mus_box" : 0,
+var flags = { "treasure_map" : 0, "new_mus_box" : 0, "old_mus_box" : 0,
 			"new_chick" : 0, "new_chicken" : 0,
 			"ankle_elli" : 0, "dream_elli" : 0, "sick_elli" : 0, "recipe_elli" : 0,
 			"kitchen" : 0, "blue_feather" : 0, "propose" : 0,
-			"borrow_cows" : 0};
+			"borrow_cows" : 0 };
 
 var MD5 = function (string) {
 
