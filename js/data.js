@@ -3,48 +3,80 @@ const _DREAM_EVENT_MIN = 160;
 const _ANKLE_EVENT_MIN = 180;
 const _PHOTO_MIN = 200;
 const _PROPOSE_MIN = 220;
-const _RICK_FIX_MIN = 33;
+const _RICK_FIX_MIN = 31;
 
 const _SICK_EVENT_AFF = 10;
 const _DREAM_EVENT_AFF = 8;
 const _ANKLE_EVENT_AFF = 10;
+const _PHOTO_EVENT_AFF = 10;
+const _MUS_BOX_AFF = 6;
 
-var month_names = ["Spring", "Summer", "Fall", "Winter"];
+const _CHICK_BORN_SLEEPS = 3;
+const _CHICK_GROW_SLEEPS = 7;
+const _COW_GROW_SLEEPS = 21;
+
+const _FUNERAL_AFF_LOSS = 10;
+
+var month_names = ["Spring", "Summer", "Fall", "Winter", "SPR", "SUM", "FALL", "WIN"];
 var day_names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday",
-				"SUN", "MON", "TUES", "WED", "THURS", "FRI", "SAT"];
+				"SUN", "MON", "TUES", "WED", "THURS", "FRI", "SAT",
+				"日", "月", "火", "水", "木", "金", "土"];
+var route_names = ["All Photos", "Elli", "Karen", "Popuri", "Elli IL Photo"];
 var bet_colors = ["lightgray", "black", "red", "blue", "yellow", "green"];
 var route_affs = [
-	[],
-	['elli', 'rick'],
-	['karen']
+	['maria', 'elli', 'ann', 'rick', 'mayor','basil', 'cliff'], //Photos
+	['elli', 'rick'], //Elli marriage
+	['karen'], //Karen marriage
+	['popuri', 'rick'], //Popuri marriage
+	['elli', 'rick'], //Elli IL
+];
+var skip_to_list = [
+	[3, 17, 64], // Photos
+	[3, 23, 31], // Elli
+	[3, 90, 102, 109, 110], // Karen
+	[3], // Popuri
+	[3, 31] // Elli IL Photo
 ];
 
+// 0 = vars; 1 = flags; 2 = aff
+var save_slots = [[{}, {}, {}], [{}, {}, {}], [{}, {}, {}], [{}, {}, {}]];
 var actions = [];
-var npcs = ["Ann", "Baby", "Basil", "Carpenter Top", "Carpenter Bot", "Cliff", "Doug",
-			"Ellen", "Elli", "Fisherman", "Gotz", "Gotz Wife", "Grey", "Harris", "Jeff",
-			"Kai", "Karen", "Kent", "Lillia", "Maria", "Mas Carpenter", "May", "Mayor",
-			"Mayors Wife", "Midwife", "Old Man", "Old Woman", "Pastor", "Potion Master",
-			"Rick", "Saibara", "Shipper", "Sprite", "Stu", "horse", "dog", "chicken", "cow"];
+
+var npcs = ["ann", "bartender", "basil", "carpenter bot", "carpenter top", "cliff", "doug",
+			"elli", "ellen", "fisherman", "gotz", "gotz wife", "grey", "harris", "jeff",
+			"kai", "karen", "kent", "lillia", "maria", "mas carpenter", "may", "mayor", 
+			"mayors wife", "midwife", "old man", "old Woman", "pastor", "popuri",
+			"potion master", "rick", "saibara", "salesman", "shipper", "sprite", "stu", "dog",
+			"_horse", "_cow", "_baby", "_chicken", "kappa", "goddess", "judge"];
+var npc_ids = {};
+var not_villagers = [1, 3, 4, 9, 20, 23, 24, 32, 33, 34, 35, 36];
+var recipes = [];
 
 var crops = ["Edible", "Berry", "Clover", "Walnut", "Mango", "Grapes", "Mushroom", "Pois Mush",
 				"Ore", "Moonlight", "Blue Rock", "Pontata", "Rare Metal",
-				"Fish S", "Fish M", "Fish L"];
+				"Fish S", "Fish M", "Fish L", "turnip", "potato", "cabbage",
+				"tomato", "corn", "eggplant", "strawberry",
+				"egg", "milk s", "milk m", "milk l", "milk g"];
 var crop_prices = [30, 40, 70, 40, 70, 50, 60, 100,
 					100, 500, 700, 800, 1000,
-					30, 100, 180];
-var crop_seasons = [[0, 1, 2], [0, 2, 3, 4], [0, 2, 5, 6, 7], [8, 9, 10, 11, 12]];
-			
+					30, 100, 180, 60, 80, 90,
+					90, 120, 300, 500];
+var crop_seasons =
+ [[0, 1, 2], [0, 2, 3, 4], [0, 2, 5, 6, 7], [8, 9, 10, 11, 12]];
+
+var vars = {};
+var flags = {};
 var aff = {};
-var route_id = null;
+var cur_slot = 0;
 
-var vars = { "chickens":0, "gold":300, "lumber":0, "day":3, "medals":0,
-			"bridge_days_worked":0, "springs_days_worked":0 }
+var route_id = 0;
+var reset = false;
+var dontsave = false;
+var sell_stuff = false;
 
-var flags = { "treasure_map" : 0, "new_mus_box" : 0, "old_mus_box" : 0,
-			"new_chick" : 0, "new_chicken" : 0,
-			"ankle_elli" : 0, "dream_elli" : 0, "sick_elli" : 0, "recipe_elli" : 0,
-			"kitchen" : 0, "blue_feather" : 0, "propose" : 0,
-			"borrow_cows" : 0 };
+var ucfirst = function (str) {
+	return str.toLowerCase().replace(/^\w/, c => c.toUpperCase());
+}
 
 var MD5 = function (string) {
 

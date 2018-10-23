@@ -2,6 +2,12 @@
 	cursor: pointer;
 }
 
+.action-btn-small {
+	cursor:pointer;
+	height: 30px;
+	font-size: 12px;
+}
+
 .container {
 	display: block;
 	margin-left: auto;
@@ -15,6 +21,62 @@
 	padding: 5px;
 }
 
+.dontsave {
+	background-color: yellow;
+	border: 3px solid red;
+	color: black;
+	font-weight: bold;
+}
+.dontsave:hover {
+	background-color:red;
+	border: 3px solid black;
+	color:white;
+}
+
+.dropdown-item {
+	cursor: pointer;
+}
+.dropdown-item:hover {
+	background-color:lightgray;
+}
+
+.dropdown-toggle {
+	font-weight: 500;
+}
+
+.forageDisp {
+	height:40px;
+	width:40px;
+}
+.forageDspSmall {
+	height:30px;
+	width:30px;
+}
+
+.textHov {
+	margin-top:10px;
+	margin-left:10px;
+	font-size:16px;
+}
+.textHvrSmall {
+	margin-top:5px;
+	margin-left:10px;
+	font-size:12px;
+}
+
+nav {
+	background-color: lightblue;
+	border:solid gray 1px;
+}
+
+.navbar-toggler {
+	background-color:lightgray;
+}
+
+.oddsInput {
+	margin-right:10px;
+}
+
 .weather {
 	border: 3px solid black;
 	border-radius: 5px;
@@ -23,24 +85,29 @@
 	text-align: center;
 }
 
-.weather.sunny { background-color: yellow; }
-.weather.rainy { background-color: lightblue; }
-.weather.typhoon { background-color: orange; }
+.sunny { background-color: yellow; }
+.rainy { background-color: lightblue; }
+.typhoon { background-color: orange; }
 
-.day {
+.day, .japanese {
 	border-radius: 50%;
 	text-align: center;
+	background-color:lightyellow;
 }
 
 .dow {}
 
-.season.spring { background-color: #c7fc7e; }
-.season.summer { background-color: #ff9f99; }
-.season.fall { background-color: #ffca68; }
-.season.winter { background-color: #aafff5; }
+.spring { background-color: #c7fc7e; }
+.summer { background-color: #ff9f99; }
+.fall { background-color: #ffca68; }
+.winter { background-color: #aafff5; }
 
 .selected {
 	font-size:30px;
 	font-weight:bold;
 	border:5px solid red;
+}
+
+#disp_gold {
+	width:75px;
 }

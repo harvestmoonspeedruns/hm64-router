@@ -14,15 +14,13 @@
 		<script src="js/bootstrap.min.js"></script>
 
 		<script src="js/routes/all_photos.js" type="text/javascript"></script>
-		<script src="js/routes/photos_spr1.js" type="text/javascript"></script>
-		<script src="js/routes/photos_sum1.js" type="text/javascript"></script>
 		<script src="js/routes/elli_route.js" type="text/javascript"></script>
 		<script src="js/routes/karen_route.js" type="text/javascript"></script>
 		<script src="js/routes/popuri_route.js" type="text/javascript"></script>
 		<script src="js/routes/elli_photo.js" type="text/javascript"></script>
 		
 		<script src="js/data.js" type="text/javascript"></script>
-		<script src="js/script.js" type="text/javascript"></script>
+		<script src="js/script.js" type="text/javascript"></script>	
 	</head>
 
 	<body>
@@ -39,52 +37,45 @@
 				<ul class="navbar-nav mr-auto">
 					<li class="nav-item dropdown">
         				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          					Girls
+          					Marriage
         				</a>
         				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
-        					<span class="dropdown-item" onclick="new_game(2)"><img src="/img/npc/karen.png" style="height:30px"/> Karen Mar</span>
-							<span class="dropdown-item" onclick="new_game(1)"><img src="/img/npc/elli.png" style="height:30px"/> Elli Mar</span>
-							<span class="dropdown-item" onclick="new_game(3)"><img src="/img/npc/popuri.png" style="height:30px"/> Popuri Mar</span>
-							<div class="dropdown-divider"></div>
-							<span class="dropdown-item" onclick="new_game(4)"><img src="/img/npc/elli.png" style="height:30px"/>Elli Photo</span>
+        					<span class="dropdown-item" onclick="new_game(2)"><img src="/img/npc/karen.png" style="height:30px"/> Karen</span>
+							<span class="dropdown-item" onclick="new_game(1)"><img src="/img/npc/elli.png" style="height:30px"/> Elli</span>
+							<span class="dropdown-item" onclick="new_game(3)"><img src="/img/npc/popuri.png" style="height:30px"/> Popuri</span>
         				</div>
       				</li>
       				
       				<li class="nav-item dropdown">
-        				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown3" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          					IL Photos
+        				</a>
+        				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+        					<span class="dropdown-item" onclick="new_game(4)"><img src="/img/npc/elli.png" style="height:30px"/> Elli IL Photo</span>
+        				</div>
+      				</li>
+      				
+      				<li class="nav-item dropdown">
+        				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           					Other
         				</a>
-        				<div class="dropdown-menu" aria-labelledby="navbarDropdown3">
+        				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
         					<span class="dropdown-item" onclick="new_game(0)">All Photos</span>
         				</div>
       				</li>
 
 					<li class="nav-item dropdown" id="skip_to_menu">
-        				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown4" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           					Skip to
         				</a>
-        				<div class="dropdown-menu" aria-labelledby="navbarDropdown4">
+        				<div class="dropdown-menu" aria-labelledby="navbarDropdown2">
         					<span class="dropdown-item" onclick="skip_to(3)">Spring 3 (WED)</span>
         				</div>
       				</li>
-      				
-      				<li class="nav-item dropdown" id="loadsave_menu">
-        				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown5" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          					Load
-        				</a>
-      					<div class="dropdown-menu" aria-labelledby="navbarDropdown5">
-        					<span class="dropdown-item" onclick="load_save(0)" id="save_0">Slot 1</span>
-							<span class="dropdown-item" onclick="load_save(1)" id="save_1">Slot 2</span>
-							<span class="dropdown-item" onclick="load_save(2)" id="save_2">Slot 3</span>
-							<span class="dropdown-item" onclick="load_save(3)" id="save_3">Slot 4</span>
-							<div class="dropdown-divider"></div>
-							<span class="dropdown-item" onclick="print_vars()">Print Vars</span>
-        				</div>
-        			</li>
       			</ul>
       		</div>
       		
-      		<button class="btn btn-outline-danger" type="button" onclick="load_save()">RESET</button>
+      		<button class="btn btn-outline-danger" type="button" onclick="start_over()">RESET</button>
       		
 <!--
       		<form class="form-inline" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
@@ -116,7 +107,7 @@
 
 			<div class="d-flex flex-row" id="status_row1">
 				<div class="p-1 display_main">
-					GOLD: <input type="number" id="disp_gold" value="300" onchange="gold_update()" />
+					GOLD: <span id="disp_gold">300</span>
 				</div>
 				<div class="p-1 display_main">
 					KAREN: <span id="npc_8">0</span>
@@ -141,9 +132,6 @@
 			</div>
 
 		</div>
-		
-		<input type="text" id="load_input" />
-		<button type="button" onclick="load_input()">LOAD</button>
 	</body>
 
 	<script>
@@ -154,10 +142,6 @@
 			$(this).addClass('selected');
 			weather_change();
 		});
-		
-		function input_increment(item) {
-			$("#" + item.id.substring(4)).val(parseInt($("#" + item.id.substring(4)).val()) + 1);
-		}
 	</script>
 
 </html>
