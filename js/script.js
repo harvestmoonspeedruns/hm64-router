@@ -89,13 +89,6 @@ function next_day(jump = false) {
 
 		// decrement flag counters
 		for (var key in flags) {
-			if (flags['new_chicken'] == -1) {
-				flags['new_chicken'] = 0;
-			}
-			if (flags['new_chicken'] == 1) {
-				vars['chickens']++;
-				flags['new_chicken'] = -1;
-			}
 			if (flags['cow1'] == 1) {
 				vars['cows']++;
 				flags['cow1'] = 0;
@@ -110,17 +103,34 @@ function next_day(jump = false) {
 			}
 			if (flags[key] > 1) { flags[key]--; }
 		}
+		
+		// Horse Affection
+		if (flags['horse'] > 0) {
+			var horse_id = get_npc_id('horse');
+			if (aff[horse_id] === undefined) { aff[horse_id] == 0; }
+			aff[horse_id]--;
+			horse_id = (horse_id < 0) ? 0 : horse_id;
+		}
+		
+		// Dog Affection
+		var dog_id = get_npc_id('dog');
+		if (aff[dog_id] === undefined) { aff[dog_id] = 0; }
+		aff[dog_id]--;
+		aff[dog_id] = (aff[dog_id] < 0) ? 0 : aff[dog_id];
 
 		// Increment waters if raining
 		if ($('.rainy').hasClass('selected') && vars['potato_waters'] < 6) {
 			vars['potato_waters']++;
 		}
-		if (vars['potato_waters'] == 6) {
+		if (vars['potato_waters'] == _POTATO_GROW_DAYS) {
 			vars['potato_waters']++; // So it doesn't stay on 6 and add 9 potatoes every day
 			vars['potatoes'] += 9;
 		}
 
 		vars['day']++;
+
+		// Increment chickens if one is born today
+		if (vars['new_chicken_days'].includes(vars['day'])) { vars['chickens']++; }
 	}
 
 		if (!dontsave) {
@@ -440,24 +450,18 @@ function load_save(slot = cur_slot) {
 	// 0 = vars; 1 = flags; 2 = aff
 	if (!$.isEmptyObject(save_slots[slot][0])) {
 		reset_vars();
-		// 0 = vars; 1 = flags; 2 = aff
-			for (var attr in save_slots[slot][0]) {
-				vars[attr] = 0;
-            	vars[attr] += save_slots[slot][0][attr];
-			}
-			for (var attr in save_slots[cur_slot][1]) {
-				flags[attr] = 0;
-            	flags[attr] += save_slots[cur_slot][1][attr];
-			}
-			for (var attr in save_slots[cur_slot][2]) {
-				aff[attr] = 0;
-            	aff[attr] += save_slots[cur_slot][2][attr];
-			}
-		/*
-		vars = save_slots[slot][0];
-		flags = save_slots[slot][1];
-		aff = save_slots[slot][2];
-		*/
+		for (var attr in save_slots[slot][0]) {
+			vars[attr] = 0;
+			vars[attr] += save_slots[slot][0][attr];
+		}
+		for (var attr in save_slots[slot][1]) {
+			flags[attr] = 0;
+			flags[attr] += save_slots[slot][1][attr];
+		}
+		for (var attr in save_slots[slot][2]) {
+			aff[attr] = 0;
+			aff[attr] += save_slots[slot][2][attr];
+		}
 		next_day(true);
 	} else {
 		console.log('empty slot');
@@ -473,11 +477,12 @@ function reset_vars() {
 
 	vars = { "chickens":0, "gold":300, "lumber":0, "day":3, "medals":0,
 			"feed":0, "fodder":0, "bridge_days_worked":0, "springs_days_worked":0,
-			"potatoes" : 0, "potato_waters" : 0, "watering_can_fill" : 0,
+			"potatoes" : 0, "potato_waters" : 0, "corn_waters" : 0, "watering_can_fill" : 0,
 			"new_chicken_days" : [] };
 	flags = { "treasure_map" : 0, "new_mus_box" : 0, "old_mus_box" : 0,
 			"fishing_rod" : 0, "dog_inside" : 0, "horse" : 0, "chicken_outside" : 0,
-			"new_chick" : 0, "new_chicken" : 0, "chicken_funeral" : 0,
+			"new_chick" : 0, "chicken_funeral" : 0, "corn_planted" : 0,
+			"recipe_basil" : 0,
 			"ankle_maria" : 0, "dream_maria" : 0, "sick_maria" : 0, "recipe_maria" : 0, "photo_maria" : 0,
 			"ankle_elli" : 0, "dream_elli" : 0, "sick_elli" : 0, "recipe_elli" : 0, "photo_elli" : 0,
 			"ankle_karen" : 0,
@@ -1065,10 +1070,10 @@ function forage(need = 0, g = vars['gold'], d = vars['day']) {
 }
 
 function print_vars() {
-	//TODO: JSON output of save objects
-	$('#load_input').val('test');
+	$('#load_input').val(JSON.stringify(save_slots[cur_slot]));
 }
 
 function load_input() {
-	// TODO
+	save_slots[0] = JSON.parse($('#load_input').val());
+	load_save(0);
 }

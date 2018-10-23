@@ -258,7 +258,7 @@ function get_actions_photos(d = 3, g = 300, is_sunny = 1) {
 				'val':[1, 6000, _COW_GROW_SLEEPS]
 			});
 			
-			// TODO: Buy a milker
+			// TODO: Buy a milker for 1800 G
 		}
 
 		// TODO: Buy Kitchen

@@ -11,6 +11,9 @@ const _ANKLE_EVENT_AFF = 10;
 const _PHOTO_EVENT_AFF = 10;
 const _MUS_BOX_AFF = 6;
 
+const _POTATO_GROW_DAYS = 6;
+const _CORN_GROW_DAYS = 13;
+
 const _CHICK_BORN_SLEEPS = 3;
 const _CHICK_GROW_SLEEPS = 7;
 const _COW_GROW_SLEEPS = 21;
@@ -47,7 +50,7 @@ var npcs = ["ann", "bartender", "basil", "carpenter bot", "carpenter top", "clif
 			"kai", "karen", "kent", "lillia", "maria", "mas carpenter", "may", "mayor", 
 			"mayors wife", "midwife", "old man", "old Woman", "pastor", "popuri",
 			"potion master", "rick", "saibara", "salesman", "shipper", "sprite", "stu", "dog",
-			"_horse", "_cow", "_baby", "_chicken", "kappa", "goddess", "judge"];
+			"_horse", "_cow", "_baby", "chicken", "kappa", "goddess", "judge"];
 var npc_ids = {};
 var not_villagers = [1, 3, 4, 9, 20, 23, 24, 32, 33, 34, 35, 36];
 var recipes = [];
