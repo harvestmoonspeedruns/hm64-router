@@ -21,6 +21,7 @@ function get_actions(rid = null, d = vars['day'], g = vars['gold'], is_sunny = 1
 
 function next_day(jump = false) {
 	if (!jump) {
+		flags['good_weather'] = 1;
 
 		// Update variables
 		var tmp_actions = [];
@@ -75,10 +76,10 @@ function next_day(jump = false) {
 		}
 
 		// Chicken Funeral
-		if (flags['chicken_funeral'] > 1) {
-			var farm_npcs = [get_npc_id('grey'), get_npc_id('doug'), get_npc_id('ann')];
+		if (flags['chicken_outside'] == 1 && flags['good_weather'] == -1) {
 			if (vars['chickens'] > 0) {
 				vars['chickens'] = 0;
+				var farm_npcs = [get_npc_id('grey'), get_npc_id('doug'), get_npc_id('ann')];
 				for (var tmp_v in aff) {
 					aff[tmp_v] -= (farm_npcs.includes(tmp_v) ? (_FUNERAL_AFF_LOSS * 30) : _FUNERAL_AFF_LOSS);
 					aff[tmp_v] = (aff[tmp_v] < 0) ? 0 : aff[tmp_v];
@@ -107,9 +108,9 @@ function next_day(jump = false) {
 		// Horse Affection
 		if (flags['horse'] > 0) {
 			var horse_id = get_npc_id('horse');
-			if (aff[horse_id] === undefined) { aff[horse_id] == 0; }
+			if (aff[horse_id] === undefined) { aff[horse_id] == 1; }
 			aff[horse_id]--;
-			horse_id = (horse_id < 0) ? 0 : horse_id;
+			aff[horse_id] = ((aff[horse_id] < 0) ? 0 : aff[horse_id]);
 		}
 		
 		// Dog Affection
@@ -119,43 +120,59 @@ function next_day(jump = false) {
 		aff[dog_id] = (aff[dog_id] < 0) ? 0 : aff[dog_id];
 
 		// Increment waters if raining
-		if ($('.rainy').hasClass('selected') && vars['potato_waters'] < 6) {
-			vars['potato_waters']++;
-		}
-		if (vars['potato_waters'] == _POTATO_GROW_DAYS) {
-			vars['potato_waters']++; // So it doesn't stay on 6 and add 9 potatoes every day
-			vars['potatoes'] += 9;
+		if ($('.rainy').hasClass('selected')) {
+			if (route_id == 0) {
+				if (flags['potato_planted'] == 1) {
+					vars['potato_waters']++;
+				}
+				if (vars['day'] > 30 && flags['corn_planted'] == 1) {
+					vars['corn_waters']++;
+				}
+				if (vars['potato_waters'] == _POTATO_GROW_DAYS) {
+					vars['potato_waters']++; // So it doesn't stay on 6 and add 9 potatoes every day
+					vars['potatoes'] += 9;
+				}
+			}
 		}
 
 		vars['day']++;
 
 		// Increment chickens if one is born today
-		if (vars['new_chicken_days'].includes(vars['day'])) { vars['chickens']++; }
-	}
-
-		if (!dontsave) {
-			// 0 = vars; 1 = flags; 2 = aff
-			for (var attr in vars) {
-				save_slots[cur_slot][0][attr] = 0;
-            	save_slots[cur_slot][0][attr] += vars[attr];
+		// Remove day from list if before today
+		if (vars['new_chicken_days'].length > 0) {
+			if (parseInt(vars['new_chicken_days'].substring(0, 3)) == vars['day']) {
+				vars['chickens']++;
 			}
-			for (var attr in flags) {
-				save_slots[cur_slot][1][attr] = 0;
-            	save_slots[cur_slot][1][attr] += flags[attr];
-			}
-			for (var attr in aff) {
-				save_slots[cur_slot][2][attr] = 0;
-            	save_slots[cur_slot][2][attr] += aff[attr];
+			if (parseInt(vars['new_chicken_days'].substring(0, 3)) < vars['day']) {
+				vars['new_chicken_days'] = vars['new_chicken_days'].substring(3);
 			}
 		}
+	}
+
+	if (flags['dontsave'] == 0) {
+		// 0 = vars; 1 = flags; 2 = aff
+		for (var attr in vars) {
+			save_slots[cur_slot][0][attr] = ((attr.localeCompare('new_chicken_days') == 0) ? "" : 0);
+            save_slots[cur_slot][0][attr] += vars[attr];
+		}
+		for (var attr in flags) {
+			save_slots[cur_slot][1][attr] = 0;
+           	save_slots[cur_slot][1][attr] += flags[attr];
+		}
+		for (var attr in aff) {
+			save_slots[cur_slot][2][attr] = 0;
+           	save_slots[cur_slot][2][attr] += aff[attr];
+		}
+	}
+	flags['dontsave'] = 0;
 
 	// Begin next day
 	update_day_gui(vars['day'], jump);
-	actions = get_actions(route_id, vars['day'], vars['gold'], 1);
+	actions = get_actions(route_id, vars['day'], vars['gold'], flags['good_weather']);
 
 	// Show or hide typhoon button
 	$('.typhoon').show();
-	if (get_month(vars['day']) != 1 || is_festival(vars['day'], false)) {
+	if (get_month(vars['day']) != 1 || is_festival(vars['day'])) {
 		$('.typhoon').hide();
 	}
 
@@ -171,8 +188,14 @@ function next_day(jump = false) {
 		}
 	}
 
-	// Set weather to sunny and update action HTML
-	$(".sunny").click();
+	// Set weather and update action HTML
+	if (flags['good_weather'] == -1) {
+		$(".typhoon").click();
+	} else if (flags['good_weather'] == 0) {
+		$(".rainy").click();
+	} else {
+		$(".sunny").click();
+	}
 }
 
 function reset_to (d = 3) {
@@ -238,6 +261,9 @@ function skip_to(d = 3) {
 }
 
 function calc_actions(a = null) {
+	
+	//console.log(a);
+	
 	var actions_today = {};
 	if (a !== null && a['cid'] !== undefined) {
 		if (!Number.isInteger(a['cid'])) {
@@ -247,10 +273,18 @@ function calc_actions(a = null) {
 					console.log("undefined flag: " + a['cid']);
 				} else {
 					if (a['val'] !== undefined) {
-						flags[a['cid'].substring(2)] += a['val'];
-						if (!actions_today[a['cid']]) {
-							actions_today[a['cid']] = 0;
+						
+						if (a['cid'].substring(2) == "new_mus_box") {
+							console.log(a['cid'].substring(2) + ": " + flags[a['cid'].substring(2)]);
 						}
+						
+						flags[a['cid'].substring(2)] += a['val'];
+						
+						if (a['cid'].substring(2) == "new_mus_box") {
+							console.log(a['cid'].substring(2) + ": " + flags[a['cid'].substring(2)]);
+						}
+						
+						if (!actions_today[a['cid']]) { actions_today[a['cid']] = 0; }
 						actions_today[a['cid']] += parseInt(a['val']);
 					} else {
 						console.log("No value given for FLAG:" + a['cid']);
@@ -262,13 +296,14 @@ function calc_actions(a = null) {
 					console.log("undefined var: " + a['cid']);
 				} else {
 					if (a['val'] !== undefined) {
-						if (!actions_today[a['cid']]) {
-							actions_today[a['cid']] = 0;
-						}
-						if (Array.isArray(vars[a['cid'].substring(2)])) {
-							// TODO: actions_today?
-							vars[a['cid'].substring(2)].push(a['val']);
+						if (a['cid'].localeCompare("v_new_chicken_days") == 0) {
+							var tmp_day = parseInt(a['val']);
+							if (parseInt(a['val']) < 10) { tmp_day = "0" + tmp_day; }
+							if (parseInt(a['val']) < 100) { tmp_day = "0" + tmp_day; }
+							actions_today[a['cid']] = tmp_day;
+							vars[a['cid'].substring(2)] += tmp_day;
 						} else {
+							if (!actions_today[a['cid']]) { actions_today[a['cid']] = 0; }
 							actions_today[a['cid']] += parseInt(a['val']);
 							vars[a['cid'].substring(2)] += a['val'];
 						}
@@ -279,13 +314,10 @@ function calc_actions(a = null) {
 			}
 		} else {
 			if (a['val'] !== undefined) {
-				if (!actions_today[a['cid']]) {
-					actions_today[a['cid']] = 0;
-				}
+				if (!actions_today[a['cid']]) { actions_today[a['cid']] = 0; }
 				actions_today[a['cid']] += a['val'];
-				if (aff[a['cid']] === undefined) {
-					aff[a['cid']] = 0;
-				}
+
+				if (aff[a['cid']] === undefined) { aff[a['cid']] = 0; }
 				aff[a['cid']] += a['val'];
 				
 				// 0 <= aff <= 255
@@ -302,9 +334,8 @@ function fish() {
 }
 
 function betting_table(a = []) {
-	a.push({'desc':('<div class="ml-3">GOLD:&nbsp;&nbsp;<input type="number" id="b_gold" value="' + vars['gold'] + '" style="margin-right:20px" onchange="calc_bets()" /></div>' +
-			'<div class="ml-3">NEED:&nbsp;&nbsp;<input type="number" id="b_need" onchange="calc_bets()" style="margin-right:20px" value="' +
-			((route_id == 0) ? (((200 - vars['medals']) < 0) ? 0 : (200 - vars['medals'])) : (((500 - vars['medals']) < 0) ? 0 : (500 - vars['medals']))) +
+	var tmp_medals_needed = ((route_id == 0) ? ((vars['day'] < 120) ? 2000 : 1000) : 500);
+	a.push({'desc':('<div class="ml-3">NEED:&nbsp;&nbsp;<input type="number" id="b_need" onchange="calc_bets()" style="margin-right:20px" value="' + tmp_medals_needed +
 			'" /></div>' + '<div class="ml-3">HAVE:&nbsp;&nbsp;<input type="number" id="b_have" onchange="calc_bets()" value="' + vars['medals'] + '" /></div>')});
 	for (var i = 0; i < 6; i++) {
 		a.push({'desc':'odds', 'b_table':true, 'b_id':i});
@@ -378,7 +409,9 @@ function new_game(id = 0) {
 	if (route_id == 0) { // All Photos
 		vars['openers'] = 0;
 		vars['potato_waters'] = 0;
+		vars['corn_waters'] = 0;
 		flags['potato_planted'] = 0;
+		flags['corn_planted'] = 0;
 	}
 
 	if (route_id == 3) { // Popuri marriage
@@ -402,7 +435,7 @@ function update_day_gui(d = vars['day'], jump = false) {
 		$('.display_main.season').removeClass('spring').removeClass('summer').removeClass('fall').removeClass('winter').addClass(m.toLowerCase());
 	}
 
-	$('.display_main.season').html(m.charAt(0).toUpperCase() + m.toLowerCase().substr(1));
+	$('.display_main.season').html(m.charAt(0).toUpperCase() + m.toLowerCase().substring(1));
 	$('.display_main.day').html(get_day(d));
 	$('.display_main.dow').html(get_day_of_week(d, true));
 	$('.display_main.japanese').html(get_day_of_week(d, false, true));
@@ -451,8 +484,8 @@ function load_save(slot = cur_slot) {
 	if (!$.isEmptyObject(save_slots[slot][0])) {
 		reset_vars();
 		for (var attr in save_slots[slot][0]) {
-			vars[attr] = 0;
-			vars[attr] += save_slots[slot][0][attr];
+			vars[attr] = ((attr.localeCompare('new_chicken_days') == 0) ? "" : 0);
+            vars[attr] += save_slots[slot][0][attr];
 		}
 		for (var attr in save_slots[slot][1]) {
 			flags[attr] = 0;
@@ -472,31 +505,30 @@ function reset_vars() {
 	actions = [];
 	actions_all = {};
 	reset = false;
-	dontsave = false;
 	sell_stuff = false;
 
 	vars = { "chickens":0, "gold":300, "lumber":0, "day":3, "medals":0,
 			"feed":0, "fodder":0, "bridge_days_worked":0, "springs_days_worked":0,
-			"potatoes" : 0, "potato_waters" : 0, "corn_waters" : 0, "watering_can_fill" : 0,
-			"new_chicken_days" : [] };
+			"potatoes" : 0, "potato_waters" : 0, "watering_can_fill" : 0,
+			"new_chicken_days" : "" };
 	flags = { "treasure_map" : 0, "new_mus_box" : 0, "old_mus_box" : 0,
 			"fishing_rod" : 0, "dog_inside" : 0, "horse" : 0, "chicken_outside" : 0,
-			"new_chick" : 0, "chicken_funeral" : 0, "corn_planted" : 0,
-			"recipe_basil" : 0,
+			"new_chick" : 0, "chicken_funeral" : 0, "horse_brush" : 0,
+			"recipe_basil" : 0, 'recipe_sprite' : 0,
+			"dog_entered" : 0, "horse_entered" : 0,
 			"ankle_maria" : 0, "dream_maria" : 0, "sick_maria" : 0, "recipe_maria" : 0, "photo_maria" : 0,
 			"ankle_elli" : 0, "dream_elli" : 0, "sick_elli" : 0, "recipe_elli" : 0, "photo_elli" : 0,
-			"ankle_karen" : 0,
+			"ankle_karen" : 0, "blue_feather" : 0, "propose" : 0,
 			"ankle_popuri" : 0, "dream_popuri" : 0, "sick_popuri" : 0, "recipe_popuri" : 0, "photo_popuri" : 0,
 			"ankle_ann" : 0, "dream_ann" : 0, "sick_ann" : 0, "recipe_ann" : 0, "photo_ann" : 0,
 			"photo_springs" : 0, "photo_swimming" : 0, "photo_cowfest" : 0, "photo_harvest" : 0,
 			"photo_horserace" : 0, "photo_dograce" : 0, "photo_married" : 0, "photo_baby" : 0,
 			"berry_kappa" : 0, "berry_flowerfest" : 0, "berry_strength" : 0,
 			"berry_eggfest" : 0, "berry_pond" : 0, "berry_farm" : 0, "berry_basil" : 0,
-			"blue_feather" : 0, "propose" : 0,
 			"wine_from_duke" : 0, "vineyard_restored" : 0,
 			"kitchen" : 0, "bathroom" : 0, "baby bed" : 0, "stairway" : 0, "log_terrace" : 0, "greenhouse" : 0,
-			"borrow_cows" : 0 , "harvest_king" : 0,
-			"cow1" : 0, "cow2" : 0, "cow3" : 0, "first_chicken" : 0 };
+			"borrow_cows" : 0 , "harvest_king" : 0, "good_weather" : 1, "dontsave" : 0,
+			"cow1" : 0, "cow2" : 0, "cow3" : 0, "milker" : 0 };
 	aff = {};
 }
 
@@ -543,7 +575,7 @@ function add_recipes() {
 
 function to_html(a = actions) {
 	
-	console.log(a);
+	//console.log(a);
 	
 	var cur_vis = true;
 	var html = "";
@@ -590,6 +622,7 @@ function to_html(a = actions) {
 				html += '<input id="bg_' + a[i]['b_id'] + '" value="';
 				html += Math.floor(vars['gold'] / (6 * 50));
 				html += '" disabled=true style="border:1px solid black"/>';
+				html += '<button class="btn" type="button" onclick="bet_winner(' + a[i]['b_id'] + ')" style="margin-left:5px; border:3px solid ' + bet_colors[a[i]['b_id']] + '" tabindex="-1">WINNER</button>';
 			} else {
 				// Plain text
 				if (a[i]['cid'] !== undefined || a[i]['iid'] !== undefined) {
@@ -606,7 +639,7 @@ function to_html(a = actions) {
 				html += '<span class="mr-2">' + ((a[i]['iid'] === undefined) ? get_npc_img(a[i]['cid']) : get_npc_img(a[i]['iid'])) + '</span>';
 			}
 			html += '<button type="button" class="btn btn-' + ((a[i]["sel"] === false) ? 'danger' : 'success') +
-				' action-button" id="ab_' + i + '" onclick="toggle_color(this, ' + "'" +
+				' action-button" id="ab_' + i + '" onclick="toggle_color(this, '+ "'" +
 				((a[i]['div_tog'] == undefined) ? "" : a[i]['div_tog']) + "', " +
 				get_toggle(a[i], a) + ')">' + a[i]['desc'] + '</button>';
 			if (a[i]['sr']) {
@@ -615,8 +648,8 @@ function to_html(a = actions) {
 		}
 	}
 	html += ((html.length > 0) ? '</div><br/>' : '') + '<button type="button" class="btn btn-primary';
-	if (dontsave) { html += ' dontsave'; }
-	html += '" onclick="next_day()">' + (((dontsave) ? "DONT SAVE" : "Sleep") + '</button>');
+	if (flags['dontsave'] == 1) { html += ' dontsave'; }
+	html += '" onclick="next_day()">' + (((flags['dontsave'] == 1) ? "DONT SAVE" : "Sleep") + '</button>');
 
 	// Small Text for many lines
 	if (lines > 8) {
@@ -638,7 +671,7 @@ function get_toggle (abid = null, a = actions) {
 		if (abid["t" + i] !== undefined) {
 			for (var j = 0; j < a.length; j++) {
 				if ((Array.isArray(abid["t" + i]) && abid["t" + i].includes(a[j]['desc'])) ||
-					(!Array.isArray(abid["t" + i]) && a[j]['desc'] === abid["t" + i])) {
+					(!Array.isArray(abid["t" + i]) && a[j]['desc'].localeCompare(abid["t" + i]) == 0)) {
 						tmp_res.push(j);
 				}
 			}
@@ -653,7 +686,7 @@ function get_toggle (abid = null, a = actions) {
 
 function get_npc_img(img_id = null) {
 	var img_html = "";
-	
+
 	// If array of values is given, loop through and send back first non-empty result
 	if (Array.isArray(img_id)) {
 		for (var i = 0; i < img_id.length; i++) {
@@ -665,10 +698,18 @@ function get_npc_img(img_id = null) {
 	
 	// Only accept numbers; ignore 'v_xyz' and 'f_xyz' for flag and variable values
 	if (Number.isInteger(parseInt(img_id)) && img_id >= 0 && img_id < npcs.length) {
-		var npc_name = npcs[img_id].toLowerCase().replace(" ", "_");
-		img_html = '<img class="forageDisp" src="/img/' + ((npcs[img_id].substring(0, 1) == "_") ? 'default' : ('npc/' + npc_name)) + '.png">';
+		img_html = '<img class="forageDisp" src="/img/' + ((npcs[img_id].substring(0, 1) == "_") ? 'default' : ('npc/' + npcs[img_id].toLowerCase().replace(" ", "_"))) + '.png">';
+		if (aff[img_id] !== undefined) {
+			img_html = '<span style="font-size:12px; margin-left:2px">' + aff[img_id] + '</span>' + img_html;
+		}
 	}
 	return img_html;
+}
+
+function bet_winner(winner_id = 0) {
+	vars['medals'] += (parseInt($('#b_' + winner_id).val()) * parseInt($('#bg_' + winner_id).val()));
+	$('#b_have').val(vars['medals']);
+	gold_update();
 }
 
 function calc_bets(bet_type = 1) {
@@ -694,6 +735,13 @@ function calc_bets(bet_type = 1) {
 	var odds = [];
 	var bets = [];
 	var max_required = 0;
+
+	if (parseInt($("#b_have").val()) >= parseInt($('#b_need').val())) {
+		$("input[id^='bg_']").each(function(i) {
+			$(this).val(0);
+		});
+		return;
+	}
 
 	for (var i = 0; i < 6; i++) {
 		var cur_need = Math.ceil(need / parseInt($('#b_' + i).val()));

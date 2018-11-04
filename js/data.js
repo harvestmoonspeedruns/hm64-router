@@ -3,7 +3,12 @@ const _DREAM_EVENT_MIN = 160;
 const _ANKLE_EVENT_MIN = 180;
 const _PHOTO_MIN = 200;
 const _PROPOSE_MIN = 220;
+const _PARTY_ATTEND_MIN = 160;
 const _RICK_FIX_MIN = 31;
+const _SPRITE_WINE_MIN = 50; // Meet + (14 gift/talk)
+const _DUKE_WINE_MIN = 41;
+const _BASIL_BERRY_MIN = 200;
+const _MINE_UNTIL = 16500;
 
 const _SICK_EVENT_AFF = 10;
 const _DREAM_EVENT_AFF = 8;
@@ -27,7 +32,7 @@ var day_names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday
 var route_names = ["All Photos", "Elli", "Karen", "Popuri", "Elli IL Photo"];
 var bet_colors = ["lightgray", "black", "red", "blue", "yellow", "green"];
 var route_affs = [
-	['maria', 'elli', 'ann', 'rick', 'mayor','basil', 'cliff'], //Photos
+	['maria', 'elli', 'ann'], //Photos
 	['elli', 'rick'], //Elli marriage
 	['karen'], //Karen marriage
 	['popuri', 'rick'], //Popuri marriage
@@ -50,7 +55,7 @@ var npcs = ["ann", "bartender", "basil", "carpenter bot", "carpenter top", "clif
 			"kai", "karen", "kent", "lillia", "maria", "mas carpenter", "may", "mayor", 
 			"mayors wife", "midwife", "old man", "old Woman", "pastor", "popuri",
 			"potion master", "rick", "saibara", "salesman", "shipper", "sprite", "stu", "dog",
-			"_horse", "_cow", "_baby", "chicken", "kappa", "goddess", "judge"];
+			"_horse", "_cow", "_baby", "chicken", "kappa", "goddess", "judge", "musbox"];
 var npc_ids = {};
 var not_villagers = [1, 3, 4, 9, 20, 23, 24, 32, 33, 34, 35, 36];
 var recipes = [];
@@ -74,7 +79,6 @@ var cur_slot = 0;
 
 var route_id = 0;
 var reset = false;
-var dontsave = false;
 var sell_stuff = false;
 
 var ucfirst = function (str) {
