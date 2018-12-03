@@ -8,7 +8,6 @@ const _RICK_FIX_MIN = 31;
 const _SPRITE_WINE_MIN = 50; // Meet + (14 gift/talk)
 const _DUKE_WINE_MIN = 41;
 const _BASIL_BERRY_MIN = 200;
-const _MINE_UNTIL = 16500;
 
 const _SICK_EVENT_AFF = 10;
 const _DREAM_EVENT_AFF = 8;
@@ -18,7 +17,11 @@ const _MUS_BOX_AFF = 6;
 
 const _POTATO_GROW_DAYS = 6;
 const _CORN_GROW_DAYS = 13;
+const _BUILD_DAYS = 4;
+const _BABY_BORN_DAYS = 60;
 
+const _PREGNANT_SLEEPS = 30;
+const _BABY_SLEEPS = 60;
 const _CHICK_BORN_SLEEPS = 3;
 const _CHICK_GROW_SLEEPS = 7;
 const _COW_GROW_SLEEPS = 21;
@@ -28,11 +31,21 @@ const _FUNERAL_AFF_LOSS = 10;
 var month_names = ["Spring", "Summer", "Fall", "Winter", "SPR", "SUM", "FALL", "WIN"];
 var day_names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday",
 				"SUN", "MON", "TUES", "WED", "THURS", "FRI", "SAT",
-				"日", "月", "火", "水", "木", "金", "土"];
+				"日", "月", "火", "水", "木", "金", "土"
+];
+var extensions = [
+	["kitchen", 5000, 450],
+	["bathroom", 3000, 300],
+	["stairway", 2000, 250],
+	["greenhouse", 30000, 580],
+	["logterrace", 7000, 350],
+	["babybed", 1000, 150]
+];
+
 var route_names = ["All Photos", "Elli", "Karen", "Popuri", "Elli IL Photo"];
 var bet_colors = ["lightgray", "black", "red", "blue", "yellow", "green"];
 var route_affs = [
-	['maria', 'elli', 'ann'], //Photos
+	[], // Placeholder for All Photos
 	['elli', 'rick'], //Elli marriage
 	['karen'], //Karen marriage
 	['popuri', 'rick'], //Popuri marriage
@@ -53,7 +66,7 @@ var actions = [];
 var npcs = ["ann", "bartender", "basil", "carpenter bot", "carpenter top", "cliff", "doug",
 			"elli", "ellen", "fisherman", "gotz", "gotz wife", "grey", "harris", "jeff",
 			"kai", "karen", "kent", "lillia", "maria", "mas carpenter", "may", "mayor", 
-			"mayors wife", "midwife", "old man", "old Woman", "pastor", "popuri",
+			"mayors wife", "midwife", "old man", "old woman", "pastor", "popuri",
 			"potion master", "rick", "saibara", "salesman", "shipper", "sprite", "stu", "dog",
 			"_horse", "_cow", "_baby", "chicken", "kappa", "goddess", "judge", "musbox"];
 var npc_ids = {};
@@ -68,7 +81,8 @@ var crops = ["Edible", "Berry", "Clover", "Walnut", "Mango", "Grapes", "Mushroom
 var crop_prices = [30, 40, 70, 40, 70, 50, 60, 100,
 					100, 500, 700, 800, 1000,
 					30, 100, 180, 60, 80, 90,
-					90, 120, 300, 500];
+					90, 120, 300, 500,
+					50, 100, 150, 300, 500];
 var crop_seasons =
  [[0, 1, 2], [0, 2, 3, 4], [0, 2, 5, 6, 7], [8, 9, 10, 11, 12]];
 

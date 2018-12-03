@@ -2,6 +2,39 @@ $(document).ready(function() {
 	new_game(2);
 });
 
+function reset_vars() {
+	actions = [];
+	actions_all = {};
+	reset = false;
+	sell_stuff = false;
+
+	vars = { "chickens" : 0, "gold":300, "lumber" : 0, "day" : 3, "medals" : 0,
+			"feed" : 0, "fodder" : 0, "bridge_days_worked" : 0, "springs_days_worked" : 0,
+			"potatoes" : 0, "potato_waters" : 0, "watering_can_fill" : 0, "corn_waters" : 0,
+			"new_chicken_days" : "", "new_cow_days" : "", "cows" : 0, "grass" : 0,
+			"grass_planted" : 0, "happiness" : 0, "days_married" : 0 };
+	flags = { "treasure_map" : 0, "new_mus_box" : 0, "old_mus_box" : 0,
+			"fishing_rod" : 0, "dog_inside" : 0, "dog_entered" : 0,
+			"horse" : 0, "horse_brush" : 0, "sustaining_carrot" : 0, "horse_entered" : 0,
+			"cows_outside" : 0, "cow_entered" : 0, "milker" : 0,
+			"new_chick" : 0, "chicken_funeral" : 0, "chicken_outside" : 0,
+			"recipe_basil" : 0, 'recipe_sprite' : 0, "golden_hammer" : 0,
+			"ankle_maria" : 0, "dream_maria" : 0, "sick_maria" : 0, "recipe_maria" : 0, "photo_maria" : 0,
+			"ankle_elli" : 0, "dream_elli" : 0, "sick_elli" : 0, "recipe_elli" : 0, "photo_elli" : 0,
+			"ankle_karen" : 0, 'photo_karen' : 0, "blue_feather" : 0, "propose" : 0,
+			"ankle_popuri" : 0, "dream_popuri" : 0, "sick_popuri" : 0, "recipe_popuri" : 0, "photo_popuri" : 0,
+			"ankle_ann" : 0, "dream_ann" : 0, "sick_ann" : 0, "recipe_ann" : 0, "photo_ann" : 0,
+			"photo_springs" : 0, "photo_swimming" : 0, "photo_cowfest" : 0, "photo_harvest" : 0,
+			"photo_horserace" : 0, "photo_dograce" : 0, "photo_married" : 0, "photo_baby" : 0,
+			"berry_kappa" : 0, "berry_flowerfest" : 0, "berry_strength" : 0, "berry_mine" : 0,
+			"berry_eggfest" : 0, "berry_pond" : 0, "berry_farm" : 0, "berry_basil" : 0,
+			"wine_from_duke" : 0, "vineyard_restored" : 0, "baby" : 0,
+			"kitchen" : 0, "bathroom" : 0, "babybed" : 0, "stairway" : 0, "logterrace" : 0, "greenhouse" : 0,
+			"borrow_cows" : 0 , "harvest_king" : 0, "good_weather" : 1, "dontsave" : 0,
+			"fishing_rod_stored" : 0};
+	aff = {};
+}
+
 function load_game (slot = 0) {
 	
 }
@@ -51,60 +84,61 @@ function next_day(jump = false) {
 		// Calculate G from sold items
 		var sell_amt = 0;
 		$("input[id^='for']").each(function(index) {
-			sell_amt += (this.value * crop_prices[this.id.split("_")[1]]);
+			var tmp_cr_id = parseInt(this.id.split("_")[1]);
+			sell_amt += (this.value * parseInt(crop_prices[tmp_cr_id]));
+			if (crops[tmp_cr_id].includes('milk')) { // Number of Milks Shipped
+				var cow_id = get_npc_id('cow');
+				if (!aff[cow_id]) { aff[cow_id] = 0; }
+				aff[get_npc_id('cow')] += parseInt(this.value);
+			}
 		});
 
 		vars['gold'] += parseInt(sell_amt);
 		sell_stuff = (sell_amt > 0);
 
-		// Affection from 4 days bridge work
-		if (vars['day'] == 87 && flags['bridge_days_worked'] == 4) {
+		// Affection from 4 days bridge work or hot springs work
+		if ((vars['day'] == 87 && flags['bridge_days_worked'] == 4) ||
+			(vars['day'] == 106 && flags['springs_days_worked'] == 4)) {
 			for (var i = 0; i < npcs.length; i++) {
 				if (aff[i] !== undefined && !not_villagers.includes(i)) {
-					aff[i] += 3;
-				}
-			}
-		}
-		
-		// Affection from 4 days hot springs work
-		if (vars['day'] == 106 && flags['springs_days_worked'] == 4) {
-			for (var i = 0; i < npcs.length; i++) {
-				if (aff[i] !== undefined && !not_villagers.includes(i)) {
-					aff[i] += 3;
+					aff[i] = ((aff[i] >= 253) ? 255 : (aff[i] + 3));
 				}
 			}
 		}
 
 		// Chicken Funeral
-		if (flags['chicken_outside'] == 1 && flags['good_weather'] == -1) {
-			if (vars['chickens'] > 0) {
-				vars['chickens'] = 0;
-				var farm_npcs = [get_npc_id('grey'), get_npc_id('doug'), get_npc_id('ann')];
-				for (var tmp_v in aff) {
-					aff[tmp_v] -= (farm_npcs.includes(tmp_v) ? (_FUNERAL_AFF_LOSS * 30) : _FUNERAL_AFF_LOSS);
-					aff[tmp_v] = (aff[tmp_v] < 0) ? 0 : aff[tmp_v];
-				}
+		if (flags['chicken_funeral'] == 1) {
+			vars['chickens'] = 0;
+			var farm_npcs = [get_npc_id('grey'), get_npc_id('doug'), get_npc_id('ann')];
+			for (var tmp_v in aff) {
+				aff[tmp_v] -= (farm_npcs.includes(tmp_v) ? (_FUNERAL_AFF_LOSS * 30) : _FUNERAL_AFF_LOSS);
+				aff[tmp_v] = (aff[tmp_v] < 0) ? 0 : aff[tmp_v];
 			}
 		}
-		if (flags['chicken_funeral'] <= 1) { flags['chicken_funeral'] = 0; }
 
 		// decrement flag counters
 		for (var key in flags) {
-			if (flags['cow1'] == 1) {
-				vars['cows']++;
-				flags['cow1'] = 0;
+			if (flags[key] > 1) {
+				// When certain extensions are done, animals warp inside
+				// Sometimes the dog warps outside
+				if (flags['kitchen'] == 2 || flags['bathroom'] == 2) {
+					flags['cows_outside'] = 0;
+					flags['chicken_outside'] = 0;
+				}
+				if (flags['stairway'] == 2) { flags['dog_inside'] = 0; }
+				flags[key]--;
 			}
-			if (flags['cow2'] == 1) {
-				vars['cows']++;
-				flags['cow2'] = 0;
-			}
-			if (flags['cow3'] == 1) {
-				vars['cows']++;
-				flags['cow3'] = 0;
-			}
-			if (flags[key] > 1) { flags[key]--; }
 		}
-		
+
+		// Married Affection
+		if (flags['photo_married'] == 1) {
+			aff[get_npc_id('karen')]--;
+			vars['days_married']++;
+			if (vars['days_married'] >= 30 && flags['baby'] == 0 && flags['babybed'] == 1 && aff[get_npc_id('karen')] >= 250) {
+				flags['baby'] = (_BABY_BORN_DAYS + 2);
+			}
+		}
+
 		// Horse Affection
 		if (flags['horse'] > 0) {
 			var horse_id = get_npc_id('horse');
@@ -112,7 +146,7 @@ function next_day(jump = false) {
 			aff[horse_id]--;
 			aff[horse_id] = ((aff[horse_id] < 0) ? 0 : aff[horse_id]);
 		}
-		
+
 		// Dog Affection
 		var dog_id = get_npc_id('dog');
 		if (aff[dog_id] === undefined) { aff[dog_id] = 0; }
@@ -120,39 +154,69 @@ function next_day(jump = false) {
 		aff[dog_id] = (aff[dog_id] < 0) ? 0 : aff[dog_id];
 
 		// Increment waters if raining
+		flags['yesterday_rain'] = 0;
 		if ($('.rainy').hasClass('selected')) {
+			flags['yesterday_rain'] = 1;
 			if (route_id == 0) {
-				if (flags['potato_planted'] == 1) {
+				if (get_month(vars['day']) == 0 && flags['potato_planted'] == 1) {
 					vars['potato_waters']++;
 				}
-				if (vars['day'] > 30 && flags['corn_planted'] == 1) {
+				if (get_month(vars['day']) == 1 && flags['corn_planted'] == 1) {
 					vars['corn_waters']++;
-				}
-				if (vars['potato_waters'] == _POTATO_GROW_DAYS) {
-					vars['potato_waters']++; // So it doesn't stay on 6 and add 9 potatoes every day
-					vars['potatoes'] += 9;
 				}
 			}
 		}
+		if (vars['potato_waters'] == _POTATO_GROW_DAYS) {
+			vars['potato_waters']++; // So it doesn't stay on 6 and add 9 potatoes every day
+			vars['potatoes'] += 9;
+		}
+		if ($('.typhoon').hasClass('selected')) {
+			flags['yesterday_rain'] = 1;
+
+			// Typhoon Chicken Death
+			if (vars['chickens'] > 0 && flags['chicken_outside'] == 1) {
+				flags['chicken_funeral'] = 1;
+			}
+		}
+
+		// Fix offset flags and vars
+		vars['watering_can_fill'] = ((vars['watering_can_fill'] > 30) ? 30 : ((vars['watering_can_fill'] < 0) ? vars['watering_can_fill'] : 0));
+		if (flags['old_mus_box'] < 0) { flags['old_mus_box'] = 0; }
 
 		vars['day']++;
 
 		// Increment chickens if one is born today
 		// Remove day from list if before today
 		if (vars['new_chicken_days'].length > 0) {
+			if (parseInt(vars['new_chicken_days'].substring(0, 3)) < vars['day']) {
+				vars['new_chicken_days'] = vars['new_chicken_days'].substring(3);
+			}
 			if (parseInt(vars['new_chicken_days'].substring(0, 3)) == vars['day']) {
 				vars['chickens']++;
 			}
-			if (parseInt(vars['new_chicken_days'].substring(0, 3)) < vars['day']) {
-				vars['new_chicken_days'] = vars['new_chicken_days'].substring(3);
+		}
+
+		// Increment cows if one is born today
+		// Remove day from list if before today
+		if (vars['new_cow_days'].length > 0) {
+			if (parseInt(vars['new_cow_days'].substring(0, 3)) < vars['day']) {
+				vars['new_cow_days'] = vars['new_cow_days'].substring(3);
+			}
+			if (parseInt(vars['new_cow_days'].substring(0, 3)) == vars['day']) {
+				vars['cows']++;
 			}
 		}
 	}
 
 	if (flags['dontsave'] == 0) {
 		// 0 = vars; 1 = flags; 2 = aff
+		
+		if (vars['corn_waters'] > 0 && get_month(vars['day']) != 1) {
+			vars['corn_waters'] = 0;
+		}
+		
 		for (var attr in vars) {
-			save_slots[cur_slot][0][attr] = ((attr.localeCompare('new_chicken_days') == 0) ? "" : 0);
+			save_slots[cur_slot][0][attr] = ((['new_chicken_days', 'new_cow_days'].includes(attr)) ? "" : 0);
             save_slots[cur_slot][0][attr] += vars[attr];
 		}
 		for (var attr in flags) {
@@ -165,6 +229,13 @@ function next_day(jump = false) {
 		}
 	}
 	flags['dontsave'] = 0;
+
+	// Clear Horse and Dog entries after race days
+	if ([18, 89, 110].includes(get_day(vars['day']))) {
+		flags['horse_entered'] = 0;
+		flags['dog_entered'] = 0;
+		flags['cow_entered'] = 0;
+	}
 
 	// Begin next day
 	update_day_gui(vars['day'], jump);
@@ -273,17 +344,7 @@ function calc_actions(a = null) {
 					console.log("undefined flag: " + a['cid']);
 				} else {
 					if (a['val'] !== undefined) {
-						
-						if (a['cid'].substring(2) == "new_mus_box") {
-							console.log(a['cid'].substring(2) + ": " + flags[a['cid'].substring(2)]);
-						}
-						
 						flags[a['cid'].substring(2)] += a['val'];
-						
-						if (a['cid'].substring(2) == "new_mus_box") {
-							console.log(a['cid'].substring(2) + ": " + flags[a['cid'].substring(2)]);
-						}
-						
 						if (!actions_today[a['cid']]) { actions_today[a['cid']] = 0; }
 						actions_today[a['cid']] += parseInt(a['val']);
 					} else {
@@ -296,7 +357,7 @@ function calc_actions(a = null) {
 					console.log("undefined var: " + a['cid']);
 				} else {
 					if (a['val'] !== undefined) {
-						if (a['cid'].localeCompare("v_new_chicken_days") == 0) {
+						if (['v_new_chicken_days', 'v_new_cow_days'].includes(a['cid'])) {
 							var tmp_day = parseInt(a['val']);
 							if (parseInt(a['val']) < 10) { tmp_day = "0" + tmp_day; }
 							if (parseInt(a['val']) < 100) { tmp_day = "0" + tmp_day; }
@@ -319,7 +380,7 @@ function calc_actions(a = null) {
 
 				if (aff[a['cid']] === undefined) { aff[a['cid']] = 0; }
 				aff[a['cid']] += a['val'];
-				
+
 				// 0 <= aff <= 255
 				aff[a['cid']] = ((aff[a['cid']] > 255) ? 255 : aff[a['cid']]);
 				aff[a['cid']] = ((aff[a['cid']] < 0) ? 0 : aff[a['cid']]);
@@ -334,7 +395,7 @@ function fish() {
 }
 
 function betting_table(a = []) {
-	var tmp_medals_needed = ((route_id == 0) ? ((vars['day'] < 120) ? 2000 : 1000) : 500);
+	var tmp_medals_needed = ((route_id == 0) ? ((vars['day'] < 120) ? 2500 : (flags['sustaining_carrot'] == 1) ? 1000 : 1500) : 500);
 	a.push({'desc':('<div class="ml-3">NEED:&nbsp;&nbsp;<input type="number" id="b_need" onchange="calc_bets()" style="margin-right:20px" value="' + tmp_medals_needed +
 			'" /></div>' + '<div class="ml-3">HAVE:&nbsp;&nbsp;<input type="number" id="b_have" onchange="calc_bets()" value="' + vars['medals'] + '" /></div>')});
 	for (var i = 0; i < 6; i++) {
@@ -366,32 +427,17 @@ function new_game(id = 0) {
 	// Clear forageable count
 	$("input[id^='for_']").val(0);
 
-	// Set affection of all characters to 0, display at top
-	// Characters listed based on route
-	var aff_html = [];
-	$('.status_row').remove();
+	// Set affection of included characters to 0
 	if (route_id == 0) {
-		for (var i = 0; i < 39; i++) {
-			aff[i] = 0;
-		}
-	}
-	for (let key in route_affs[route_id]) {
-		var npc_id = get_npc_id(route_affs[route_id][key]);
-		aff[npc_id] = 0;
-		aff_html.push('<div class="p-1 display_main">' +  route_affs[route_id][key].toUpperCase() + ': <span id="npc_' + npc_id + '">0</span></div>');
-	}
-
-	var tmp_html = '<div class="p-1 display_main">GOLD: <input type="number" id="disp_gold" value="300"  onchange="gold_update()" /></div>';
-	if (aff_html.length <= 3) {
-		$('#status_row1').html(tmp_html + aff_html.join(""));
+		for (var i = 0; i < 38; i++) { aff[i] = 0; }
 	} else {
-		$('#status_row1').html(tmp_html + aff_html[0] + aff_html[1] + aff_html[2]);
-		for (var i = 3; i < aff_html.length; i++) {
-			//TODO
-			// Multiple affections to track
-			// Put on multiple rows; four per row
+		for (var i = 0; i < route_affs[route_id].length; i++) {
+			aff[get_npc_id(route_affs[route_id][i])] = 0;
 		}
 	}
+	
+	// Characters listed based on route
+	$("#status_row").html(set_affections(route_id));
 
 	// Custom skip options
 	var html_list = [];
@@ -408,8 +454,6 @@ function new_game(id = 0) {
 	// Custom flags for particular run
 	if (route_id == 0) { // All Photos
 		vars['openers'] = 0;
-		vars['potato_waters'] = 0;
-		vars['corn_waters'] = 0;
 		flags['potato_planted'] = 0;
 		flags['corn_planted'] = 0;
 	}
@@ -426,7 +470,6 @@ function new_game(id = 0) {
 }
 
 function update_day_gui(d = vars['day'], jump = false) {
-
 	var m = get_month_name(d);
 
 	if (d % 30 == 1 || jump) {
@@ -439,33 +482,85 @@ function update_day_gui(d = vars['day'], jump = false) {
 	$('.display_main.day').html(get_day(d));
 	$('.display_main.dow').html(get_day_of_week(d, true));
 	$('.display_main.japanese').html(get_day_of_week(d, false, true));
-	for (let key in aff) {
-		$("#npc_" + key).html(aff[key]);
-		if (is_bachelorette(key)) {
-			$("#npc_" + key).parent().css('background-color', get_heart_color(aff[key]));
-		}
-	}
+	$('#happiness_meter').html(vars['happiness']);
 	$('#disp_gold').val(vars['gold']);
+
+	// Characters listed based on route
+	// All Photos is currently the only one where the affections listed
+	// 		at the top change during the run.
+	if (route_id == 0 && d != 3) {
+		$("#status_row").html(set_affections(route_id));
+	}
+
+	// Affections on top
+	$('[id^="npc_"]').each(function() {
+		var tmp_id = parseInt(this.id.substring(4));
+		$(this).html(aff[tmp_id]);
+		if (is_bachelorette(tmp_id)) {
+			$(this).parent().css('background-color', get_heart_color(aff[tmp_id]));
+		}
+	});
 
 	var html = "";
 	//Seasonal Foragables
-	tmp_cs = crop_seasons[get_month(d)];
+	var tmp_cs = [];
+	for (var i = 0; i < crop_seasons[get_month(d)].length; i++) {
+		tmp_cs.push(crop_seasons[get_month(d)][i]);
+	}
+	if (vars['potatoes'] > 0  && get_month(d) == 0) { // Potatoes in Spring
+		tmp_cs.push(crops.indexOf('potato'));
+	}
+	if (vars['corn_waters'] >= _CORN_GROW_DAYS && get_month(d) == 1) { // Corn in Summer
+		tmp_cs.push(crops.indexOf('corn'));
+	}
+	if (vars['chickens'] > 0) { // Eggs
+		tmp_cs.push(crops.indexOf('egg'));
+	}
+	if (flags['fishing_rod_stored'] == 0) { //Fish
+		var x = crops.indexOf('Fish S');
+		tmp_cs = tmp_cs.concat([x, x + 1, x + 2]);
+	}
+	if (vars['cows'] > 0) { // Milk
+		var x = crops.indexOf('milk s');
+		tmp_cs = tmp_cs.concat([x, x + 1, x + 2]);
+		if (flags['photo_cowfest'] == 1 || (flags['cow_entered'] == 1 && get_day(vars['day']) != 64)) {
+			tmp_cs.push(x + 3);
+		}
+	}
+
+	// Update Forage Inputs
 	for (var i = 0; i < tmp_cs.length; i++) {
 		html += '<div class="ml-3"><img class="forageDisp" id="img_for_' + tmp_cs[i] +
 			'" src="/img/item/' + crops[tmp_cs[i]].toLowerCase().replace(" ", "_") + '.png" ' +
 			'onclick="input_increment(this)" />&nbsp;';
 		html += '<input style="width:40px" type="number" value="0" id="for_' + tmp_cs[i] + '" /></div>';
 	}
-	
-	//Fish
-	for (var i = 13; i < 16; i++) {
-		html += '<div class="ml-3"><img class="forageDisp" id="img_for_' + i +
-			'" src="/img/item/' + crops[i].toLowerCase().replace(" ", "_") + '.png" ' +
-			'onclick="input_increment(this)" />&nbsp;';
-		html += '<input style="width:40px" type="number" value="0" id="for_' + i + '" /></div>';
-	}
 	$('#forage_display').html(html);
-	
+
+	// Flag Display
+	var flaglist = [];
+	for (var attr in flags) {
+		flaglist.push(attr);
+	}
+	flaglist.sort();
+	var val_html = '<div class="container">';
+	for (var i = 0; i < flaglist.length; i++) {
+		val_html += '<div class="d-flex flex-row"><div class="ml-4">' + flaglist[i].toLowerCase() + '</div><div class="ml-4"><input id="q_f_' + flaglist[i] + '" value="' + flags[flaglist[i]] + '" onchange="flag_update()" /></div></div>';
+	}
+	$("#all_values").html(val_html + "</div>");
+
+	// Affection Display
+	var afflist = [];
+	for (var i = 0; i < npcs.length; i++) {
+		afflist.push([aff[i], i]);
+	}
+	afflist.sort(function(a,b){return ((a[0] == undefined || b[0] == undefined) ? ((a[0] === undefined) ? 1 : -1) : b[0] - a[0]) });
+	val_html = "";
+	for (var i = 0; i < afflist.length; i++) {
+		val_html += '<div class="d-flex flex-row"><div class="ml-4">' + npcs[afflist[i][1]].toLowerCase() + '</div><div class="ml-4"><input id="q_n_' + afflist[i][1] + '" value="' + afflist[i][0] + '" onchange="npc_update()" /></div></div>';
+	}
+	$("#all_affs").html(val_html + "</div>");
+
 	/*
 	// Load Slot Menu
 	for (var i = 0; i < 4; i++) {
@@ -476,7 +571,6 @@ function update_day_gui(d = vars['day'], jump = false) {
 		}
 	}
 	*/
-	
 }
 
 function load_save(slot = cur_slot) {
@@ -484,7 +578,7 @@ function load_save(slot = cur_slot) {
 	if (!$.isEmptyObject(save_slots[slot][0])) {
 		reset_vars();
 		for (var attr in save_slots[slot][0]) {
-			vars[attr] = ((attr.localeCompare('new_chicken_days') == 0) ? "" : 0);
+			vars[attr] = ((['new_chicken_days', 'new_cow_days'].includes(attr)) ? "" : 0);
             vars[attr] += save_slots[slot][0][attr];
 		}
 		for (var attr in save_slots[slot][1]) {
@@ -499,37 +593,6 @@ function load_save(slot = cur_slot) {
 	} else {
 		console.log('empty slot');
 	}
-}
-
-function reset_vars() {
-	actions = [];
-	actions_all = {};
-	reset = false;
-	sell_stuff = false;
-
-	vars = { "chickens":0, "gold":300, "lumber":0, "day":3, "medals":0,
-			"feed":0, "fodder":0, "bridge_days_worked":0, "springs_days_worked":0,
-			"potatoes" : 0, "potato_waters" : 0, "watering_can_fill" : 0,
-			"new_chicken_days" : "" };
-	flags = { "treasure_map" : 0, "new_mus_box" : 0, "old_mus_box" : 0,
-			"fishing_rod" : 0, "dog_inside" : 0, "horse" : 0, "chicken_outside" : 0,
-			"new_chick" : 0, "chicken_funeral" : 0, "horse_brush" : 0,
-			"recipe_basil" : 0, 'recipe_sprite' : 0,
-			"dog_entered" : 0, "horse_entered" : 0,
-			"ankle_maria" : 0, "dream_maria" : 0, "sick_maria" : 0, "recipe_maria" : 0, "photo_maria" : 0,
-			"ankle_elli" : 0, "dream_elli" : 0, "sick_elli" : 0, "recipe_elli" : 0, "photo_elli" : 0,
-			"ankle_karen" : 0, "blue_feather" : 0, "propose" : 0,
-			"ankle_popuri" : 0, "dream_popuri" : 0, "sick_popuri" : 0, "recipe_popuri" : 0, "photo_popuri" : 0,
-			"ankle_ann" : 0, "dream_ann" : 0, "sick_ann" : 0, "recipe_ann" : 0, "photo_ann" : 0,
-			"photo_springs" : 0, "photo_swimming" : 0, "photo_cowfest" : 0, "photo_harvest" : 0,
-			"photo_horserace" : 0, "photo_dograce" : 0, "photo_married" : 0, "photo_baby" : 0,
-			"berry_kappa" : 0, "berry_flowerfest" : 0, "berry_strength" : 0,
-			"berry_eggfest" : 0, "berry_pond" : 0, "berry_farm" : 0, "berry_basil" : 0,
-			"wine_from_duke" : 0, "vineyard_restored" : 0,
-			"kitchen" : 0, "bathroom" : 0, "baby bed" : 0, "stairway" : 0, "log_terrace" : 0, "greenhouse" : 0,
-			"borrow_cows" : 0 , "harvest_king" : 0, "good_weather" : 1, "dontsave" : 0,
-			"cow1" : 0, "cow2" : 0, "cow3" : 0, "milker" : 0 };
-	aff = {};
 }
 
 function add_recipes() {
@@ -676,7 +739,7 @@ function get_toggle (abid = null, a = actions) {
 				}
 			}
 			if (!tmp_res.length) {
-				console.log("WARNING: toggle added to action button, but id doesnt exist - (T" + i + " = " + abid["t" + i] + ')');
+				console.log("WARNING: toggle added to action button, but id doesnt exist - (T" + i + " = " + abid["t" + i] + ' | desc = ' + abid['desc'] + ')');
 			}
 		}
 		result.push('[' + tmp_res.join(", ") + ']');
@@ -684,7 +747,7 @@ function get_toggle (abid = null, a = actions) {
 	return result.join(", ");
 }
 
-function get_npc_img(img_id = null) {
+function get_npc_img(img_id = null, for_title = false) {
 	var img_html = "";
 
 	// If array of values is given, loop through and send back first non-empty result
@@ -695,12 +758,24 @@ function get_npc_img(img_id = null) {
 		}
 		return "";
 	}
-	
+
 	// Only accept numbers; ignore 'v_xyz' and 'f_xyz' for flag and variable values
 	if (Number.isInteger(parseInt(img_id)) && img_id >= 0 && img_id < npcs.length) {
-		img_html = '<img class="forageDisp" src="/img/' + ((npcs[img_id].substring(0, 1) == "_") ? 'default' : ('npc/' + npcs[img_id].toLowerCase().replace(" ", "_"))) + '.png">';
-		if (aff[img_id] !== undefined) {
-			img_html = '<span style="font-size:12px; margin-left:2px">' + aff[img_id] + '</span>' + img_html;
+		img_html = '<img class="forageDisp" ';
+		if (for_title) {
+			img_html += ' style="margin-right:5px" ';
+		}
+		img_html += 'src="/img/' + ((npcs[img_id].substring(0, 1) == "_") ? 'default' : ('npc/' + npcs[img_id].toLowerCase().replace(" ", "_"))) + '.png">';
+		if (aff[img_id] !== undefined && !for_title) {
+			img_html = '<span style="font-size:12px; margin-left:2px' +
+			/*
+			 * 
+			 * TODO: change style of aff number next to img if >= 160 (photo min)
+			 *
+			 *	((aff[img_id] >= 160) ? ";background-color:lightgreen;" : "") +
+			 * 
+			*/
+				'">' + aff[img_id] + '</span>' + img_html;
 		}
 	}
 	return img_html;
@@ -814,7 +889,16 @@ function calc_bets(bet_type = 1) {
 				buy_amt -= (99 - odds[i][3]);
 				odds[i][3] = 99;
 			} else {
-				odds[i][3] += buy_amt;
+				var tmp_split = [i];
+				var j = i - 1;
+				while (j >= 0 && odds[j][3] == odds[i][3]) {
+					tmp_split.push(j);
+					j--;
+				}
+				for (var k = 0; k < tmp_split.length; k++) {
+					odds[tmp_split[k]][3] += Math.floor(buy_amt / tmp_split.length);
+				}
+				odds[i][3] += buy_amt % tmp_split.length;
 				buy_amt = 0;
 			}
 			i--;
@@ -870,24 +954,12 @@ function get_crop_id(n = null) {
 	return null;
 }
 
-function weather_change(update_gui = true) {
+function weather_change(update_gui = false) {
 	if (update_gui) {
 		update_day_gui();
 	}
 	var z = $('.weather.selected');
 	actions = get_actions(route_id, vars['day'], vars['gold'], (z.hasClass('sunny') ? 1 : (z.hasClass('typhoon') ? -1 : 0)));
-
-	/*
-	//Set forage values for next day
-	for (var i = 0; i < actions.length; i++) {
-		if (actions[i]['forage']) {
-			for (var j = 0; j < actions[i]['forage_list'].length; j++) {
-				$("#for_" + actions[i]['forage_list'][j][0]).val(actions[i]['forage_list'][j][1]);
-			}
-		}
-	}
-	*/
-
 	$('#hm64-content').html(to_html(actions));
 }
 
@@ -908,22 +980,22 @@ function is_festival (d = vars['day'], store_close_only = true) {
 }
 
 function festival_name (d = vars['day']) {
-	if (d == 1) { return "New Years Day"; }
-	if (d == 8) { return "Planting Festival"; }
-	if (d == 17 || d == 88) { return "Horse Race"; }
-	if (d == 23) { return "Flower Festival"; }
-	if (d == 31) { return "Fireworks Festival"; }
-	if (d == 39) { return "Vegetable Festival"; }
-	if (d == 47) { return "Firefly Festival"; }
-	if (d == 54) { return "Sea Festival"; }
-	if (d == 64) { return "Cow Festival"; }
-	if (d == 72) { return "Harvest Festival"; }
-	if (d == 80) { return "Egg Festival"; }
-	if (d == 100) { return "Thanksgiving"; }
-	if (d == 109) { return "Dog Race"; }
-	if (d == 114) { return "Starry Night"; }
-	if (d == 117) { return "Spirit Festival"; }
-	if (d == 120) { return "New Years Eve"; }
+	if (d % 120 == 1) { return "New Years Day"; }
+	if (d % 120 == 8) { return "Planting Festival"; }
+	if (d % 120 == 17 || d % 120 == 88) { return "Horse Race"; }
+	if (d % 120 == 23) { return "Flower Festival"; }
+	if (d % 120 == 31) { return "Fireworks Festival"; }
+	if (d % 120 == 39) { return "Vegetable Festival"; }
+	if (d % 120 == 47) { return "Firefly Festival"; }
+	if (d % 120 == 54) { return "Sea Festival"; }
+	if (d % 120 == 64) { return "Cow Festival"; }
+	if (d % 120 == 72) { return "Harvest Festival"; }
+	if (d % 120 == 80) { return "Egg Festival"; }
+	if (d % 120 == 100) { return "Thanksgiving"; }
+	if (d % 120 == 109) { return "Dog Race"; }
+	if (d % 120 == 114) { return "Starry Night"; }
+	if (d % 120 == 117) { return "Spirit Festival"; }
+	if (d % 120 == 120) { return "New Years Eve"; }
 	return null;
 }
 
@@ -960,7 +1032,14 @@ function get_heart_color(num = 0) {
 }
 
 function is_bachelorette(gid = null) {
-	return (gid == get_npc_id('elli') || gid == get_npc_id('karen') || gid == get_npc_id('ann') || gid == get_npc_id('popuri') || gid == get_npc_id('maria'));
+	// Accepts string or integer
+	var bachs = ['elli', 'karen', 'ann', 'popuri', 'maria'];
+	for (var i = 0; i < bachs.length; i++) {
+		if (gid == get_npc_id(bachs[i]) || bachs[i].localeCompare(gid) == 0) {
+			return true;
+		}
+	}
+	return false;
 }
 
 function get_month (num = null) {
@@ -988,9 +1067,27 @@ function get_day (num = null) {
 	return (num % 30 == 0) ? 30 : num % 30;
 }
 
+function flag_update() {
+	$("input[id^='q_f_']").each(function() {
+		if (flags[this.id.substring(4)] !== undefined) {
+			flags[this.id.substring(4)] = (isNaN(parseInt(this.value)) ? undefined : parseInt(this.value));
+		}
+	});
+	weather_change();
+}
+
+function npc_update() {
+	$("input[id^='q_n_']").each(function() {
+		if (aff[this.id.substring(4)] !== undefined) {
+			aff[this.id.substring(4)] = (isNaN(parseInt(this.value)) ? -1 : parseInt(this.value));
+		}
+	});
+	weather_change();
+}
+
 function gold_update() {
 	vars['gold'] = parseInt($('#disp_gold').val());
-	weather_change(false);
+	weather_change();
 }
 
 function arr_to_str(arr = []) {
@@ -999,6 +1096,44 @@ function arr_to_str(arr = []) {
 
 function ats (arr = []) {
 	return arr_to_str(arr);
+}
+
+function next_sunday(d = 3) {
+	return d + (7 - (d % 7));
+}
+
+function set_affections (rid = 0) {
+	if (rid > route_affs.length - 1) { rid = 0; }
+	if (!vars['gold']) { vars['gold'] = 300; }
+
+	var tmp_html = '<div class="p-1 display_main">GOLD: <input type="number" id="disp_gold" value="' + vars['gold'] + 
+					'"  onchange="gold_update()" /></div>';
+	var tx = route_affs[rid];
+	if (rid == 0) {
+		var tmp_day = get_day(vars['day']);
+		tx = [];
+
+		if (flags['photo_maria'] == 0) { tx.push('maria'); }
+		if (aff[get_npc_id('rick')] < _RICK_FIX_MIN) { tx.push('rick'); }
+		if (flags['photo_elli'] == 0) { tx.push('elli'); }
+		if (flags['wine_from_duke'] == 0 && aff[get_npc_id('bartender')] < _DUKE_WINE_MIN) { tx.push('bartender'); }
+		if (tx.length < 4 && aff[get_npc_id('sprite')] < _SPRITE_WINE_MIN) { tx.push('sprite'); }
+		if (tx.length < 4 && flags['photo_ann'] == 0) { tx.push('ann'); }
+		if (tx.length < 4 && ((vars['day'] % 120) > 14) && ((vars['day'] % 120) < 63)) { tx.push('basil'); }
+		if (tx.length < 4 && vars['day'] > 17) { tx.push('cliff'); }
+		if (tx.length < 4) { tx.push('mayor'); }
+		if (tx.length < 4) { tx.push('rick'); }
+	}
+	for (var i = 0; i < tx.length; i++) {
+		tmp_html += '<div class="p-1 display_main">';
+		if (route_id == 0) {
+			tmp_html += get_npc_img(get_npc_id(tx[i]), true);
+		} else {
+			tmp_html += npcs[get_npc_id(tx[i])].toUpperCase() + ': ';
+		}
+		tmp_html += '<span id="npc_' + get_npc_id(tx[i]) + '">' + aff[tx[i]] + '</span></div>';
+	}
+	return tmp_html;
 }
 
 function forage(need = 0, g = vars['gold'], d = vars['day']) {
@@ -1124,4 +1259,13 @@ function print_vars() {
 function load_input() {
 	save_slots[0] = JSON.parse($('#load_input').val());
 	load_save(0);
+}
+
+function cliff_maxed() {
+	return (aff[get_npc_id('cliff')] >= (_PARTY_ATTEND_MIN - (8 - (flags['photo_swimming'] * 8)) - (8 - (flags['photo_harvest'] * 8))));
+}
+
+function basil_min(d) {
+	var x = (_BASIL_BERRY_MIN - ((182 - d) * 6));
+	return ((x > _BASIL_BERRY_MIN) ? _BASIL_BERRY_MIN : x);
 }

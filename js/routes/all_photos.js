@@ -133,36 +133,55 @@ function get_actions_photos(d = 3, g = 300, is_sunny = 1) {
 	} // End of Spring Y2
 	
 	if (d > 150 && d <= 180) { // Summer Y2
-		if (d == 174) { // Swim Fest
-			a.push({'desc':"Win Swim Festival", 'iid':"mayor",
-				'cid':["f_photo_swimfest", "v_lumber", get_npc_id('jeff'),
-					get_npc_id('grey'), get_npc_id('harris'), get_npc_id('kai'), get_npc_id('cliff')],
-				'val':[1, 150, 8, 8, 8, 8, 8]
-			});
-		} else {
-			// TODO: Buy Staircase
-		}
+		a = actions_photos_sum_y2(a, d, g, is_sunny);
 	} // End of Summer Y2
-	
+
 	if (d > 180 && d <= 210) { // Fall Y2
-		if (d == 200) { // Egg Fest
-			a.push({'desc':"Egg Festival Berry", 'cid':["f_berry_eggfest", get_npc_id('mayor')], 'val':[1, 2]});
-			a.push({'desc':"Talk", 'cid':get_npc_id('rick'), 'val':2});
-			a.push({'desc':"Talk", 'cid':get_npc_id('cliff'), 'val':2});
-		}
+		a = actions_photos_fall_y2(a, d, g, is_sunny);
 	} // End of Fall Y2
 
 	if (d > 210 && d <= 240) { // Winter Y2
-		// TODO: Dog Race; Lumber (Win 19)
+		a = actions_photos_win_y2(a, d, g, is_sunny);
 	} // End of Winter Y2
-	
+
 	if (d > 240 && d <= 270) { // Spring Y3
-		// TODO: buy log terrace; greenhouse
-		// TODO: Full Grass Field
-		// TODO: Buy a Chicken
-		// TODO: Spam Doug w/ baby
-		// TODO: Spam Kent w/ baby or chicken (Spr 30)
+		a = actions_photos_spr_y3(a, d, g, is_sunny);
 	} // End of Spring Y3
 
 	return a;
+}
+
+function money_needed() {
+	var tmp_g = 0;
+
+	// Brush
+	tmp_g += (600 - 600 * ((flags['horse_brush'] === undefined) ? 0 : flags['horse_brush']));
+
+	// Milker
+	tmp_g += (1800 - 1800 * ((flags['milker'] === undefined) ? 0 : flags['milker']));
+
+	// Flower Fest Berry
+	tmp_g += (1000 - 1000 * ((flags['berry_flowerfest'] === undefined) ? 0 : flags['berry_flowerfest']));
+
+	// Extensions
+	for (var i = 0; i < extensions.length; i++) {
+		if (flags[extensions[i][0]] == 0) {
+			tmp_g += extensions[i][1];
+		}
+	}
+
+	// Grass
+	tmp_g += ((43 - vars['grass'] - vars['grass_planted']) * 500);
+
+	// Chicken
+	if (vars['chickens'] == 0 && flags['new_chick'] == 0 && vars['new_chicken_days'].length == 0) {
+		tmp_g += 1500;
+	}
+
+	// Selling Cows (Assuming 1 Gold Milk and the rest Large Milk)
+	if (vars['cows'] > 0) {
+		tmp_g -= ((vars['cows'] * 7500) + 1000);
+	}
+	
+	return (((tmp_g - vars['gold']) < 0) ? 0 : (tmp_g - vars['gold']));
 }

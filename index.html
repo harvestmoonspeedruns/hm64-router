@@ -18,11 +18,17 @@
 		<script src="js/routes/photos_sum1.js" type="text/javascript"></script>
 		<script src="js/routes/photos_fall1.js" type="text/javascript"></script>
 		<script src="js/routes/photos_win1.js" type="text/javascript"></script>
+		<script src="js/routes/photos_spr2.js" type="text/javascript"></script>
+		<script src="js/routes/photos_sum2.js" type="text/javascript"></script>
+		<script src="js/routes/photos_fall2.js" type="text/javascript"></script>
+		<script src="js/routes/photos_win2.js" type="text/javascript"></script>
+		<script src="js/routes/photos_spr3.js" type="text/javascript"></script>
+
 		<script src="js/routes/elli_route.js" type="text/javascript"></script>
 		<script src="js/routes/karen_route.js" type="text/javascript"></script>
 		<script src="js/routes/popuri_route.js" type="text/javascript"></script>
 		<script src="js/routes/elli_photo.js" type="text/javascript"></script>
-		
+
 		<script src="js/data.js" type="text/javascript"></script>
 		<script src="js/script.js" type="text/javascript"></script>
 	</head>
@@ -101,10 +107,10 @@
 		<div class="container">
 
 			<div class="d-flex flex-row">
-				<div class="ml-4"  style="display:none">
+				<div class="ml-4" style="display:none">
 					<button type="button" class="btn btn-danger" onclick="jump_prev()" id="jump_prev">Go Back</button>
 				</div>
-				<div class="ml-4"  style="display:none">
+				<div class="ml-4" style="display:none">
 					<button type="button" class="btn btn-danger" onclick="jump_next()" id="jump_next">Go Forward</button>
 				</div>
 			</div>
@@ -114,9 +120,13 @@
 				<div class="ml-2 display_main day">3</div>
 				<div class="ml-2 display_main dow">WED</div>
 				<div class="ml-2 display_main japanese">水</div>
+				<div class="ml-2 display_main happiness">
+					<img src="/img/smile.png" style="height:20px;margin-right:5px"/>
+					<span id="happiness_meter">0</span>
+				</div>
 			</div>
 
-			<div class="d-flex flex-row" id="status_row1">
+			<div class="d-flex flex-row" id="status_row">
 				<div class="p-1 display_main">
 					GOLD: <input type="number" id="disp_gold" value="300" onchange="gold_update()" />
 				</div>
@@ -142,10 +152,15 @@
 				</div>
 			</div>
 
-		</div>
-		
+		</div><br/>
+
 		<input type="text" id="load_input" />
-		<button type="button" onclick="load_input()">LOAD</button>
+		<button type="button" onclick="load_input()">LOAD</button> = -
+		<br/><br/>
+		<button type="button" id="flag_disp_btn" class="btn btn-warning" onclick="toggle_flags()">SHOW FLAGS</button>
+		<div id="all_values" style="display:none"> </div>
+		<button type="button" id="aff_disp_btn" class="btn btn-danger" onclick="toggle_affs()">SHOW AFFS</button>
+		<div id="all_affs" style="display:none"> </div>
 	</body>
 
 	<script>
@@ -156,9 +171,31 @@
 			$(this).addClass('selected');
 			weather_change();
 		});
-		
+
 		function input_increment(item) {
 			$("#" + item.id.substring(4)).val(parseInt($("#" + item.id.substring(4)).val()) + 1);
+		}
+
+		function toggle_flags() {
+			if ($('#all_values').is(":hidden")) {
+				$("#flag_disp_btn").html("HIDE FLAGS");
+				$("#flag_disp_btn").removeClass('btn-warning').addClass('btn-success');
+			} else {
+				$("#flag_disp_btn").html("SHOW FLAGS");
+				$("#flag_disp_btn").removeClass('btn-success').addClass('btn-warning');
+			}
+			$('#all_values').toggle();
+		}
+
+		function toggle_affs() {
+			if ($('#all_affs').is(":hidden")) {
+				$("#aff_disp_btn").html("HIDE AFFS");
+				$("#aff_disp_btn").removeClass('btn-warning').addClass('btn-success');
+			} else {
+				$("#aff_disp_btn").html("SHOW AFFS");
+				$("#aff_disp_btn").removeClass('btn-success').addClass('btn-warning');
+			}
+			$('#all_affs').toggle();
 		}
 	</script>
 
