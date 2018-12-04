@@ -31,6 +31,7 @@ function reset_vars() {
 			"wine_from_duke" : 0, "vineyard_restored" : 0, "baby" : 0,
 			"kitchen" : 0, "bathroom" : 0, "babybed" : 0, "stairway" : 0, "logterrace" : 0, "greenhouse" : 0,
 			"borrow_cows" : 0 , "harvest_king" : 0, "good_weather" : 1, "dontsave" : 0,
+			"cutscene_beach" : 0, "cutscene_rabbit" : 0, "cutscene_watermelon" : 0, "cutscene_bug" : 0, "cutscene_cookfish" : 0,
 			"fishing_rod_stored" : 0};
 	aff = {};
 }
@@ -646,6 +647,10 @@ function to_html(a = actions) {
 	var cur_div = null;
 	var div_list = [];
 	for (var i = 0; i < a.length; i++) {
+		if (a[i]['val'] !== undefined) {
+			if (a[i]['red'] == true) { a[i]['sel'] = false;}
+			else if (a[i]['imp'] == true) { a[i]['sel'] = true;}
+		}
 		if (a[i]['sr'] !== true) {
 			lines++;
 			if (i != 0) { html += "</div>"; }
@@ -671,6 +676,8 @@ function to_html(a = actions) {
 			html += '<div class="d-flex justify-content-start" style="margin-bottom:5px;';
 			if (a[i]['imp'] == true) {
 				html += ' background-color:yellow;';
+			} else if (a[i]['red'] == true) {
+				html += ' background-color:pink;';
 			}
 			html += '">';
 		}

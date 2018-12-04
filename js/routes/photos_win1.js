@@ -96,8 +96,8 @@ function actions_photos_win_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 				});
 
 				// CLIFF
-				if (["TUES", "WED"].includes(dow) && aff[cliff_id] < _PARTY_ATTEND_MIN && (aff[elli_id] < 170 || dow == "WED")) {
-					// Beach cutscene between Karen and Elli occurs when Elli is >= 170-ish
+				if (["TUES", "WED"].includes(dow) && aff[cliff_id] < _PARTY_ATTEND_MIN && (aff[elli_id] < 160 || dow == "WED")) {
+					// Beach cutscene between Karen and Elli occurs when Elli is >= 160-ish
 					a.push({'desc':get_cliff_loc(dow), 'cid':cliff_id, 'val':2});
 					a.push({'desc':"Gift    ", 'cid':cliff_id, 'val':4, 't2':"Egg ", 'sr':true});
 					a.push({'desc':"Egg ", 'cid':cliff_id, 'val':8, 'sel':false, 't2':"Gift    ", 'sr':true});

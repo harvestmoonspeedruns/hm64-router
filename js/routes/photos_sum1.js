@@ -399,8 +399,8 @@ function ranch_stuff_sum(tmp_act = [], dow = get_dow(vars['day']), is_sunny = 1)
 				// "Gift    " <- 4 spaces
 				// "Egg " <- 1 space
 				var cliff_id = get_npc_id('cliff');
-				if (["TUES", "WED"].includes(dow) && aff[cliff_id] < _PARTY_ATTEND_MIN && (aff[elli_id] < 170 || dow == "WED")) {
-					// Beach cutscene between Karen and Elli occurs when Elli is >= 170-ish
+				if (["TUES", "WED"].includes(dow) && aff[cliff_id] < _PARTY_ATTEND_MIN && (aff[elli_id] < 160 || dow == "WED")) {
+					// Beach cutscene between Karen and Elli occurs when Elli is >= 160-ish
 
 					tmp_act.push({'desc':get_cliff_loc(dow), 'cid':cliff_id, 'val':2});
 					tmp_act.push({'desc':"Gift    ", 'cid':cliff_id, 'val':4, 't2':"Egg ", 'sr':true});

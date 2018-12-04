@@ -357,8 +357,8 @@ function ranch_stuff_fall(tmp_act = [], dow = get_dow(vars['day']), is_sunny = 1
 			// CLIFF
 			// "Gift    " <- 4 spaces
 			// "Egg " <- 1 space
-			if (["TUES", "WED"].includes(dow) && (aff[elli_id] < 170 || dow == "WED") && !cliff_maxed(aff[cliff_id])) {
-				// Beach cutscene between Karen and Elli occurs when Elli is >= 170-ish
+			if (["TUES", "WED"].includes(dow) && (aff[elli_id] < 160 || dow == "WED") && !cliff_maxed(aff[cliff_id])) {
+				// Beach cutscene between Karen and Elli occurs when Elli is >= 160-ish
 
 				tmp_act.push({'desc':("Talk (" + ((dow == "WED") ? "Ranch) " : "Beach) ")), 'cid':cliff_id, 'val':2});
 				tmp_act.push({'desc':" Gift", 'cid':cliff_id, 'val':4, 't2':" Egg", 'sr':true, 'sel':(vars['chickens'] == 0 || (!(aff[elli_id] >= _PHOTO_MIN || (dow == "MON" && aff[elli_id] >= 170))))});
@@ -367,10 +367,8 @@ function ranch_stuff_fall(tmp_act = [], dow = get_dow(vars['day']), is_sunny = 1
 
 			// ELLI Beach
 			// "Gift " <- 1 space
-			if (dow == "MON" && aff[elli_id] < 170) {
-				// Cutscene between Karen and Elli occurs when Elli is >= 170-ish,
-				// so to avoid this cutscene, dont visit the beach when Elli is >=170
-				// (The lowest Ive seen it is 174, but 170 to be safe)
+			if (dow == "MON" && aff[elli_id] < 160) {
+				// Cutscene between Karen and Elli occurs when Elli is >= 160-ish
 
 				tmp_act.push({'desc':"Talk (Beach)", 'cid':elli_id, 'val':1, 't2':"MusBox "});
 				tmp_act.push({'desc':"MusBox ", 'cid':[elli_id, 'f_new_mus_box'], 'val':[_MUS_BOX_AFF, -1],
