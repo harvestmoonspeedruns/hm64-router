@@ -1,14 +1,14 @@
 ## ACTION PROPERTIES
-"desc" - (Description) Words that appear on the action button. REQUIRED
-"cid" - (Char ID) Variable, flag, or npc id that changes by the value if this button is selected. "v_" precedes variables and "f_" precedes flags.
-"val" - (Value) Value that the item indicated by the CID changes by if this button is selected
-"sr" - (Same Row) If true, this action will appear on the same row as the previous action. Default: false
-"iid" - (Image ID) ID of NPC whose image will appear to the left of the text. Overwrites an npc ID "cid" value
-"sel" - (Selected) If true, action starts as selected. If false, action will start deselected. Default is true.
-"t1" - If this action is turned off, turn the action with this description off
-"t2" - If this action is turned off, turn the action with this description on
-"t3" - If this action is turned on, turn the action with this description off
-"t4" - If this action is turned on, turn the action with this description on
+* **"desc"** - (Description) Words that appear on the action button. REQUIRED
+* **"cid"** - (Char ID) Variable, flag, or npc id that changes by the value if this button is selected. "v_" precedes variables and "f_" precedes flags.
+* **"val"** - (Value) Value that the item indicated by the CID changes by if this button is selected
+* **"sr"** - (Same Row) If true, this action will appear on the same row as the previous action. Default: false
+* **"iid"** - (Image ID) ID of NPC whose image will appear to the left of the text. Overwrites an npc ID "cid" value
+* **"sel"** - (Selected) If true, action starts as selected. If false, action will start deselected. Default is true.
+* **"t1"** - If this action is turned off, turn the action with this description off
+* **"t2"** - If this action is turned off, turn the action with this description on
+* **"t3"** - If this action is turned on, turn the action with this description off
+* **"t4"** - If this action is turned on, turn the action with this description on
 
 ## VARS
 * **bridge_days_worked**: Counter for the number of days you have worked on the bridge. If it equals four on Fall 27, the next_day function in script.js will increment affection for villagers
