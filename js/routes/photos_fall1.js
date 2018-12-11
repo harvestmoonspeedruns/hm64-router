@@ -69,7 +69,9 @@ function actions_photos_fall_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 		// End of Chicken Cycling
 		if (flags['chicken_outside'] == 0) {
 			a.push({'desc':"Bring Chickens & Chicks Outside", 'cid':'f_chicken_outside', 'val':(1 - flags['chicken_outside']), 'imp':true, 'iid':chicken_id});
-			a.push({'desc':"Scare Birds", 'cid':'v_happiness', 'val':1, 'sel':false, 'sr':true});
+			if (is_sunny == 1) {
+				a.push({'desc':"Scare Birds", 'cid':'v_happiness', 'val':1, 'sel':false, 'sr':true});
+			}
 			if (flags['new_chick'] < 2) {
 				if (flags['new_chick'] == 1) {
 					a.push({'desc':"New Chick", 'cid':["v_new_chicken_days", "f_new_chick"], 'val':[d + _CHICK_GROW_SLEEPS, -1], 'iid':chicken_id});

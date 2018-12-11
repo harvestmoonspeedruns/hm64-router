@@ -660,7 +660,7 @@ function to_html(a = actions, show_red = true) {
 	for (var i = 0; i < a.length; i++) {
 		if (a[i]['sr'] !== true) {
 			is_red = (a[i]['red'] === true);
-			if (is_red && !show_red) {
+			if (!is_red || show_red) {
 				lines++;
 				if (i != 0) { html += "</div>"; }
 				if (a[i]['div'] != cur_div) {
@@ -691,7 +691,7 @@ function to_html(a = actions, show_red = true) {
 				html += '">';
 			}
 		}
-		if (is_red && !show_red) {
+		if (!is_red || show_red) {
 			if (a[i]['val'] === undefined) {
 				if (a[i]['b_table']) {
 					// Bet table
@@ -743,6 +743,7 @@ function to_html(a = actions, show_red = true) {
 			html = html.replace('textHov', 'textHvrSmall');
 		}
 	}
+	
 	return html;
 }
 

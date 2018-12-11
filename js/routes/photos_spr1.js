@@ -86,7 +86,9 @@ function actions_photos_spr_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 					a.push({'desc':"Dig a Berry", 'val':1, 'cid':'f_berry_farm', 'sr':true, 'sel':false});
 				}
 			}
-			a.push({'desc':"Scare Birds", 'cid':'v_happiness', 'val':1});
+			if (is_sunny == 1) {
+				a.push({'desc':"Scare Birds", 'cid':'v_happiness', 'val':1, 'sel':false});
+			}
 		}
 
 		// Horse Affection
@@ -123,7 +125,9 @@ function actions_photos_spr_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 			a.push({'desc':"Equip Watering Can"});
 			if (vars['watering_can_fill'] < 30) {
 				a.push({'desc':"Fill Watering Can", 'cid':'v_watering_can_fill', 'val':30, 'sr':true, 'sel':(vars['watering_can_fill'] <= 10)});
-				a.push({'desc':"Scare Birds", 'cid':'v_happiness', 'val':1, 'sel':false, 'sr':true});
+				if (is_sunny == 1) {
+					a.push({'desc':"Scare Birds", 'cid':'v_happiness', 'val':1, 'sel':false, 'sr':true});
+				}
 			}
 			a.push({'desc':"Water Potatoes", 'cid':['v_potato_waters', 'v_watering_can_fill'], 'val':[1, -10], 'imp':true, 'sel':false});
 			if (sell_stuff) {
@@ -550,7 +554,9 @@ function actions_photos_spr_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 			a.push({'desc':"Equip Watering Can"});
 			a.push({'desc':"Water Potatoes", 'cid':['v_potato_waters', 'v_watering_can_fill'], 'val':[1, -10], 'sr':true, 'imp':true, 'sel':false});
 			a.push({'desc':"Fill Watering Can", 'cid':'v_watering_can_fill', 'val':30, 'sel':(vars['watering_can_fill'] <= 10)});
-			a.push({'desc':"Scare Birds", 'cid':'v_happiness', 'val':1, 'sel':false, 'sr':true});
+			if (is_sunny == 1) {
+				a.push({'desc':"Scare Birds", 'cid':'v_happiness', 'val':1, 'sel':false, 'sr':true});
+			}
 		}
 
 		if (get_horse || (is_sunny == 1 && flags['chicken_inside'] == 1)) {

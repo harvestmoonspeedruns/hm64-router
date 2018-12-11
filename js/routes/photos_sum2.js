@@ -78,8 +78,9 @@ function actions_photos_sum_y2(a, d, g, is_sunny) {
 				}
 			} else {
 				// Cutscene with Cliff + Ann when Cliff >= 143 affection
-				if (is_sunny == 1 && aff[cliff_id] >= 143) {
+				if (is_sunny == 1 && aff[cliff_id] >= 143 && flags['cutscene_rabbit'] == 0) {
 					a.push({'desc':"Dont go to Carp House Screen", 'imp':true});
+					a.push({'desc':"Rabbit Cutscene", 'sel':false, 'cid':'f_cutscene_rabbit', 'val':1, 'sr':true});
 				} else if (dow != "TUES") {
 					// Extensions on rainy days to avoid cutscenes if Cliff aff >= 143
 					var tmp_build_ext = false;
@@ -127,8 +128,8 @@ function actions_photos_sum_y2(a, d, g, is_sunny) {
 
 					// CLIFF
 					if (tmp_build_ext) {
-						a.push({'desc':("Talk (" + ((is_sunny == 0) ? "In Carp House)" : ((["FRI", "SAT"].includes(dow)) ? "Fish Tent 50%)" : "Carp Screen)"))),
-								'sel':false, 'cid':cliff_id, 'val':2
+						a.push({'desc':("Talk (" + ((is_sunny == 0) ? "In Carp House 50%)" : ((["FRI", "SAT"].includes(dow)) ? "Fish Tent 50%)" : "Carp Screen)"))),
+								'sel':false, 'cid':cliff_id, 'val':2, 'red':(aff[cliff_id] >= _PARTY_ATTEND_MIN)
 						});
 						a.push({'desc':" Gift", 'cid':cliff_id, 'val':4, 't2':" Egg", 'sr':true, 'sel':false});
 						a.push({'desc':" Egg", 'cid':cliff_id, 'val':8, 't2':" Gift", 'sr':true, 'sel':false});
@@ -136,7 +137,7 @@ function actions_photos_sum_y2(a, d, g, is_sunny) {
 				} // End of Buy Extensions
 
 				// Basil nearing min value for Spring Power Nut
-				if (aff[basil_id] < basil_min(d)) {
+				if (aff[basil_id] < basil_min(d) && flags['berry_basil'] == 0) {
 					if (["FRI", "SAT"].includes(dow) && is_sunny == 1) {
 						a = mtn_visit_sum2(a, d, g, is_sunny);
 						mtn_visit = true;
@@ -164,9 +165,9 @@ function actions_photos_sum_y2(a, d, g, is_sunny) {
 						mtn_visit = true;
 					}
 
-					if (dow == "THURS" && aff[basil_id] < _BASIL_BERRY_MIN && aff[basil_id] >= basil_min(d)) {
-						a.push({'desc':"Talk (Greenhouse)", 'cid':basil_id, 'val':3});
-						a.push({'desc':"Gift", 'cid':basil_id, 'val':3, 'sr':true});
+					if (flags['berry_basil'] == 0 && dow == "THURS" && aff[basil_id] >= basil_min(d)) {
+						a.push({'desc':"Talk (Greenhouse)", 'cid':basil_id, 'val':3, 'sel':(aff[basil_id] < _BASIL_BERRY_MIN && (aff[basil_id] < _PARTY_ATTEND_MIN || flags['berry_mine'] == 0)), 'red':(aff[basil_id] >= _BASIL_BERRY_MIN || (aff[basil_id] >= _PARTY_ATTEND_MIN && flags['berry_mine'] == 1))});
+						a.push({'desc':"Gift", 'cid':basil_id, 'val':3, 'sr':true, 'sel':(aff[basil_id] < _BASIL_BERRY_MIN && (aff[basil_id] < _PARTY_ATTEND_MIN || flags['berry_mine'] == 0))});
 					}
 
 					var tmp_seeds = Math.floor((vars['gold'] - (980 - 980 * flags['blue_feather'])) / 500);
@@ -178,22 +179,26 @@ function actions_photos_sum_y2(a, d, g, is_sunny) {
 					}
 
 					// RICK
-					a.push({'desc':"Talk", 'cid':rick_id, 'val':3, 'sel':(aff[rick_id] < _PHOTO_MIN)});
+					a.push({'desc':"Talk", 'cid':rick_id, 'val':3, 'sel':(aff[rick_id] < _PHOTO_MIN), 'red':(aff[rick_id] >= _PHOTO_MIN)});
 					a.push({'desc':"Gift", 'cid':rick_id, 'val':3, 'sr':true, 'sel':(aff[rick_id] < _PHOTO_MIN)});
 					a.push({'desc':"Buy Blue Feather", 'cid':['v_gold', 'f_blue_feather'], 'val':[-980, 1], 'sr':true,
 							't0':["Propose at Bar"], 't3':"Propose at Bar"});
-					if (aff[cliff_id] <= 142) {
+					if (aff[cliff_id] <= 142 || flags['cutscene_rabbit'] == 1) {
 						a[a.length - 1]['t0'].push("Propose in Mtns");
 					}
 
 					// MAYOR
-					if (aff[mayor_id] < _PARTY_ATTEND_MIN) {
-						// When Ann aff >= 153, Watermelon cutscene occurs with Maria
-						// Dont enter second village screen when Ann's affection >= ~153
-						// (Not sure what the min value for this is, but it happened for me at 153)
-						// 118 < trigger < 154
-						a.push({'desc':"Talk (Rick Shop 50%)", 'cid':mayor_id, 'val':3, 'sel':false});
-						a.push({'desc':"Gift", 'cid':mayor_id, 'val':3, 'sr':true, 'sel':false});
+					// "  Talk" <- -2 spaces
+					// "  Gift" <- -2 spaces
+					if (is_sunny == 1 && dow != "SUN") {
+						if (flags['cutscene_watermelon'] == 0 && aff[ann_id] >= 153) {
+							// When Ann aff >= 153, Watermelon cutscene occurs with Maria on second village screen
+							// 118 < trigger < 154
+							a.push({'desc':"WARNING: Cutscene plays at 2nd Village Screen", 'imp':true});
+							a.push({'desc':"Watermelon Cutscene", 'val':1, 'cid':'f_cutscene_watermelon', 'sr':true, 'sel':false});
+						}
+						a.push({'desc':"Talk (Rick Shop 50%)", 'cid':mayor_id, 'val':3, 'sel':false, 'red':(aff[mayor_id] >= _PARTY_ATTEND_MIN)});
+						a.push({'desc':"  Gift", 'cid':mayor_id, 'val':3, 'sr':true, 'sel':false});
 					}
 
 					// Propose to Karen in Mtns
