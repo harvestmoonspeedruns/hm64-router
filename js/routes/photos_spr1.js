@@ -31,7 +31,8 @@ function actions_photos_spr_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 	if (vars['openers'] == 0) { a.push({'desc':"Equip hoe"}); }
 
 	if (d == 15) { a.push({'desc':"Ignore Basil on the Farm", 'iid':basil_id}); }
-	if (d == 18) { a.push({'desc':"Ignore Cliff on the Farm", 'iid':cliff_id}); }
+	if (d == 18) { a.push({'desc':"Feed Cliff on the Farm", 'cid':cliff_id, 'val':5}); }
+	if (d == 25) { a.push({'desc':"Ignore Karen on the Farm", 'iid':karen_id}); }
 
 	if (d == 3) { // Spring 3
 		a.push({'desc':"Greet the Mayor", 'iid':mayor_id});
@@ -90,8 +91,8 @@ function actions_photos_spr_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 
 		// Horse Affection
 		if (flags['horse'] != 0) {
-			a.push({'desc':"Whistle Horse", 'val':1, 'cid':get_npc_id('horse')});
-			a.push({'desc':((flags['horse'] == 1) ? "Ride Horse": "Talk to Horse"), 'val':1, 'cid':a[a.length - 1]['cid'], 'sr':true});
+			a.push({'desc':"Whistle Horse", 'val':1, 'cid':get_npc_id('horse'), 'sel':false});
+			a.push({'desc':((flags['horse'] == 1) ? "Ride Horse": "Talk to Horse"), 'val':1, 'cid':a[a.length - 1]['cid'], 'sr':true, 'sel':false});
 		}
 
 		if (d == 23) { // Flower Fest
@@ -179,8 +180,8 @@ function actions_photos_spr_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 		// Horse Affection
 		if (flags['horse'] > 0) {
 			var horse_id = get_npc_id('horse');
-			a.push({'desc':"Whistle Horse", 'val':1, 'cid':horse_id});
-			a.push({'desc':((flags['horse'] == 1) ? "Ride Horse": "Talk to Horse"), 'val':1, 'cid':horse_id, 'sr':true});
+			a.push({'desc':"Whistle Horse", 'val':1, 'cid':horse_id, 'sel':false});
+			a.push({'desc':((flags['horse'] == 1) ? "Ride Horse": "Talk to Horse"), 'val':1, 'cid':horse_id, 'sr':true, 'sel':false});
 		}
 
 		if (d < 7 && aff[karen_id] < 50 && flags['dog_inside'] == 0) {
@@ -300,11 +301,11 @@ function actions_photos_spr_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 				a.push({'desc':"Talk (MTN)", 'cid':elli_id, 'val':1, 'sr':(aff[elli_id] == 0)});
 				a.push({'desc':"Gift ", 'cid':elli_id, 'val':1, 'sr':true,
 					't2':((vars['chickens'] > 0) ? "Egg" : "M/L Fish"),
-					'sel':(vars['chickens'] == 0 || flags['new_chick'] == 1)
+					'sel':(d != 24 && (vars['chickens'] == 0 || flags['new_chick'] == 1))
 				});
 				a.push({
 					'desc':((vars['chickens'] > 0) ? "Egg" : "M/L Fish"), 'sr':true, 't2':"Gift ",
-					'sel':(!(vars['chickens'] == 0 || flags['new_chick'] == 1)),
+					'sel':(d == 24 || (vars['chickens'] > 0 && flags['new_chick'] != 1)),
 					'cid':((vars['chickens'] > 0 && flags['recipe_elli'] == 0) ? ['f_recipe_elli', elli_id] : elli_id),
 					'val':((vars['chickens'] > 0) ? ((flags['recipe_elli'] == 0) ? ([1, 6]) : 4) : 3)
 				});
@@ -325,7 +326,7 @@ function actions_photos_spr_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 				// "Gift    " <- 4 spaces
 				// "Egg " <- 1 space
 				if (d > 17) {
-					a.push({'desc':"Talk (Hot Springs)", 'cid':cliff_id, 'val':2, 'sel':false});
+					a.push({'desc':"Talk (Hot Springs)", 'cid':cliff_id, 'val':2, 'sel':false, 'red':true});
 					a.push({'desc':"Gift    ", 'cid':cliff_id, 'val':4, 't2':"Egg ", 'sr':true, 'sel':false});
 					a.push({'desc':"Egg ", 'cid':cliff_id, 'val':8, 't2':"Gift    ", 'sr':true, 'sel':false});
 				}
@@ -374,10 +375,14 @@ function actions_photos_spr_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 				a.push({'desc':"Egg ", 'cid':cliff_id, 'val':8, 'sel':false, 't2':"Gift    ", 'sr':true});
 			}
 			if (["THURS", "SUN"].includes(dow) && d > 17) {
-				a.push({'desc':"Talk (Carp House)", 'cid':cliff_id, 'val':2, 'sel':false});
+				a.push({'desc':"Talk (Carp House)", 'cid':cliff_id, 'val':2, 'sel':false, 'red':((vars['chickens'] > 0 || g >= 1500) && (dow != "MON" || is_sunny == 0))});
 				a.push({'desc':"Gift    ", 'cid':cliff_id, 'val':4, 't2':"Egg ", 'sr':true, 'sel':false});
 				a.push({'desc':"Egg ", 'cid':cliff_id, 'val':8, 't2':"Gift    ", 'sr':true, 'sel':false});
 			}
+		}
+
+		if (!get_horse && is_sunny == 0) {
+			a.push({'desc':"ed, ber, flower"}); // Quick gifts for villagers
 		}
 
 		// BASIL
@@ -401,13 +406,13 @@ function actions_photos_spr_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 			}
 			a.push({'desc':"Gift ", 'cid':elli_id, 'val':1, 'sr':true,
 				't2':((vars['chickens'] > 0) ? "Egg" : "M/L Fish"),
-				'sel':(vars['chickens'] == 0 || flags['new_chick'] < 2)
+				'sel':(d != 24 && (vars['chickens'] == 0 || flags['new_chick'] == 1))
 			});
 			a.push({
 				'desc':((vars['chickens'] > 0) ? "Egg" : "M/L Fish"), 'sr':true, 't2':"Gift ",
-				'sel':(vars['chickens'] > 0 && flags['new_chick'] >= 2),
+				'sel':(d == 24 || (vars['chickens'] > 0 && flags['new_chick'] != 1)),
 				'cid':((vars['chickens'] > 0 && flags['recipe_elli'] == 0) ? ['f_recipe_elli', elli_id] : elli_id),
-				'val':((vars['chickens'] > 0) ? (flags['recipe_elli'] ? 4 : [1, 6]) : 3)
+				'val':((vars['chickens'] > 0) ? ((flags['recipe_elli'] == 0) ? ([1, 6]) : 4) : 3)
 			});
 		}
 
@@ -580,9 +585,7 @@ function actions_photos_spr_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 	}
 
 	// Feed Dog
-	if (vars['chickens'] > 0) {
-		a.push({'desc':"Feed Dog", 'cid':get_npc_id('dog'), 'val':2, 'sel':false});
-	}
+	a.push({'desc':"Feed Dog", 'cid':get_npc_id('dog'), 'val':2, 'sel':false, 'red':(vars['chickens'] == 0)});
 
 	// End of Season, save potatoes
 	if (d == 30 && vars['potatoes'] > 0) {

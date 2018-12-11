@@ -28,8 +28,12 @@ function actions_photos_spr_y2(a = [], d = 3, g = 300, is_sunny = 1) {
 	}
 
 	// Basil berry
-	if (d == 135 && aff[basil_id] >= _BASIL_BERRY_MIN) {
-		a.push({'desc':"Berry from Basil", 'cid':[basil_id, 'f_berry_basil'], 'val':[3, 1], 'imp':true});	
+	if (d == 135) {
+		a.push({'desc':"Ignore Basil on Farm", 'cid':[basil_id, 'f_berry_basil'], 'val':[0, 0], 'imp':true});
+		if (aff[basil_id] >= _BASIL_BERRY_MIN) {
+			a[a.length - 1]['desc'] = "Berry from Basil"
+			a[a.length - 1]['val'] = [3, 1];
+		}
 	}
 
 	// Enter Horse Race
@@ -41,14 +45,18 @@ function actions_photos_spr_y2(a = [], d = 3, g = 300, is_sunny = 1) {
 		}
 	}
 
+	// Horse Affection
 	var horse_id = get_npc_id('horse');
-	if (flags['photo_horserace'] == 0 && !(flags['horse_entered'] && d == 137)) {
-		if (flags['horse_brush'] == 1 && (aff[horse_id] < (255 - 3 - flags["sustaining_carrot"]))) {
-			a.push({'desc':"Equip brush", 'iid':horse_id});
+	if (flags['photo_horserace'] == 0) {
+		if (flags['horse_brush'] == 1 && aff[horse_id] < (255 - 4 - flags["sustaining_carrot"])) {
+			a.push({'desc':"Equip Brush", 'iid':horse_id, 'sel':false});
 		}
-		a.push({'desc':"Whistle / Ride Horse", 'val':(2 + flags["sustaining_carrot"]), 'cid':horse_id, 'sr':(flags['horse_brush'] == 1 && (aff[horse_id] < (255 - 3 - flags["sustaining_carrot"])))});
-		if (flags['horse_brush'] == 1) {
-			a.push({'desc':"Brush Horse", 'val':2, 'cid':horse_id, 'sr':true, 'sel':(aff[horse_id] < (255 - 3 - flags["sustaining_carrot"]))});
+		if (flags['horse'] != 0) {
+			a.push({'desc':"Whistle Horse", 'val':1, 'cid':get_npc_id('horse'), 'sel':false, 'sr':(flags['horse_brush'] == 1 && aff[horse_id] < (255 - 4 - flags["sustaining_carrot"]))});
+			a.push({'desc':((flags['horse'] == 1) ? "Ride": "Talk"), 'val':1, 'cid':a[a.length - 1]['cid'], 'sr':true, 'sel':false});
+		}
+		if (flags['horse_brush'] == 1 && aff[horse_id] < (255 - 4 - flags["sustaining_carrot"])) {
+			a.push({'desc':"Brush", 'val':2, 'cid':horse_id, 'sr':true, 'sel':false});
 		}
 	}
 
@@ -108,25 +116,24 @@ function actions_photos_spr_y2(a = [], d = 3, g = 300, is_sunny = 1) {
 			if (aff[rick_id] < _PARTY_ATTEND_MIN || aff[mayor_id] < _PARTY_ATTEND_MIN || (d >= 135 && aff[basil_id] < _PARTY_ATTEND_MIN || (aff[basil_id] < _BASIL_BERRY_MIN && flags['berry_mine'] == 0))) {
 				a.push({'desc':"Dont go to Carp House Screen", 'imp':true});
 				a.push({'desc':"ed, ber, flower"}); // Quick gifts for villagers
+
+				// BASIL
+				if (d >= 135 && ["FRI", "SAT"].includes(dow)) {
+					a.push({'desc':"Talk (MTN)", 'cid':basil_id, 'val':3, 'sel':(aff[basil_id] < _PARTY_ATTEND_MIN || (aff[basil_id] < _BASIL_BERRY_MIN && flags['berry_mine'] == 0)), 'red':((aff[basil_id] >= _PARTY_ATTEND_MIN && flags['berry_mine'] == 1) || aff[basil_id] >= _BASIL_BERRY_MIN)});
+					a.push({'desc':"Gift", 'cid':basil_id, 'val':3, 'sr':true, 'sel':(aff[basil_id] < _PARTY_ATTEND_MIN || (aff[basil_id] < _BASIL_BERRY_MIN && flags['berry_mine'] == 0))});
+				}
+
+				// CLIFF
+				if (is_sunny == 1 && ["MON", "FRI", "SAT"].includes(dow)) {
+					a.push({'desc':("Talk (" + ((dow == "MON") ? "Hot Springs)" : "Fish Tent 50%)")), 'cid':cliff_id, 'val':2, 'sel':false, 'red':(aff[cliff_id] >= _PARTY_ATTEND_MIN)});
+					a.push({'desc':"Gift ", 'cid':cliff_id, 'val':4, 't2':"Egg", 'sr':true, 'sel':false});
+					a.push({'desc':"Egg", 'cid':cliff_id, 'val':8, 'sel':false, 't2':"Gift ", 'sr':true});
+				}
 			}
 
 			// BASIL
-			if (d >= 135 && ["FRI", "SAT"].includes(dow) && (aff[basil_id] < _PARTY_ATTEND_MIN || (aff[basil_id] < _BASIL_BERRY_MIN && flags['berry_mine'] == 0))) {
-				a.push({'desc':"Talk (MTN)", 'cid':basil_id, 'val':3});
-				a.push({'desc':"Gift", 'cid':basil_id, 'val':3, 'sr':true});
-			}
-
-			// CLIFF
-			if (is_sunny == 1 && ["MON", "FRI", "SAT"].includes(dow) &&
-					aff[cliff_id] < (_PARTY_ATTEND_MIN - (8 - (flags['photo_swimming'] * 8)) - (8 - (flags['photo_harvest'] * 8)))) {
-				a.push({'desc':("Talk (" + ((dow == "MON") ? "Hot Springs)" : "Fish Tent 50%)")), 'cid':cliff_id, 'val':2});
-				a.push({'desc':"Gift ", 'cid':cliff_id, 'val':4, 't2':"Egg", 'sr':true, 'sel':(dow != "MON")});
-				a.push({'desc':"Egg", 'cid':cliff_id, 'val':8, 'sel':false, 't2':"Gift ", 'sr':true});
-			}
-
-			// BASIL
-			if (is_sunny == 1 && dow == "THURS" && d >= 135 && (aff[basil_id] < _PARTY_ATTEND_MIN || (aff[basil_id] < _BASIL_BERRY_MIN && flags['berry_mine'] == 0))) {
-				a.push({'desc':"Talk (Greenhouse)", 'cid':basil_id, 'val':3});
+			if (flags['berry_basil'] == 0 && is_sunny == 1 && dow == "THURS" && d >= 135) {
+				a.push({'desc':"Talk (Greenhouse)", 'cid':basil_id, 'val':3, 'sel':(aff[basil_id] < _BASIL_BERRY_MIN || (aff[basil_id] < _PARTY_ATTEND_MIN && flags['berry_mine'] == 1)), 'red':(aff[basil_id] >= _BASIL_BERRY_MIN || (aff[basil_id] >= _PARTY_ATTEND_MIN && flags['berry_mine'] == 1))});
 				a.push({'desc':"Gift", 'cid':basil_id, 'val':3, 'sr':true});
 			}
 

@@ -92,6 +92,10 @@ function next_day(jump = false) {
 				if (!aff[cow_id]) { aff[cow_id] = 0; }
 				aff[get_npc_id('cow')] += parseInt(this.value);
 			}
+			if (crops[tmp_cr_id].localeCompare("potato") == 0) {
+				// Decrease potatoes variable if potatoes are sold
+				vars['potatoes'] = (((vars['potatoes'] - this.value) < 0) ? 0 : (vars['potatoes'] - this.value));
+			}
 		});
 
 		vars['gold'] += parseInt(sell_amt);
@@ -236,6 +240,12 @@ function next_day(jump = false) {
 		flags['horse_entered'] = 0;
 		flags['dog_entered'] = 0;
 		flags['cow_entered'] = 0;
+	}
+
+	// Include chicks on "chickens_outside" at beginning of Fall
+	// to end chicken cycling and leave one last egg
+	if (vars['day'] == 61 && vars['new_chicken_days'].length > 0) {
+		flags['chicken_outside'] = 0;
 	}
 
 	// Begin next day
@@ -396,7 +406,7 @@ function fish() {
 }
 
 function betting_table(a = []) {
-	var tmp_medals_needed = ((route_id == 0) ? ((vars['day'] < 120) ? 2500 : (flags['sustaining_carrot'] == 1) ? 1000 : 1500) : 500);
+	var tmp_medals_needed = ((route_id == 0) ? ((vars['day'] < 120) ? 2000 : 1000) : 500);
 	a.push({'desc':('<div class="ml-3">NEED:&nbsp;&nbsp;<input type="number" id="b_need" onchange="calc_bets()" style="margin-right:20px" value="' + tmp_medals_needed +
 			'" /></div>' + '<div class="ml-3">HAVE:&nbsp;&nbsp;<input type="number" id="b_have" onchange="calc_bets()" value="' + vars['medals'] + '" /></div>')});
 	for (var i = 0; i < 6; i++) {
@@ -508,10 +518,10 @@ function update_day_gui(d = vars['day'], jump = false) {
 	for (var i = 0; i < crop_seasons[get_month(d)].length; i++) {
 		tmp_cs.push(crop_seasons[get_month(d)][i]);
 	}
-	if (vars['potatoes'] > 0  && get_month(d) == 0) { // Potatoes in Spring
+	if (vars['potatoes'] > 0) { // Potatoes in Spring
 		tmp_cs.push(crops.indexOf('potato'));
 	}
-	if (vars['corn_waters'] >= _CORN_GROW_DAYS && get_month(d) == 1) { // Corn in Summer
+	if (vars['corn_waters'] >= _CORN_GROW_DAYS && [1,2].includes(get_month(d))) { // Corn in Summer
 		tmp_cs.push(crops.indexOf('corn'));
 	}
 	if (vars['chickens'] > 0) { // Eggs
@@ -637,83 +647,85 @@ function add_recipes() {
 	];
 }
 
-function to_html(a = actions) {
+function to_html(a = actions, show_red = true) {
 	
 	//console.log(a);
 	
+	var is_red = false;
 	var cur_vis = true;
 	var html = "";
 	var lines = 0;
 	var cur_div = null;
 	var div_list = [];
 	for (var i = 0; i < a.length; i++) {
-		if (a[i]['val'] !== undefined) {
-			if (a[i]['red'] == true) { a[i]['sel'] = false;}
-			else if (a[i]['imp'] == true) { a[i]['sel'] = true;}
-		}
 		if (a[i]['sr'] !== true) {
-			lines++;
-			if (i != 0) { html += "</div>"; }
-			if (a[i]['div'] != cur_div) {
-				cur_vis = (a[i]['vis'] === undefined) ? true : a[i]['vis'];
-				if (a[i]['div'] !== undefined) {
-					if (cur_div != null) { html += "</div>"; }
-					html += '<div id="' + a[i]['div'] + '"';
-					if (!cur_vis) {
-						html += ' style="display:none"';
+			is_red = (a[i]['red'] === true);
+			if (is_red && !show_red) {
+				lines++;
+				if (i != 0) { html += "</div>"; }
+				if (a[i]['div'] != cur_div) {
+					cur_vis = (a[i]['vis'] === undefined) ? true : a[i]['vis'];
+					if (a[i]['div'] !== undefined) {
+						if (cur_div != null) { html += "</div>"; }
+						html += '<div id="' + a[i]['div'] + '"';
+						if (!cur_vis) {
+							html += ' style="display:none"';
+						}
+						html += '>';
+						if (div_list.includes(a[i]['div'])) {
+							console.log("WARNING: duplicate or split div id (" + a[i]['div'] + ")");
+						}
+						div_list.push(a[i]['div']);
+						cur_div = a[i]['div'];
+					} else if (cur_div != null) {
+						html += "</div>";
+						cur_div = null;
 					}
-					html += '>';
-					if (div_list.includes(a[i]['div'])) {
-						console.log("WARNING: duplicate or split div id (" + a[i]['div'] + ")");
-					}
-					div_list.push(a[i]['div']);
-					cur_div = a[i]['div'];
-				} else if (cur_div != null) {
-					html += "</div>";
-					cur_div = null;
 				}
+				html += '<div class="d-flex justify-content-start" style="margin-bottom:5px;';
+				if (a[i]['imp'] == true) {
+					html += ' background-color:yellow;';
+				} else if (a[i]['red'] == true) {
+					html += ' background-color:pink;';
+				}
+				html += '">';
 			}
-			html += '<div class="d-flex justify-content-start" style="margin-bottom:5px;';
-			if (a[i]['imp'] == true) {
-				html += ' background-color:yellow;';
-			} else if (a[i]['red'] == true) {
-				html += ' background-color:pink;';
-			}
-			html += '">';
 		}
-		if (a[i]['val'] === undefined) {
-			if (a[i]['b_table']) {
-				// Bet table
-				// {'desc':'odds', 'b_table':true, 'b_id':i}
-				
-				html += '<span style="border:3px solid ' + bet_colors[a[i]['b_id']];
-				html += ';width:30px;height:30px;margin:5px;text-align:center">' + (parseInt(a[i]['b_id']) + 1) + '</span>';
-				html += 'x&nbsp;<input class="oddsInput" type="number" id="b_' + a[i]['b_id'] + '" value="1" onchange="calc_bets()" />';
-				html += '<input id="bg_' + a[i]['b_id'] + '" value="';
-				html += Math.floor(vars['gold'] / (6 * 50));
-				html += '" disabled=true style="border:1px solid black"/>';
-				html += '<button class="btn" type="button" onclick="bet_winner(' + a[i]['b_id'] + ')" style="margin-left:5px; border:3px solid ' + bet_colors[a[i]['b_id']] + '" tabindex="-1">WINNER</button>';
+		if (is_red && !show_red) {
+			if (a[i]['val'] === undefined) {
+				if (a[i]['b_table']) {
+					// Bet table
+					// {'desc':'odds', 'b_table':true, 'b_id':i}
+					
+					html += '<span style="border:3px solid ' + bet_colors[a[i]['b_id']];
+					html += ';width:30px;height:30px;margin:5px;text-align:center">' + (parseInt(a[i]['b_id']) + 1) + '</span>';
+					html += 'x&nbsp;<input class="oddsInput" type="number" id="b_' + a[i]['b_id'] + '" value="1" onchange="calc_bets()" />';
+					html += '<input id="bg_' + a[i]['b_id'] + '" value="';
+					html += Math.floor(vars['gold'] / (6 * 50));
+					html += '" disabled=true style="border:1px solid black"/>';
+					html += '<button class="btn" type="button" onclick="bet_winner(' + a[i]['b_id'] + ')" style="margin-left:5px; border:3px solid ' + bet_colors[a[i]['b_id']] + '" tabindex="-1">WINNER</button>';
+				} else {
+					// Plain text
+					if (a[i]['cid'] !== undefined || a[i]['iid'] !== undefined) {
+						// With Image
+						html += '<span class="mr-2">' + ((a[i]['iid'] === undefined) ? get_npc_img(a[i]['cid']) : get_npc_img(a[i]['iid'])) + '</span>';
+					}
+					html += '<span class="textHov">' + a[i]["desc"] + '</span>';
+				}
 			} else {
-				// Plain text
-				if (a[i]['cid'] !== undefined || a[i]['iid'] !== undefined) {
-					// With Image
+				// Value defined
+				if (a[i]['sr']) {
+					html += '<div class="ml-3">';
+				} else {
 					html += '<span class="mr-2">' + ((a[i]['iid'] === undefined) ? get_npc_img(a[i]['cid']) : get_npc_img(a[i]['iid'])) + '</span>';
 				}
-				html += '<span class="textHov">' + a[i]["desc"] + '</span>';
-			}
-		} else {
-			// Value defined
-			if (a[i]['sr']) {
-				html += '<div class="ml-3">';
-			} else {
-				html += '<span class="mr-2">' + ((a[i]['iid'] === undefined) ? get_npc_img(a[i]['cid']) : get_npc_img(a[i]['iid'])) + '</span>';
-			}
-			html += '<button type="button" class="btn btn-' + ((a[i]["sel"] === false) ? 'danger' : 'success') +
-				' action-button" id="ab_' + i + '" onclick="toggle_color(this, '+ "'" +
-				((a[i]['div_tog'] == undefined) ? "" : a[i]['div_tog']) + "', " +
-				get_toggle(a[i], a) + ')">' + a[i]['desc'] + '</button>';
-			if (a[i]['sr']) {
-				html += '</div>';
+				html += '<button type="button" class="btn btn-' + ((a[i]["sel"] === false) ? 'danger' : 'success') +
+					' action-button" id="ab_' + i + '" onclick="toggle_color(this, '+ "'" +
+					((a[i]['div_tog'] == undefined) ? "" : a[i]['div_tog']) + "', " +
+					get_toggle(a[i], a) + ')">' + a[i]['desc'] + '</button>';
+				if (a[i]['sr']) {
+					html += '</div>';
+				}
 			}
 		}
 	}

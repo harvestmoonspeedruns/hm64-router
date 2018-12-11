@@ -16,9 +16,12 @@ function actions_photos_fall_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 		flags['dontsave'] = true;
 	} else if (d == 66 || d == 68) { // Fall 6 & 8
 		a.push({'desc':"Check Weather, RESET IF RAINY TOMORROW", 'imp':true});
-	} else if (d == 90 || d == 87) {
-		// Horse Race Entry + Winter Cows
+	} else if (d == 87) {
+		// Horse Race Entry
 		a.push({'desc':"Ignore Doug on Farm", 'imp':true, 'iid':get_npc_id('doug')});
+	} else if (d == 90) {
+		// Winter Cows
+		a.push({'desc':"Talk to Doug on Farm", 'cid':'borrow_cows', 'val':1, 'iid':get_npc_id('doug'), 'sel':false});
 	}
 
 	// Dog Affection
@@ -45,48 +48,35 @@ function actions_photos_fall_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 
 		// Horse Affection
 		var horse_id = get_npc_id('horse');
-		if (aff[horse_id] < (255 - 4 - flags["sustaining_carrot"]) && flags['photo_horserace'] == 0) {
-			if (flags['horse_brush'] == 1) {
-				a.push({'desc':"Equip brush", 'iid':horse_id});
+		if (flags['photo_horserace'] == 0) {
+			if (flags['horse_brush'] == 1 && aff[horse_id] < (255 - 4 - flags["sustaining_carrot"])) {
+				a.push({'desc':"Equip Brush", 'iid':horse_id, 'sel':false});
 			}
-			a.push({'desc':"Whistle / Ride Horse", 'val':(2 + flags["sustaining_carrot"]), 'cid':horse_id, 'sr':(flags['horse_brush'] == 1), 'sel':(flags['photo_horserace'] == 0)});
-			a.push({'desc':"Brush Horse", 'val':2, 'cid':horse_id, 'sr':true, 'sel':(flags['photo_horserace'] == 0 && flags['horse_brush'] == 1)});
+			if (flags['horse'] != 0) {
+				a.push({'desc':"Whistle Horse", 'val':1, 'cid':get_npc_id('horse'), 'sel':false, 'sr':(flags['horse_brush'] == 1 && aff[horse_id] < (255 - 4 - flags["sustaining_carrot"]))});
+				a.push({'desc':((flags['horse'] == 1) ? "Ride": "Talk"), 'val':1, 'cid':a[a.length - 1]['cid'], 'sr':true, 'sel':false});
+			}
+			if (flags['horse_brush'] == 1 && aff[horse_id] < (255 - 4 - flags["sustaining_carrot"])) {
+				a.push({'desc':"Brush", 'val':2, 'cid':horse_id, 'sr':true, 'sel':false});
+			}
 		}
 
-		if (d != 72) {
-			// New Chicken
-			var to_coop = false;
-			var chicken_id = get_npc_id('chicken');
-			if (vars['new_chicken_days'].length > 0 && parseInt(vars['new_chicken_days'].substr(0,3)) == d) {
-				a.push({'desc':"New Chicken", 'iid':chicken_id});
-			}
-
-			// CHICKENS
-			if (vars['chickens'] > 0) {
-				if (is_sunny != flags['chicken_outside']) {
-					// Put chicken inside or outside
-					a.push({'desc':("Put Chicken " + ((flags['chicken_outside'] == 0) ? "Out" : "In") + "side"), 'cid':'f_chicken_outside', 'val':((is_sunny == 0) ? -1 : 1), 'imp':true, 'iid':chicken_id, 'sel':(!is_festival(d))});
-					to_coop = true;
-				} else if (is_sunny == 0 && flags['chicken_outside'] == 0) {
-					// Feed if already inside and raining
-					a.push({'desc':"Feed Chicken", 'cid':'v_feed', 'val':-1, 'imp':true, 'iid':chicken_id, 'sel':(!is_festival(d))});
-					to_coop = true;
+		// New Chicken
+		var chicken_id = get_npc_id('chicken');
+		if (vars['new_chicken_days'].length > 0 && parseInt(vars['new_chicken_days'].substr(0,3)) == d) {
+			a.push({'desc':"New Chicken", 'iid':chicken_id});
+		}
+		// End of Chicken Cycling
+		if (flags['chicken_outside'] == 0) {
+			a.push({'desc':"Bring Chickens & Chicks Outside", 'cid':'f_chicken_outside', 'val':(1 - flags['chicken_outside']), 'imp':true, 'iid':chicken_id});
+			a.push({'desc':"Scare Birds", 'cid':'v_happiness', 'val':1, 'sel':false, 'sr':true});
+			if (flags['new_chick'] < 2) {
+				if (flags['new_chick'] == 1) {
+					a.push({'desc':"New Chick", 'cid':["v_new_chicken_days", "f_new_chick"], 'val':[d + _CHICK_GROW_SLEEPS, -1], 'iid':chicken_id});
 				}
+				a.push({'desc':"Incubate Last Egg", 'cid':"f_new_chick", 'val':(_CHICK_BORN_SLEEPS + 1), 'sr':(flags['new_chick'] == 1)});
+				if (flags['new_chick'] != 1) { a[a.length - 1]['iid'] = chicken_id; }
 			}
-			// New Chick
-			if (flags['new_chick'] == 1) {
-				a.push({'desc':"New Chick OUTSIDE", 'cid':["v_new_chicken_days", "f_new_chick"], 'val':[d + _CHICK_GROW_SLEEPS, -1], 'sel':(!is_festival(d) && (to_coop || (vars['new_chicken_days'].length > 0 && parseInt(vars['new_chicken_days'].substr(0,3)) == d)))});
-				if (to_coop) { a[a.length - 1]['sr'] = true; } else { a[a.length - 1]['iid'] = chicken_id; }
-				a.push({'desc':"Incubate", 'cid':"f_new_chick", 'val':(_CHICK_BORN_SLEEPS + 1), 'sr':true, 'sel':(!is_festival(d) && vars['chickens'] > 0)});
-				to_coop = true;
-			}
-			// Incubate last egg
-			if (vars['chickens'] > 0 && flags['new_chick'] == 0) {
-				a.push({'desc':"Incubate", 'cid':"f_new_chick", 'val':(_CHICK_BORN_SLEEPS + 1), 'sel':(!is_festival(d))});
-				if (to_coop) { a[a.length - 1]['sr'] = true; } else { a[a.length - 1]['iid'] = chicken_id; }
-				to_coop = true;
-			}
-			if (to_coop) { a.push({'desc':"Scare Birds", 'cid':'v_happiness', 'val':1, 'sel':false, 'sr':true}); }
 		}
 	}
 
@@ -101,7 +91,7 @@ function actions_photos_fall_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 			if (aff[mayor_id] < _PARTY_ATTEND_MIN) { a.push({'desc':"Talk", 'cid':mayor_id, 'val':2}); }
 			if (aff[cliff_id] >= 100 && !cliff_maxed(aff[cliff_id])) { a.push({'desc':"Talk", 'cid':cliff_id, 'val':2}); }
 			a.push({'desc':"Dance with Ann", 'val':12, 'cid':ann_id, 't2':"Dance with Elli"});
-			a.push({'desc':"Dance with Elli", 'val':12, 'cid':elli_id, 'sel':false, 't2':"Dance with Ann"});
+			a.push({'desc':"Dance with Elli", 'val':12, 'cid':elli_id, 'sel':false, 't2':"Dance with Ann", 'red':true});
 			a.push({'desc':"RESET IF NOT KING", 'imp':true});
 		} else if (d == 88) { // Fall 28
 			// Horse Race
@@ -109,7 +99,7 @@ function actions_photos_fall_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 		}
 	} else {
 		// Spam Kent with Chicken
-		if (vars['chickens'] > 0 && aff[kent_id] < 100 && dow == "SAT" && is_sunny == 1) {
+		if (vars['chickens'] > 0 && aff[kent_id] < 100 && is_sunny == 1 && dow == "SAT" && d >= 69) {
 			a.push({'desc':"Chicken to the Mtns"});
 		}
 
@@ -124,7 +114,7 @@ function actions_photos_fall_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 			// Fall 83, 84, 85, 86, 87
 			//	    Sat Sun Mon Tue Wed
 			var mas_carp_id = get_npc_id('mas_carpenter');
-			a.push({'desc':"Bridge Work", 'val':[5, 5, 5, 1, 1000], 'iid':mas_carp_id,
+			a.push({'desc':"Bridge Work", 'val':[5, 5, 5, 1, 1000], 'iid':mas_carp_id, 'imp':true,
 					'cid':[mas_carp_id, get_npc_id('carpenter_top'), get_npc_id('carpenter_bot'), 'v_bridge_days_worked', 'v_gold'],
 			});
 		}
@@ -150,11 +140,6 @@ function actions_photos_fall_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 			a.push({'desc':" Egg ", 't2':" Gift", 'cid':cliff_id, 'val':8, 'sel':false, 'sr':true});
 		}
 
-		// Spam Kent with Chicken
-		if (aff[kent_id] < 100 && dow == "SAT" && is_sunny == 1) {
-			a.push({'desc':"Chicken Spam (85 Talks)", 'val':255, 'cid':kent_id, 'sel':false});
-		}
-
 		if ((d < 67 && flags['vineyard_restored'] == 0 && is_sunny == 1) || [61, 65, 67, 69].includes(d) ||
 			(flags['dream_ann'] == 0 && aff[ann_id] >= _DREAM_EVENT_MIN && is_sunny == 1) ||
 			(aff[cliff_id] < 100 && (dow == "THURS" || (is_sunny == 0 && dow != "TUES")))) {
@@ -167,20 +152,20 @@ function actions_photos_fall_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 				a.push({'desc':"DREAM (Cave)", 'cid':[ann_id, 'f_dream_ann'], 'val':[_DREAM_EVENT_AFF, 1]});
 			}
 
-			// TODO: Sprite recipe affection?
-			var sprite_recipe_aff = 3;
-
 			// SPRITE
 			// "  Talk" <- -3 spaces
 			// "  Gift" <- -3 spaces
 			var sprite_id = get_npc_id('sprite');
 			if (flags['vineyard_restored'] == 0 && d < 67) {
-				a.push({'desc':"   Talk", 'cid':sprite_id, 'val':1});
-				a.push({'desc':"   Gift", 'cid':sprite_id, 'val':1, 'sr':true, 't2':"Mushroom"});
-				a.push({'desc':"Mushroom", 't2':"   Gift", 'sr':true,
+				a.push({'desc':"   Talk", 'cid':sprite_id, 'val':1, 'imp':(aff[sprite_id] >= (_SPRITE_WINE_MIN - 1 - 5))});
+				a.push({'desc':"   Gift", 'cid':sprite_id, 'val':1, 'sr':true, 't2':"Mushroom", 'sel':false});
+				a.push({'desc':"Mushroom", 't2':"   Gift", 'sr':true, 'sel':(aff[sprite_id] < (_SPRITE_WINE_MIN - 1)),
 						'cid':((flags['recipe_sprite'] == 0) ? ['f_recipe_sprite', sprite_id] : sprite_id),
-						'val':((flags['recipe_sprite'] == 0) ? [1, sprite_recipe_aff] : 2)
+						'val':((flags['recipe_sprite'] == 0) ? [1, 5] : 2)
 				});
+				if (aff[sprite_id] >= (_SPRITE_WINE_MIN - 1 - ((flags['recipe_sprite'] == 0) ? 5 : 2))) {
+					a.push({'desc':"Mention Goddess and Vineyard", 'iid':sprite_id, 'imp':true});
+				}
 			}
 
 			// CLIFF
@@ -213,6 +198,11 @@ function actions_photos_fall_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 			a.push({'desc':"edible, mushroom"});
 		}
 
+		// Spam Kent with Chicken
+		if (aff[kent_id] < 100 && dow == "SAT" && is_sunny == 1 && vars['chickens'] > 0 && d >= 69) {
+			a.push({'desc':"Chicken Spam (MTN / Town Square) [85 Talks]", 'val':255, 'cid':kent_id, 'imp':true});
+		}
+
 		// ANN
 		if (flags['new_mus_box'] == 1) {
 			a = ranch_stuff_fall(a, dow, is_sunny);
@@ -221,29 +211,36 @@ function actions_photos_fall_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 		// ELLI
 		// "Gift " <- one space
 		// "Talk " <- one space
-		if (aff[elli_id] < _PHOTO_MIN && dow != "MON") {
+		if (dow != "MON") {
 			if (is_sunny == 0 && aff[elli_id] >= _SICK_EVENT_MIN && flags['sick_elli'] == 0) {
-				a.push({'desc':"Sick Event (Bakery)", 'cid':[elli_id, 'f_sick_elli'], 'val':[_SICK_EVENT_AFF, 1]});
+				a.push({'desc':"Sick Event (Bakery)", 'cid':[elli_id, 'f_sick_elli'], 'val':[_SICK_EVENT_AFF, 1], 'red':(aff[elli_id] >= _PHOTO_MIN), 'sel':(aff[elli_id] < _PHOTO_MIN)});
 			} else if (dow != "SUN") {
-				a.push({'desc':((dow == "WED") ? "Talk (Flower Shop)" : "Talk "), 'cid':elli_id, 'val':1, 'sr':(aff[elli_id] == 0), 'sel':(flags['new_mus_box'] != 1)});
+				if (flags['dream_elli'] == 0 && aff[elli_id] >= (_PHOTO_MIN - _DREAM_EVENT_MIN)) {
+					a.push({'desc':"DREAM (Village)", 'cid':[elli_id, 'f_dream_elli'], 'val':[_DREAM_EVENT_AFF, 1], 'sel':(aff[elli_id] < _PHOTO_MIN), 'imp':(aff[elli_id] < _PHOTO_MIN), 'red':(aff[elli_id] >= _PHOTO_MIN)});
+				}
+				a.push({'desc':((dow == "WED") ? "Talk (Flower Shop)" : "Talk "), 'cid':elli_id, 'val':1,
+						'sel':(flags['new_mus_box'] != 1 && !(flags['dream_elli'] == 0 && aff[elli_id] >= (_PHOTO_MIN - _DREAM_EVENT_MIN) && aff[elli_id] < _PHOTO_MIN) && aff[elli_id] < _PHOTO_MIN),
+						'red':((aff[elli_id] >= _PHOTO_MIN) || (flags['dream_elli'] == 0 && aff[elli_id] >= (_PHOTO_MIN - _DREAM_EVENT_MIN) && aff[elli_id] < _PHOTO_MIN))
+				});
 				if (flags['new_mus_box'] == 1) {
 					a[a.length - 1]['t2'] = "MusBox ";
-					a.push({'desc':"MusBox ", 'cid':[elli_id, 'f_new_mus_box'], 'val':[_MUS_BOX_AFF, -1], 'sr':true, 'sel':true, 't2':a[a.length - 1]['desc']});
+					a.push({'desc':"MusBox ", 'cid':[elli_id, 'f_new_mus_box'], 'val':[_MUS_BOX_AFF, -1], 'sr':true,
+							'sel':(aff[elli_id] < _PHOTO_MIN && (flags['dream_elli'] == 1 || aff[elli_id] < (_PHOTO_MIN - _DREAM_EVENT_MIN))), 't2':a[a.length - 1]['desc']});
 				}
 				a.push({'desc':"Gift ", 'cid':elli_id, 'val':1, 'sr':true, 't2':"Egg ",
-					'sel':(vars['chickens'] == 0 || flags['new_chick'] == 1)
+					'sel':(aff[elli_id] < _PHOTO_MIN && (vars['chickens'] == 0 || flags['new_chick'] == 1) && (flags['dream_elli'] == 1 || aff[elli_id] < (_PHOTO_MIN - _DREAM_EVENT_MIN)))
 				});
 				a.push({
 					'desc':"Egg ", 'sr':true, 't2':"Gift ",
-					'sel':(vars['chickens'] > 0 && flags['new_chick'] != 1),
+					'sel':(aff[elli_id] < _PHOTO_MIN && vars['chickens'] > 0 && flags['new_chick'] != 1 && (flags['dream_elli'] == 1 || aff[elli_id] < (_PHOTO_MIN - _DREAM_EVENT_MIN))),
 					'cid':((vars['chickens'] > 0 && flags['recipe_elli'] == 0) ? ['f_recipe_elli', elli_id] : elli_id),
 					'val':((vars['chickens'] > 0) ? (flags['recipe_elli'] ? 4 : [1, 6]) : 3)
 				});
-				if (flags['dream_elli'] == 0 && aff[elli_id] >= (_DREAM_EVENT_MIN - _MUS_BOX_AFF - 4)) {
-					a.push({'desc':"Dream (Village)", 'cid':[elli_id, 'f_dream_elli'], 'val':[_DREAM_EVENT_AFF, 1], 'sr':true, 'sel':false});
+				if (flags['dream_elli'] == 0 && aff[elli_id] >= (_DREAM_EVENT_MIN - _MUS_BOX_AFF - 4) && aff[elli_id] < (_PHOTO_MIN - _DREAM_EVENT_MIN)) {
+					a.push({'desc':"DREAM (Village)", 'cid':[elli_id, 'f_dream_elli'], 'val':[_DREAM_EVENT_AFF, 1], 'sr':true, 'sel':false});
 				}
 				if (flags['ankle_elli'] == 0 && aff[elli_id] >= (_ANKLE_EVENT_MIN - _MUS_BOX_AFF - 4)) {
-					a.push({'desc':"Ankle (MTN)", 'cid':[elli_id, 'f_ankle_elli'], 'val':[_ANKLE_EVENT_AFF, 1], 'sr':true, 'sel':false});
+					a.push({'desc':"ANKLE (MTN)", 'cid':[elli_id, 'f_ankle_elli'], 'val':[_ANKLE_EVENT_AFF, 1], 'sr':true, 'sel':false});
 				}
 			}
 		}
@@ -251,7 +248,7 @@ function actions_photos_fall_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 		// RICK
 		// "Gift    " <- 4 spaces
 		// "Talk    " <- 4 spaces
-		if (is_sunny == 1 && !["WED", "SUN"].includes(dow) && (aff[ann_id] < _PHOTO_MIN || (d >= 83 && d <= 87))) {
+		if (is_sunny == 1 && !["WED", "SUN"].includes(dow) && (aff[elli_id] < _PHOTO_MIN || aff[ann_id] < _PHOTO_MIN || (d >= 83 && d <= 87))) {
 			a.push({'desc':"Talk    ", 'cid':rick_id, 'val':3, 'sel':(dow != "SAT")});
 			a.push({'desc':"Gift    ", 'cid':rick_id, 'val':3, 'sr':true, 'sel':false});
 			if (flags['old_mus_box'] == 1 || (flags['old_mus_box'] == 0 && (aff[ann_id] < (_PHOTO_MIN - ((flags['new_mus_box'] == 1) ? _MUS_BOX_AFF : 0))))) {
@@ -273,17 +270,48 @@ function actions_photos_fall_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 					a.push({'desc':"ANKLE (Crossroads)", 'cid':[ann_id, 'f_ankle_ann'], 'val':[_ANKLE_EVENT_AFF, 1], 'sel':false, 'sr':(dow != "SAT" || aff[ann_id] < 150)});
 				}
 			}
+		}
 
-			// MAYOR
-			// "  Talk" <- -2 spaces
-			// "  Gift" <- -2 spaces
-			if ((dow != "SAT" || aff[ann_id] < 150) && aff[mayor_id] < _PARTY_ATTEND_MIN) {
-				// TODO: When Ann aff >= 153, Watermelon cutscene occurs with Maria
-				// Dont enter second village screen when Ann's affection >= ~153
-				// (Not sure what the min value for this is, but it happened for me at 153)
+		// MAYOR
+		// "  Talk" <- -2 spaces
+		// "  Gift" <- -2 spaces
+		if (is_sunny == 1 && dow != "SUN") {
+			if (flags['cutscene_watermelon'] == 0 && aff[ann_id] >= 153) {
+				// When Ann aff >= 153, Watermelon cutscene occurs with Maria on second village screen
 				// 118 < trigger < 154
-				a.push({'desc':((dow == "SAT") ? "Talk (Rick Shop 50%)" : "  Talk"), 'cid':mayor_id, 'val':3, 'sel':(dow != "SAT")});
-				a.push({'desc':"  Gift", 'cid':mayor_id, 'val':3, 'sr':true, 'sel':(aff[mayor_id] < aff[rick_id] && dow != "SAT")});
+				a.push({'desc':"WARNING: Cutscene plays at 2nd Village Screen", 'imp':true});
+				a.push({'desc':"Watermelon Cutscene", 'val':1, 'cid':'f_cutscene_watermelon', 'sr':true, 'sel':false});
+			}
+			a.push({'desc':"Talk (Rick Shop 50%)", 'cid':mayor_id, 'val':3, 'sel':false, 'red':(aff[mayor_id] >= _PARTY_ATTEND_MIN)});
+			a.push({'desc':"  Gift", 'cid':mayor_id, 'val':3, 'sr':true, 'sel':false});
+		}
+
+		if (is_sunny == 1 && dow == "SUN") {
+			// MAYOR
+			a.push({'desc':"Talk (Church)", 'cid':mayor_id, 'val':3, 'sel':(aff[mayor_id] < _PARTY_ATTEND_MIN), 'red':(aff[mayor_id] >= _PARTY_ATTEND_MIN)});
+			a.push({'desc':"Gift", 'cid':mayor_id, 'val':3, 'sr':true, 'sel':(aff[mayor_id] < aff[rick_id])});
+
+			// RICK
+			if (flags['new_mus_box'] == 1) {
+				a.push({'desc':"DONT TALK TO RICK WITH A FIXED MUSIC BOX!", 'imp':true, 'iid':rick_id});
+			}
+			a.push({'desc':"Talk (Town Square) ", 'cid':rick_id, 'val':3, 'sr':(aff[rick_id] == 0), 'sel':false, 't0':"Rick Fix"});
+			a.push({'desc':"Rick Fix", 'sr':true, 'sel':false, 't3':"Talk (Town Square) ", 'cid':['f_old_mus_box', 'f_new_mus_box'], 'val':[-1, 1]});
+			a.push({'desc':"Gift", 'sr':true, 'sel':false, 'cid':rick_id, 'val':3});
+
+			if (d == 63) {
+				// BASIL
+				a.push({'desc':"Talk (Town Square)", 'cid':basil_id, 'val':3, 'sel':(aff[basil_id] < _BASIL_BERRY_MIN), 'red':(aff[basil_id] >= _BASIL_BERRY_MIN)});
+				a.push({'desc':"Gift   ", 'cid':basil_id, 'val':3, 'sr':true, 'sel':(aff[basil_id] < _BASIL_BERRY_MIN), 't2':"Corn"});
+				a.push({'desc':"Corn", 'cid':basil_id, 'sr':true, 'sel':false,
+						'cid':((flags['recipe_basil'] == 0) ? [basil_id, 'f_recipe_basil'] : basil_id),
+						'val':((flags['recipe_basil'] == 0) ? [7, 1] : 5), 't2':"Gift   "
+				});
+			}
+
+			// MAY
+			if (aff[get_npc_id('may')] == 0) {
+				a.push({'desc':"Spam May (Town Square) [83 Talks]", 'cid':get_npc_id('may'), 'val':255, 'sel':false});
 			}
 		}
 
@@ -292,10 +320,10 @@ function actions_photos_fall_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 			a = ranch_stuff_fall(a, dow, is_sunny);
 		}
 
-		if ([67, 69].includes(d) || (d == 61 && flags['wine_from_duke'] == 0)) {
+		if ([67, 69].includes(d) || (d < 63 && flags['wine_from_duke'] == 0)) {
 			a.push({'desc':"Equip hammer, clear farm"});
 			a.push({'desc':"Golden Hammer", 'cid':'f_golden_hammer', 'val':1, 'sel':false, 'sr':true});
-			if (d == 61) {
+			if (d < 63) {
 				// BAR
 				var duke_id = get_npc_id('bartender');
 				a.push({'desc':"Talk", 'cid':duke_id, 'val':3, 'sr':(aff[duke_id] == 0), 'imp':true});
@@ -340,59 +368,64 @@ function ranch_stuff_fall(tmp_act = [], dow = get_dow(vars['day']), is_sunny = 1
 	var mus_box_give = ((flags['new_mus_box'] == 1) || (is_sunny == 1 && !["WED", "SAT", "SUN"].includes(dow)));
 
 	if (dow != "THURS") {
-		if (vars['chickens'] > 1 || (vars['chickens'] > 0 && aff[elli_id] >= _PHOTO_MIN && aff[ann_id] >= _PHOTO_MIN && cliff_maxed(aff[cliff_id]))) {
-			tmp_act.push({'desc':"Sell Chicken", 'cid':['v_chickens', 'v_gold'], 'val':[-1, 500], 'iid':get_npc_id('doug')});
+		if (vars['chickens'] > 0) {
+			tmp_act.push({'desc':"Sell Chicken", 'cid':['v_chickens', 'v_gold'], 'val':[-1, 500], 'iid':get_npc_id('doug'), 'sel':false});
 		}
 
 		// ANN
 		// "Gift  " <- 2 spaces
-		if (aff[ann_id] < _PHOTO_MIN) {
-			tmp_act.push({'desc':("Talk (" + ((is_sunny == 0) ? "Barn)" : "Ranch)")), 'cid':ann_id, 'val':1, 't2':"MusBox", 'sel':(!mus_box_give)});
-			tmp_act.push({'desc':"MusBox", 'cid':[ann_id, 'f_new_mus_box'], 'val':[_MUS_BOX_AFF, -1], 'sr':true, 't2':tmp_act[tmp_act.length - 1]['desc'], 'sel':mus_box_give});
-			tmp_act.push({'desc':"Gift  ", 'cid':ann_id, 'val':1, 'sr':true, 't2':"Corn / Potato"});
-			tmp_act.push({'desc':"Corn / Potato", 'cid':[ann_id, 'v_potatoes'], 'val':[3, -1], 'sr':true, 'sel':false, 't2':tmp_act[tmp_act.length - 1]['desc']});
-		}
+		tmp_act.push({'desc':("Talk (" + ((is_sunny == 0) ? "Barn)" : "Ranch)")), 'cid':ann_id, 'val':1, 't2':"MusBox", 'sel':(!mus_box_give && aff[ann_id] < _PHOTO_MIN), 'red':(aff[ann_id] >= _PHOTO_MIN)});
+		tmp_act.push({'desc':"MusBox", 'cid':[ann_id, 'f_new_mus_box'], 'val':[_MUS_BOX_AFF, -1], 'sr':true, 't2':tmp_act[tmp_act.length - 1]['desc'], 'sel':(mus_box_give && aff[ann_id] < _PHOTO_MIN)});
+		tmp_act.push({'desc':"Gift  ", 'cid':ann_id, 'val':1, 'sr':true, 't2':"Corn / Potato", 'sel':(aff[ann_id] < _PHOTO_MIN)});
+		tmp_act.push({'desc':"Corn / Potato", 'cid':[ann_id, 'v_potatoes'], 'val':[3, -1], 'sr':true, 'sel':(aff[ann_id] < _PHOTO_MIN), 't2':tmp_act[tmp_act.length - 1]['desc']});
 
 		if (is_sunny == 1) {
-			// CLIFF
-			// "Gift    " <- 4 spaces
-			// "Egg " <- 1 space
-			if (["TUES", "WED"].includes(dow) && (aff[elli_id] < 160 || dow == "WED") && !cliff_maxed(aff[cliff_id])) {
-				// Beach cutscene between Karen and Elli occurs when Elli is >= 160-ish
-
-				tmp_act.push({'desc':("Talk (" + ((dow == "WED") ? "Ranch) " : "Beach) ")), 'cid':cliff_id, 'val':2});
-				tmp_act.push({'desc':" Gift", 'cid':cliff_id, 'val':4, 't2':" Egg", 'sr':true, 'sel':(vars['chickens'] == 0 || (!(aff[elli_id] >= _PHOTO_MIN || (dow == "MON" && aff[elli_id] >= 170))))});
-				tmp_act.push({'desc':" Egg", 'cid':cliff_id, 'val':8, 'sel':(vars['chickens'] > 0 && (aff[elli_id] >= _PHOTO_MIN || (dow == "MON" && aff[elli_id] >= 170))), 't2':tmp_act[tmp_act.length - 1]['desc'], 'sr':true});
-			}
-
-			// ELLI Beach
-			// "Gift " <- 1 space
-			if (dow == "MON" && aff[elli_id] < 160) {
-				// Cutscene between Karen and Elli occurs when Elli is >= 160-ish
-
-				tmp_act.push({'desc':"Talk (Beach)", 'cid':elli_id, 'val':1, 't2':"MusBox "});
-				tmp_act.push({'desc':"MusBox ", 'cid':[elli_id, 'f_new_mus_box'], 'val':[_MUS_BOX_AFF, -1],
-							'sr':true, 'sel':false, 't2':tmp_act[tmp_act.length - 1]['desc']});
-				tmp_act.push({'desc':"Gift ", 'cid':elli_id, 'val':1, 'sr':true,
-							't2':"Egg ", 'sel':(vars['chickens'] == 0 || flags['new_chick'] < 2)
-				});
-				tmp_act.push({
-					'desc':"Egg ", 'sr':true, 't2':"Gift ", 'sel':(vars['chickens'] > 0 && flags['new_chick'] >= 2),
-					'cid':((vars['chickens'] > 0 && flags['recipe_elli'] == 0) ? ['f_recipe_elli', elli_id] : elli_id),
-					'val':((vars['chickens'] > 0) ? (flags['recipe_elli'] ? 4 : [1, 6]) : 3)
-				});
-				if (flags['dream_elli'] == 0 && aff[elli_id] >= (_DREAM_EVENT_MIN - _MUS_BOX_AFF - 4)) {
-					tmp_act.push({'desc':"DREAM (Village)", 'cid':[elli_id, 'f_dream_elli'], 'val':[_DREAM_EVENT_AFF, 1], 'sr':true, 'sel':false});
+				// CLIFF
+				// "Gift    " <- 4 spaces
+				// "Egg " <- 1 space
+				var cliff_id = get_npc_id('cliff');
+				if (aff[cliff_id] < _PARTY_ATTEND_MIN && ["TUES", "WED"].includes(dow)) {
+					if (dow == "TUES" && aff[elli_id] >= 160 && flags['cutscene_beach'] == 0) {
+						// Beach cutscene between Karen and Elli occurs when Elli is >= 160-ish
+						tmp_act.push({'desc':"WARNING: Cutscene plays at Beach", 'imp':true});
+						tmp_act.push({'desc':"Beach Cutscene", 'val':1, 'cid':'f_cutscene_beach', 'sr':true, 'sel':false});
+						tmp_act.push({'desc':get_cliff_loc(dow), 'cid':cliff_id, 'val':2, 'sel':false, 'red':true, 't3':"Beach Cutscene"});
+					} else {
+						tmp_act.push({'desc':get_cliff_loc(dow), 'cid':cliff_id, 'val':2, 'sel':false, 'red':(aff[cliff_id] >= _PHOTO_MIN)});
+					}
+					tmp_act.push({'desc':"Gift    ", 'cid':cliff_id, 'val':4, 't2':"Egg ", 'sr':true, 'sel':tmp_act[tmp_act.length - 1]['sel']});
+					tmp_act.push({'desc':"Egg ", 'cid':cliff_id, 'val':8, 'sel':false, 't2':"Gift    ", 'sr':true, 'sel':tmp_act[tmp_act.length - 1]['sel']});
+					if (dow == "TUES") {
+						tmp_act.push({'desc':"Scare crab", 'cid':'v_happiness', 'val':1, 'sr':true, 'sel':false});
+					}
 				}
-				if (flags['ankle_elli'] == 0 && aff[elli_id] >= (_ANKLE_EVENT_MIN - _MUS_BOX_AFF - 4)) {
-					tmp_act.push({'desc':"ANKLE (MTN)", 'cid':[elli_id, 'f_ankle_elli'], 'val':[_ANKLE_EVENT_AFF, 1], 'sr':true, 'sel':false});
+
+				// ELLI Beach
+				// "Gift " <- 1 space
+				if (dow == "MON") {
+					if (aff[elli_id] >= 160 && flags['cutscene_beach'] == 0) {
+						// Beach cutscene between Karen and Elli occurs when Elli is >= 160-ish
+						tmp_act.push({'desc':"WARNING: Cutscene plays at Beach", 'imp':true});
+						tmp_act.push({'desc':"Beach Cutscene", 'sr':true, 'sel':false, 'cid':'f_cutscene_beach', 'val':1});
+						tmp_act.push({'desc':"Talk (Beach)", 'cid':elli_id, 'val':1, 't2':"MusBox ", 'red':true, 'sel':false, 't3':"Beach Cutscene"});
+						tmp_act.push({'desc':"MusBox ", 'cid':[elli_id, 'f_new_mus_box'], 'val':[_MUS_BOX_AFF, -1], 'sr':true, 'sel':false, 't2':tmp_act[tmp_act.length - 1]['desc'], 't3':"Beach Cutscene"});
+					} else {
+						tmp_act.push({'desc':"Talk (Beach)", 'cid':elli_id, 'val':1, 't2':"MusBox ", 'sel':(aff[elli_id] < _PHOTO_MIN), 'red':(aff[elli_id] >= _PHOTO_MIN)});
+						tmp_act.push({'desc':"MusBox ", 'cid':[elli_id, 'f_new_mus_box'], 'val':[_MUS_BOX_AFF, -1], 'sr':true, 'sel':false, 't2':tmp_act[tmp_act.length - 1]['desc'], 't3':"Beach Cutscene"});
+					}
+					tmp_act.push({'desc':"Gift ", 'cid':elli_id, 'val':1, 'sr':true, 
+						't2':((vars['chickens'] > 0) ? "Egg" : "M/L Fish"),
+						'sel':((aff[elli_id] < _PHOTO_MIN) && (aff[elli_id] < 160 || flags['cutscene_beach'] == 1) && (vars['chickens'] == 0 || flags['new_chick'] < 2))
+					});
+					tmp_act.push({
+						'desc':((vars['chickens'] > 0) ? "Egg" : "M/L Fish"), 'sr':true, 't2':"Gift ",
+						'sel':((aff[elli_id] < _PHOTO_MIN) && (aff[elli_id] < 160 || flags['cutscene_beach'] == 1) && (vars['chickens'] > 0 && flags['new_chick'] >= 2)),
+						'cid':((vars['chickens'] > 0 && flags['recipe_elli'] == 0) ? ['f_recipe_elli', elli_id] : elli_id),
+						'val':((vars['chickens'] > 0) ? (flags['recipe_elli'] ? 4 : [1, 6]) : 3)
+					});
+					tmp_act.push({'desc':"Scare crab", 'cid':'v_happiness', 'val':1, 'sr':true, 'sel':false});
 				}
 			}
-			
-			if (flags['ankle_ann'] == 0 && aff[ann_id] >= (_ANKLE_EVENT_MIN - _MUS_BOX_AFF - 2)) {
-				tmp_act.push({'desc':"ANKLE (Crossroads)", 'cid':[ann_id, 'f_ankle_ann'], 'val':[_ANKLE_EVENT_AFF, 1], 'sel':false});
-			}
-		}
 	}
 	return tmp_act;
 }

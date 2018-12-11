@@ -68,7 +68,7 @@ var npcs = ["ann", "bartender", "basil", "carpenter bot", "carpenter top", "clif
 			"kai", "karen", "kent", "lillia", "maria", "mas carpenter", "may", "mayor", 
 			"mayors wife", "midwife", "old man", "old woman", "pastor", "popuri",
 			"potion master", "rick", "saibara", "salesman", "shipper", "sprite", "stu", "dog",
-			"_horse", "_cow", "_baby", "chicken", "kappa", "goddess", "judge", "musbox"];
+			"horse", "_cow", "_baby", "chicken", "kappa", "goddess", "judge", "musbox"];
 var npc_ids = {};
 var not_villagers = [1, 3, 4, 9, 20, 23, 24, 32, 33, 34, 35, 36];
 var recipes = [];
