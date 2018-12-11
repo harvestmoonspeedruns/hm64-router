@@ -26,7 +26,7 @@
 * **ankle_karen**: INT [0,1] - Has the ankle event occurred for Karen
 * **ankle_maria**: INT [0,1] - Has the ankle event occurred for Maria
 * **ankle_popuri**: INT [0,1] - Has the ankle event occurred for Popuri
-* **baby**
+* **baby**: INT [0, _BABY_BORN_DAYS + 2] - 1 means baby is born that day. 0 means the counter hasnt begun yet. Anything greater than 1 is a countdown to the baby born event.
 * **babybed**: INT [0, _BUILD_DAYS + 1] - Has the baby bed been contracted. 0 is no, 1 is fully built, and anything above 1 is being built.
 * **bathroom**: INT [0, _BUILD_DAYS + 1] - Has the bathroom been contracted. 0 is no, 1 is fully built, and anything above 1 is being built.
 * **berry_basil**: INT [0,1] - Has the player obtained Basils berry
@@ -39,10 +39,10 @@
 * **berry_strength**: INT [0,1] - Has the player gotten a berry by wishing for strength from the goddess while at full stamina and no fatigue
 * **blue_feather**: INT [0,1] - Has the player bought a blue feather from Rick
 * **borrow_cows**: INT [0,1] - Did the player agree to watch cows for Doug during the first winter
-* **chicken_funeral**
-* **chicken_outside**
+* **chicken_funeral**: INT [0,1] - Is a chicken funeral held today
+* **chicken_outside**: INT [0,1] - Are the chickens / chicks outside the barn
 * **cow_entered**: INT [0,1] - Did the player enter a cow into the Cow Festival
-* **cows_outside**
+* **cows_outside**: INT [0,1] - Is there a cow outside the barn / are the cows outside the barn
 * **cutscene_beach**: INT [0,1] - Has the cutscene with Elli and Karen played at the beach
 * **cutscene_bug**: INT [0,1] - Has the cutscene with Maria pulling a bug out of Karens hair near the cave played yet
 * **cutscene_cookfish**: INT [0,1] - Has the cutscene with Elli cooking fish for Maria by the fisherman tent played yet
@@ -58,7 +58,7 @@
 * **fishing_rod**: INT [0,1] - Did you get the fishing rod from the fisherman
 * **fishing_rod_stored**: INT [0,1] - Is the fishing rod stored in the tool box
 * **golden_hammer**: INT [0,1] - Is the hammer upgraded to gold
-* **good_weather**
+* **good_weather**: INT [-1, 0, 1] - 1 is a sunny day, 0 is a rainy day, and -1 is a typhoon (summer only)
 * **greenhouse**: INT [0, _BUILD_DAYS + 1] - Has the greenhouse been contracted. 0 is no, 1 is fully built, and anything above 1 is being built.
 * **harvest_king**: INT [0,1] - Did the player win Harvest King at the previous Harvest Festival
 * **horse**: INT [0,1] - Does the player have a horse
@@ -67,7 +67,7 @@
 * **kitchen**: INT [0, _BUILD_DAYS + 1] - Has the kitchen been contracted. 0 is no, 1 is fully built, and anything above 1 is being built.
 * **logterrace**: INT [0, _BUILD_DAYS + 1] - Has the log terrace been contracted. 0 is no, 1 is fully built, and anything above 1 is being built.
 * **milker**: INT [0,1] - Did the player buy a milker from Rick
-* **new_chick**
+* **new_chick**: INT [0, _CHICK_BORN_SLEEPS + 1] - 0 is not chicken incubating, 1 means a new chick will be born if you enter the barn, and anything 2 or above is a countdown to a new chick being born
 * **new_mus_box**: INT [0,1] - Does the player have a fixed music box
 * **old_mus_box**: INT [0,1] - Does the player have a broken music box
 * **photo_ann**: INT [0,1] - Has Anns photo sequence been triggered
