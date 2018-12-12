@@ -1,4 +1,5 @@
 function actions_photos_sum_y2(a, d, g, is_sunny) {
+	var ann_id = get_npc_id('ann');
 	var basil_id = get_npc_id('basil');
 	var cliff_id = get_npc_id('cliff');
 	var karen_id = get_npc_id('karen');
@@ -8,6 +9,7 @@ function actions_photos_sum_y2(a, d, g, is_sunny) {
 
 	var dow = get_dow(d, true);
 	var mtn_visit = false;
+	var build_ext = false;
 
 	if (flags['propose'] == 1) {
 		a.push({'desc':"Wedding Day", 'iid':get_npc_id('karen'), 'cid':['f_photo_married', 'f_propose'], 'val':[1, -1], 'imp':true});
@@ -45,7 +47,7 @@ function actions_photos_sum_y2(a, d, g, is_sunny) {
 			// ** IMPORTANT: Marriage by SUM 25 or Baby wont arrive before Evaluation **
 			var tmp_gneed = 5000 - (((flags['kitchen'] > 0) ? 1 : 0) * 5000) + 980 - (flags['blue_feather'] * 980);
 			if (flags['kitchen'] == 0 && (vars['gold'] < (tmp_gneed - (420 * (168 - d))))) {
-				a = mtn_visit_sum2(a, d, g, is_sunny);
+				a = mtn_visit_sum2(a, d, g, is_sunny, build_ext);
 				mtn_visit = true;
 				a.push(forage(5000, g, d));
 			}
@@ -83,12 +85,6 @@ function actions_photos_sum_y2(a, d, g, is_sunny) {
 					a.push({'desc':"Rabbit Cutscene", 'sel':false, 'cid':'f_cutscene_rabbit', 'val':1, 'sr':true});
 				} else if (dow != "TUES") {
 					// Extensions on rainy days to avoid cutscenes if Cliff aff >= 143
-					var tmp_build_ext = false;
-
-					if (is_sunny == 1) {
-						a = mtn_visit_sum2(a, d, g, is_sunny);
-						mtn_visit = true;
-					}
 
 					if (flags['kitchen'] == 0 && vars['gold'] >= 5000) {
 						// Kitchen
@@ -96,7 +92,7 @@ function actions_photos_sum_y2(a, d, g, is_sunny) {
 								'cid':['v_gold', 'v_lumber', 'f_kitchen'],
 								'val':[-5000, -450, _BUILD_DAYS + 1]
 						});
-						tmp_build_ext = true;
+						build_ext = true;
 					} else if (flags['kitchen'] == 1) {
 						var leftover_g = vars['gold'] - (980 - 980 * ((flags['blue_feather'] > 0 || flags['propose'] > 0) ? 1 : 0)) - (1800 - 1800 * flags['milker']);
 						if (flags['babybed'] == 0 && leftover_g >= 1000) {
@@ -105,7 +101,7 @@ function actions_photos_sum_y2(a, d, g, is_sunny) {
 								'cid':['v_gold', 'v_lumber', 'f_babybed'],
 								'val':[-1000, -150, _BUILD_DAYS + 1]
 							});
-							tmp_build_ext = true;
+							build_ext = true;
 						} else if (flags['babybed'] == 1) {
 							if (flags['bathroom'] == 0 && leftover_g >= 3000) {
 								// Bathroom
@@ -113,7 +109,7 @@ function actions_photos_sum_y2(a, d, g, is_sunny) {
 									'cid':['v_gold', 'v_lumber', 'f_bathroom'],
 									'val':[-3000, -300, _BUILD_DAYS + 1]
 								});
-								tmp_build_ext = true;
+								build_ext = true;
 							} else if (flags['bathroom'] == 1 && flags['stairway'] == 0 && d > 174 && leftover_g >= 2000) {
 								// Lumber needed for Stairway earned at Swim Fest
 								// Stairway
@@ -121,25 +117,21 @@ function actions_photos_sum_y2(a, d, g, is_sunny) {
 									'cid':['v_gold', 'v_lumber', 'f_stairway'],
 									'val':[-2000, -250, _BUILD_DAYS + 1]
 								});
-								tmp_build_ext = true;
+								build_ext = true;
 							}
 						}
 					}
-
-					// CLIFF
-					if (tmp_build_ext) {
-						a.push({'desc':("Talk (" + ((is_sunny == 0) ? "In Carp House 50%)" : ((["FRI", "SAT"].includes(dow)) ? "Fish Tent 50%)" : "Carp Screen)"))),
-								'sel':false, 'cid':cliff_id, 'val':2, 'red':(aff[cliff_id] >= _PARTY_ATTEND_MIN)
-						});
-						a.push({'desc':" Gift", 'cid':cliff_id, 'val':4, 't2':" Egg", 'sr':true, 'sel':false});
-						a.push({'desc':" Egg", 'cid':cliff_id, 'val':8, 't2':" Gift", 'sr':true, 'sel':false});
+					
+					if (is_sunny == 1) {
+						a = mtn_visit_sum2(a, d, g, is_sunny, build_ext);
+						mtn_visit = true;
 					}
 				} // End of Buy Extensions
 
 				// Basil nearing min value for Spring Power Nut
 				if (aff[basil_id] < basil_min(d) && flags['berry_basil'] == 0) {
 					if (["FRI", "SAT"].includes(dow) && is_sunny == 1) {
-						a = mtn_visit_sum2(a, d, g, is_sunny);
+						a = mtn_visit_sum2(a, d, g, is_sunny, build_ext);
 						mtn_visit = true;
 					} else {
 						if (!mtn_visit) { a.push({'desc':"ed, wal, flower"}); }
@@ -161,7 +153,7 @@ function actions_photos_sum_y2(a, d, g, is_sunny) {
 						if (flags['berry_farm'] == 0) {
 							a.push({'desc':"Dig a Berry", 'val':1, 'cid':'f_berry_farm', 'sr':true, 'sel':false});
 						}
-						a = mtn_visit_sum2(a, d, g, is_sunny);
+						a = mtn_visit_sum2(a, d, g, is_sunny, build_ext);
 						mtn_visit = true;
 					}
 
@@ -179,8 +171,8 @@ function actions_photos_sum_y2(a, d, g, is_sunny) {
 					}
 
 					// RICK
-					a.push({'desc':"Talk", 'cid':rick_id, 'val':3, 'sel':(aff[rick_id] < _PHOTO_MIN), 'red':(aff[rick_id] >= _PHOTO_MIN)});
-					a.push({'desc':"Gift", 'cid':rick_id, 'val':3, 'sr':true, 'sel':(aff[rick_id] < _PHOTO_MIN)});
+					a.push({'desc':"Talk", 'cid':rick_id, 'val':3, 'sel':(aff[rick_id] < _PARTY_ATTEND_MIN), 'red':(aff[rick_id] >= _PARTY_ATTEND_MIN && flags['blue_feather'] == 1)});
+					a.push({'desc':"Gift", 'cid':rick_id, 'val':3, 'sr':true, 'sel':(aff[rick_id] < _PARTY_ATTEND_MIN)});
 					a.push({'desc':"Buy Blue Feather", 'cid':['v_gold', 'f_blue_feather'], 'val':[-980, 1], 'sr':true,
 							't0':["Propose at Bar"], 't3':"Propose at Bar"});
 					if (aff[cliff_id] <= 142 || flags['cutscene_rabbit'] == 1) {
@@ -200,6 +192,8 @@ function actions_photos_sum_y2(a, d, g, is_sunny) {
 						a.push({'desc':"Talk (Rick Shop 50%)", 'cid':mayor_id, 'val':3, 'sel':false, 'red':(aff[mayor_id] >= _PARTY_ATTEND_MIN)});
 						a.push({'desc':"  Gift", 'cid':mayor_id, 'val':3, 'sr':true, 'sel':false});
 					}
+					
+					a.push({'desc':"Get Blue Feather from Tool Chest", 'imp':true});
 
 					// Propose to Karen in Mtns
 					if (flags['photo_married'] == 0 && flags['propose'] == 0 && aff[cliff_id] <= 142) {
@@ -208,7 +202,7 @@ function actions_photos_sum_y2(a, d, g, is_sunny) {
 					}
 					if (propose_at_bar) {
 						a.push({'desc':"Equip Grass Seeds"});
-						a.push({'desc':"Plant Grass", 'sr':true, 'cid':['v_grass_planted', 'v_grass'], 'val':[tmp_seeds, -1 * tmp_seeds]});
+						a.push({'desc':"Plant All Grass", 'sel':false, 'sr':true, 'cid':['v_grass_planted', 'v_grass'], 'val':[tmp_seeds, -1 * tmp_seeds]});
 						if (flags['berry_farm'] == 0) {
 							a.push({'desc':"Dig a Berry", 'val':1, 'cid':'f_berry_farm', 'sr':true, 'sel':false});
 						}
@@ -217,12 +211,12 @@ function actions_photos_sum_y2(a, d, g, is_sunny) {
 
 				// BASIL & CLIFF Aff
 				if (!mtn_visit && ["FRI", "SAT"].includes(dow)) {
-					if (mtn_visit_sum2(a, d, g, is_sunny).length > 1) {
+					if (mtn_visit_sum2(a, d, g, is_sunny, build_ext).length > 1) {
 						a.push({'desc':"Equip hoe, Clear field or Plant Grass"});
 						if (flags['berry_farm'] == 0) {
 							a.push({'desc':"Dig a Berry", 'val':1, 'cid':'f_berry_farm', 'sr':true, 'sel':false});
 						}
-						a = mtn_visit_sum2(a, d, g, is_sunny);
+						a = mtn_visit_sum2(a, d, g, is_sunny, build_ext);
 						mtn_visit = true;
 					}
 				}
@@ -281,7 +275,7 @@ function actions_photos_sum_y2(a, d, g, is_sunny) {
 	return a;
 }
 
-function mtn_visit_sum2(a, d, g, is_sunny = 1) {
+function mtn_visit_sum2(a, d, g, is_sunny = 1, build_ext = false) {
 	var dow = get_dow(d, true);
 	var tmp_a = [];
 
@@ -303,13 +297,13 @@ function mtn_visit_sum2(a, d, g, is_sunny = 1) {
 		if (["FRI", "SAT"].includes(dow)) {
 			tmp_a.push({'desc':"Talk (Fish Tent)", 'cid':cliff_id, 'val':2, 'sel':(!cliff_maxed())});
 		} else if (["THURS", "SUN"].includes(dow)) {
-			tmp_a.push({'desc':"Talk (Carp House)", 'cid':cliff_id, 'val':2, 'sel':false});
+			tmp_a.push({'desc':("Talk (" + ((dow == "THURS") ? "By Cave)" : "Carp House)")), 'cid':cliff_id, 'val':2, 'sel':false});
 		}
 	} else {
-		tmp_a.push({'desc':"Talk (In Carp House)", 'cid':cliff_id, 'val':2, 'sel':(!cliff_maxed())});
+		tmp_a.push({'desc':"Talk (In Carp House 50%)", 'cid':cliff_id, 'val':2, 'sel':(!cliff_maxed())});
 	}
 	if (tmp_a[tmp_a.length - 1]['cid'] == cliff_id) {
-		tmp_a.push({'desc':" Gift", 'cid':cliff_id, 'val':4, 't2':"Egg", 'sr':true, 'sel':(!cliff_maxed())});
+		tmp_a.push({'desc':" Gift", 'cid':cliff_id, 'val':4, 't2':"Egg", 'sr':true, 'sel':(tmp_a[tmp_a.length - 1]['sel'])});
 		tmp_a.push({'desc':"Egg", 'cid':cliff_id, 'val':8, 't2':" Gift", 'sr':true, 'sel':false});
 	}
 	return tmp_a;
