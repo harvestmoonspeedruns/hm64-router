@@ -1,3 +1,12 @@
+## ROUTE IDS
+* **0** - All Photos (Karen marriage)
+* **1** - Elli Marriage
+* **2** - Karen Marriage
+* **3** - Popuri Marriage
+* **4** - Elli Photo
+* **5** - All Photos (Elli marriage)
+* **6** - All Recipes
+
 ## ACTION PROPERTIES
 * **"desc"** - (Description) Words that appear on the action button. REQUIRED
 * **"cid"** - (Char ID) Variable, flag, or npc id that changes by the value if this button is selected. "v_" precedes variables and "f_" precedes flags.
