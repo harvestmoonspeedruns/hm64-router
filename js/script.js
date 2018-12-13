@@ -439,7 +439,7 @@ function new_game(id = 0) {
 	$("input[id^='for_']").val(0);
 
 	// Set affection of included characters to 0
-	if (route_id == 0) {
+	if ([0, 5].includes(route_id)) {
 		for (var i = 0; i < 38; i++) { aff[i] = 0; }
 	} else {
 		for (var i = 0; i < route_affs[route_id].length; i++) {
@@ -454,16 +454,20 @@ function new_game(id = 0) {
 	var html_list = [];
 	html_list.push('<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Skip to</a>');
 	html_list.push('<div class="dropdown-menu" aria-labelledby="navbarDropdown2">');
-	for (var i = 0; i < skip_to_list[route_id].length; i++) {
-		html_list.push('<span class="dropdown-item ' + get_month_name(skip_to_list[route_id][i]).toLowerCase() +
-			'" onclick="skip_to(' + skip_to_list[route_id][i] +
-			')">' + get_month_name(skip_to_list[route_id][i], true) + ' ' + get_day(skip_to_list[route_id][i]) +
-			' (' + get_day_of_week(skip_to_list[route_id][i], true).toUpperCase() + ')</span>');
+	if (route_id < skip_to_list.length) {
+		for (var i = 0; i < skip_to_list[route_id].length; i++) {
+			html_list.push('<span class="dropdown-item ' + get_month_name(skip_to_list[route_id][i]).toLowerCase() +
+				'" onclick="skip_to(' + skip_to_list[route_id][i] +
+				')">' + get_month_name(skip_to_list[route_id][i], true) + ' ' + get_day(skip_to_list[route_id][i]) +
+				' (' + get_day_of_week(skip_to_list[route_id][i], true).toUpperCase() + ')</span>');
+		}
 	}
-	$('#skip_to_menu').html(html_list.join("") + '</div>');
+	if (html_list.length > 2) {
+		$('#skip_to_menu').html(html_list.join("") + '</div>');
+	}
 
 	// Custom flags for particular run
-	if (route_id == 0) { // All Photos
+	if ([0, 5].includes(route_id)) { // All Photos
 		vars['openers'] = 0;
 		flags['potato_planted'] = 0;
 		flags['corn_planted'] = 0;
