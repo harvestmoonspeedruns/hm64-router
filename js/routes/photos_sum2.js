@@ -9,23 +9,30 @@ function actions_photos_sum_y2(a, d, g, is_sunny) {
 
 	var dow = get_dow(d, true);
 	var mtn_visit = false;
-	var build_ext = false;
+
+	var ext_price = 0;
+	var ext_desc = "";
+	var ext_id = -1;
 
 	if (flags['propose'] == 1) {
 		a.push({'desc':"Wedding Day", 'iid':get_npc_id('karen'), 'cid':['f_photo_married', 'f_propose'], 'val':[1, -1], 'imp':true});
 	} else {
 		// Married Affection
 		if (flags['photo_married'] == 1) {
-			a.push({'desc':"Talk", 'val':1, 'cid':karen_id});
-			a.push({'desc':"Gift", 'val':1, 'cid':karen_id, 'sr':true, 'sel':false});
+			a.push({'desc':" Talk", 'val':1, 'cid':karen_id, 't2':"Musbox", 'sel':(flags['new_mus_box'] == 0)});
+			a.push({'desc':"Musbox", 'val':6, 'cid':karen_id, 'sel':(flags['new_mus_box'] == 1), 'sr':true, 't2':a[a.length - 1]['desc']})
+			a.push({'desc':"Gift", 'val':1, 'cid':karen_id, 'sr':true, 'sel':(aff[karen_id] < 250)});
 		}
 
 		// Dog Affection
 		if (flags['dog_inside'] == 1) {
 			a.push({'desc':"Whistle / Pick up Dog", 'cid':get_npc_id('dog'), 'val':2});
+		} else {
+			a.push({'desc':"Bring Dog Inside", 'cid':['f_dog_inside', get_npc_id('dog')], 'val':[1, 1]});
+			a.push({'desc':"Whistle", 'val':1, 'sr':true});
 		}
 		if (is_sunny == 1) {
-			a.push({'desc':"Scare birds", 'cid':'v_happiness', 'val':1, 'sr':(flags['dog_inside'] == 1), 'sel':false});
+			a.push({'desc':"Scare Birds", 'cid':'v_happiness', 'val':1, 'sr':true, 'sel':false});
 		}
 
 		if (is_sunny != -1) {
@@ -47,7 +54,7 @@ function actions_photos_sum_y2(a, d, g, is_sunny) {
 			// ** IMPORTANT: Marriage by SUM 25 or Baby wont arrive before Evaluation **
 			var tmp_gneed = 5000 - (((flags['kitchen'] > 0) ? 1 : 0) * 5000) + 980 - (flags['blue_feather'] * 980);
 			if (flags['kitchen'] == 0 && (vars['gold'] < (tmp_gneed - (420 * (168 - d))))) {
-				a = mtn_visit_sum2(a, d, g, is_sunny, build_ext);
+				a = mtn_visit_sum2(a, d, g, is_sunny);
 				mtn_visit = true;
 				a.push(forage(5000, g, d));
 			}
@@ -58,6 +65,9 @@ function actions_photos_sum_y2(a, d, g, is_sunny) {
 					a.push({'desc':('Milk Cow' + ((vars['cows'] > 1) ? 's' : '')), 'iid':cow_id, 'imp':(flags['cows_outside'] == 0)});
 					if (flags['cows_outside'] == 0) {
 						a.push({'desc':"Put Cows Outside", 'cid':'f_cows_outside', 'val':1,'sr':true});
+					}
+					if (is_sunny == 1) {
+						a.push({'desc':"Scare birds", 'cid':'v_happiness', 'val':1, 'sr':true, 'sel':false});
 					}
 				}
 				// New Cow
@@ -92,7 +102,6 @@ function actions_photos_sum_y2(a, d, g, is_sunny) {
 								'cid':['v_gold', 'v_lumber', 'f_kitchen'],
 								'val':[-5000, -450, _BUILD_DAYS + 1]
 						});
-						build_ext = true;
 					} else if (flags['kitchen'] == 1) {
 						var leftover_g = vars['gold'] - (980 - 980 * ((flags['blue_feather'] > 0 || flags['propose'] > 0) ? 1 : 0)) - (1800 - 1800 * flags['milker']);
 						if (flags['babybed'] == 0 && leftover_g >= 1000) {
@@ -101,7 +110,6 @@ function actions_photos_sum_y2(a, d, g, is_sunny) {
 								'cid':['v_gold', 'v_lumber', 'f_babybed'],
 								'val':[-1000, -150, _BUILD_DAYS + 1]
 							});
-							build_ext = true;
 						} else if (flags['babybed'] == 1) {
 							if (flags['bathroom'] == 0 && leftover_g >= 3000) {
 								// Bathroom
@@ -109,7 +117,6 @@ function actions_photos_sum_y2(a, d, g, is_sunny) {
 									'cid':['v_gold', 'v_lumber', 'f_bathroom'],
 									'val':[-3000, -300, _BUILD_DAYS + 1]
 								});
-								build_ext = true;
 							} else if (flags['bathroom'] == 1 && flags['stairway'] == 0 && d > 174 && leftover_g >= 2000) {
 								// Lumber needed for Stairway earned at Swim Fest
 								// Stairway
@@ -117,13 +124,17 @@ function actions_photos_sum_y2(a, d, g, is_sunny) {
 									'cid':['v_gold', 'v_lumber', 'f_stairway'],
 									'val':[-2000, -250, _BUILD_DAYS + 1]
 								});
-								build_ext = true;
 							}
 						}
 					}
-					
+					if (a[a.length - 1]['iid'] == get_npc_id('mas_carpenter')) {
+						ext_price = -1 * a[a.length - 1]['val'][0];
+						ext_desc = a[a.length - 1]['desc'];
+						ext_id = a.length - 1;
+					}
+
 					if (is_sunny == 1) {
-						a = mtn_visit_sum2(a, d, g, is_sunny, build_ext);
+						a = mtn_visit_sum2(a, d, g, is_sunny);
 						mtn_visit = true;
 					}
 				} // End of Buy Extensions
@@ -131,7 +142,7 @@ function actions_photos_sum_y2(a, d, g, is_sunny) {
 				// Basil nearing min value for Spring Power Nut
 				if (aff[basil_id] < basil_min(d) && flags['berry_basil'] == 0) {
 					if (["FRI", "SAT"].includes(dow) && is_sunny == 1) {
-						a = mtn_visit_sum2(a, d, g, is_sunny, build_ext);
+						a = mtn_visit_sum2(a, d, g, is_sunny);
 						mtn_visit = true;
 					} else {
 						if (!mtn_visit) { a.push({'desc':"ed, wal, flower"}); }
@@ -153,7 +164,7 @@ function actions_photos_sum_y2(a, d, g, is_sunny) {
 						if (flags['berry_farm'] == 0) {
 							a.push({'desc':"Dig a Berry", 'val':1, 'cid':'f_berry_farm', 'sr':true, 'sel':false});
 						}
-						a = mtn_visit_sum2(a, d, g, is_sunny, build_ext);
+						a = mtn_visit_sum2(a, d, g, is_sunny);
 						mtn_visit = true;
 					}
 
@@ -162,12 +173,21 @@ function actions_photos_sum_y2(a, d, g, is_sunny) {
 						a.push({'desc':"Gift", 'cid':basil_id, 'val':3, 'sr':true, 'sel':(aff[basil_id] < _BASIL_BERRY_MIN && (aff[basil_id] < _PARTY_ATTEND_MIN || flags['berry_mine'] == 0))});
 					}
 
-					var tmp_seeds = Math.floor((vars['gold'] - (980 - 980 * flags['blue_feather'])) / 500);
+					var tmp_seeds = Math.floor((vars['gold'] - ext_price - (980 - 980 * flags['blue_feather'])) / 500);
+					var tmp_seeds2 = Math.floor((vars['gold'] - (980 - 980 * flags['blue_feather'])) / 500);
 					tmp_seeds = ((tmp_seeds > 20) ? 20 : tmp_seeds);
 					if (propose_at_bar && tmp_seeds > 0) {
 						a.push({'desc':("Buy " + tmp_seeds + " Grass Seeds"), 'iid':get_npc_id('lillia'),
 								'cid':['v_gold', 'v_grass'], 'val':[-500 * tmp_seeds, tmp_seeds]
 						});
+						if (tmp_seeds != tmp_seeds2) {
+							a[a.length - 1]['t2'] = "Buy " + tmp_seeds2 + " Grass Seeds";
+							a.push({'desc':a[a.length - 1]['t2'], 'cid':['v_gold', 'v_grass'], 'sr':true, 'sel':false,
+									'val':[-500 * tmp_seeds2, tmp_seeds2], 't2':[a[a.length - 1]['desc'], ext_desc]
+							});
+							a[ext_id]['t2'] = a[a.length - 1]['desc'];
+							a[ext_id]['t3'] = a[a.length - 2]['desc'];
+						}
 					}
 
 					// RICK
@@ -211,12 +231,12 @@ function actions_photos_sum_y2(a, d, g, is_sunny) {
 
 				// BASIL & CLIFF Aff
 				if (!mtn_visit && ["FRI", "SAT"].includes(dow)) {
-					if (mtn_visit_sum2(a, d, g, is_sunny, build_ext).length > 1) {
+					if (mtn_visit_sum2(a, d, g, is_sunny).length > 1) {
 						a.push({'desc':"Equip hoe, Clear field or Plant Grass"});
 						if (flags['berry_farm'] == 0) {
 							a.push({'desc':"Dig a Berry", 'val':1, 'cid':'f_berry_farm', 'sr':true, 'sel':false});
 						}
-						a = mtn_visit_sum2(a, d, g, is_sunny, build_ext);
+						a = mtn_visit_sum2(a, d, g, is_sunny);
 						mtn_visit = true;
 					}
 				}
@@ -226,6 +246,9 @@ function actions_photos_sum_y2(a, d, g, is_sunny) {
 					a.push({'desc':('Milk Cow' + ((vars['cows'] > 1) ? 's' : '')), 'iid':cow_id, 'imp':(flags['cows_outside'] == 0)});
 					if (flags['cows_outside'] == 0) {
 						a.push({'desc':"Put Cows Outside", 'cid':'f_cows_outside', 'val':1,'sr':true});
+					}
+					if (is_sunny == 1) {
+						a.push({'desc':"Scare birds", 'cid':'v_happiness', 'val':1, 'sr':true, 'sel':false});
 					}
 				}
 				// New Cow
@@ -252,8 +275,8 @@ function actions_photos_sum_y2(a, d, g, is_sunny) {
 
 			// Plant Grass Seeds
 			if (vars['grass'] > 0) {
-				a.push({'desc':"Equip Grass Seeds", 'imp':true});
-				a.push({'desc':"Plant " + vars['grass'] + " Grass", 'cid':['v_grass', 'v_grass_planted'], 'val':[-1 * vars['grass'], vars['grass']]});
+				a.push({'desc':"Equip Grass Seeds"});
+				a.push({'desc':"Plant All Grass Seeds", 'cid':['v_grass', 'v_grass_planted'], 'val':[-1 * vars['grass'], vars['grass']], 'sr':true, 'sel':false});
 				if (flags['berry_farm'] == 0) {
 					a.push({'desc':"Dig a Berry", 'val':1, 'cid':'f_berry_farm', 'sr':true, 'sel':false});
 				}
@@ -269,20 +292,20 @@ function actions_photos_sum_y2(a, d, g, is_sunny) {
 			}
 
 			// Feed Dog
-			a.push({'desc':"Feed Dog", 'cid':get_npc_id('dog'), 'val':2, 'sel':false});
+			a.push({'desc':"Feed Dog", 'cid':get_npc_id('dog'), 'val':2, 'sel':false, 'red':(aff[get_npc_id('dog')] > 250)});
 		} // End of if (!typhoon)
 	}
 	return a;
 }
 
-function mtn_visit_sum2(a, d, g, is_sunny = 1, build_ext = false) {
+function mtn_visit_sum2(a, d, g, is_sunny = 1) {
 	var dow = get_dow(d, true);
+	var tmp_s = [];
 	var tmp_a = [];
 
 	for (var i = 0; i < a.length; i++) {
-		tmp_a.push(a[i]);
+		tmp_s.push(a[i]);
 	}
-	tmp_a.push({'desc':"ed, wal, flower"});
 
 	// BASIL
 	var basil_id = get_npc_id('basil');
@@ -302,9 +325,10 @@ function mtn_visit_sum2(a, d, g, is_sunny = 1, build_ext = false) {
 	} else {
 		tmp_a.push({'desc':"Talk (In Carp House 50%)", 'cid':cliff_id, 'val':2, 'sel':(!cliff_maxed())});
 	}
-	if (tmp_a[tmp_a.length - 1]['cid'] == cliff_id) {
+	if (tmp_a.length > 0 && tmp_a[tmp_a.length - 1]['cid'] == cliff_id) {
 		tmp_a.push({'desc':" Gift", 'cid':cliff_id, 'val':4, 't2':"Egg", 'sr':true, 'sel':(tmp_a[tmp_a.length - 1]['sel'])});
 		tmp_a.push({'desc':"Egg", 'cid':cliff_id, 'val':8, 't2':" Gift", 'sr':true, 'sel':false});
 	}
-	return tmp_a;
+
+	return ((tmp_a.length > 0) ? tmp_s.concat([{'desc':"ed, wal, flower"}].concat(tmp_a)) : tmp_s);
 }

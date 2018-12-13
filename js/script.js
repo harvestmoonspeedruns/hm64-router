@@ -649,7 +649,7 @@ function add_recipes() {
 
 function to_html(a = actions, show_red = true) {
 	
-	console.log(a);
+	//console.log(a);
 	
 	var is_red = false;
 	var cur_vis = true;
