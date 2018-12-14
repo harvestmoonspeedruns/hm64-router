@@ -31,7 +31,7 @@ function actions_photos_spr_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 	if (vars['openers'] == 0) { a.push({'desc':"Equip hoe"}); }
 
 	if (d == 15) { a.push({'desc':"Ignore Basil on the Farm", 'iid':basil_id}); }
-	if (d == 18) { a.push({'desc':"Feed Cliff on the Farm", 'cid':cliff_id, 'val':5}); }
+	if (d == 18 && route_id == 0) { a.push({'desc':"Feed Cliff on the Farm", 'cid':cliff_id, 'val':5}); }
 	if (d == 25) { a.push({'desc':"Ignore Karen on the Farm", 'iid':karen_id}); }
 
 	if (d == 3) { // Spring 3
@@ -229,7 +229,7 @@ function actions_photos_spr_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 			// CLIFF
 			// "Gift    " <- 4 spaces
 			// "Egg " <- 1 space
-			if (dow == "WED" && d > 17) {
+			if (dow == "WED" && d > 17 && route_id == 0) {
 				a.push({'desc':"Talk (Ranch)", 'cid':cliff_id, 'val':2});
 				a.push({'desc':"Gift    ", 'cid':cliff_id, 'val':4, 't2':"Egg ", 'sr':true});
 				a.push({'desc':"Egg ", 'cid':cliff_id, 'val':8, 'sel':false, 't2':"Gift    ", 'sr':true});
@@ -260,7 +260,7 @@ function actions_photos_spr_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 			// CLIFF
 			// "Gift    " <- 4 spaces
 			// "Egg " <- 1 space
-			if (d > 17 && is_sunny == 1 && ["TUES", "WED"].includes(dow)) {
+			if (route_id == 0 && d > 17 && is_sunny == 1 && ["TUES", "WED"].includes(dow)) {
 				a.push({'desc':"Talk (" + ((dow == "TUES") ? "Beach)" : "Ranch)"), 'cid':cliff_id, 'val':2, 'sel':(dow == "WED")});
 				a.push({'desc':"Gift    ", 'cid':cliff_id, 'val':4, 't2':"Egg ", 'sr':true, 'sel':(dow == "WED")});
 				a.push({'desc':"Egg ", 'cid':cliff_id, 'val':8, 't2':"Gift    ", 'sr':true, 'sel':false});
@@ -329,7 +329,7 @@ function actions_photos_spr_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 				// CLIFF
 				// "Gift    " <- 4 spaces
 				// "Egg " <- 1 space
-				if (d > 17) {
+				if (d > 17 && route_id == 0) {
 					a.push({'desc':"Talk (Hot Springs)", 'cid':cliff_id, 'val':2, 'sel':false, 'red':true});
 					a.push({'desc':"Gift    ", 'cid':cliff_id, 'val':4, 't2':"Egg ", 'sr':true, 'sel':false});
 					a.push({'desc':"Egg ", 'cid':cliff_id, 'val':8, 't2':"Gift    ", 'sr':true, 'sel':false});
@@ -373,12 +373,12 @@ function actions_photos_spr_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 			// CLIFF
 			// "Gift    " <- 4 spaces
 			// "Egg " <- 1 space
-			if (["FRI", "SAT"].includes(dow) && d > 17) {
+			if (["FRI", "SAT"].includes(dow) && d > 17 && route_id == 0) {
 				a.push({'desc':"Talk (Fish Tent)", 'cid':cliff_id, 'val':2});
 				a.push({'desc':"Gift    ", 'cid':cliff_id, 'val':4, 't2':"Egg ", 'sr':true});
 				a.push({'desc':"Egg ", 'cid':cliff_id, 'val':8, 'sel':false, 't2':"Gift    ", 'sr':true});
 			}
-			if (["THURS", "SUN"].includes(dow) && d > 17) {
+			if (["THURS", "SUN"].includes(dow) && d > 17 && route_id == 0) {
 				a.push({'desc':"Talk (Carp House)", 'cid':cliff_id, 'val':2, 'sel':false, 'red':((vars['chickens'] > 0 || g >= 1500) && (dow != "MON" || is_sunny == 0))});
 				a.push({'desc':"Gift    ", 'cid':cliff_id, 'val':4, 't2':"Egg ", 'sr':true, 'sel':false});
 				a.push({'desc':"Egg ", 'cid':cliff_id, 'val':8, 't2':"Gift    ", 'sr':true, 'sel':false});
