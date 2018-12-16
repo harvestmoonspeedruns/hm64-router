@@ -118,10 +118,22 @@ function actions_photos_fall_y2(a = [], d = 3, g = 300, is_sunny = 1) {
 
 		// Sell Cows
 		if (money_needed() <= 0 && vars['cows'] > 0 && d > 184 && dow != "THURS") {
+			a.push({'desc':"Equip hoe, Clear Field & Plant Grass"});
+			a.push({'desc':"Plant All Grass", 'sel':false, 'sr':true, 'cid':['v_grass_planted', 'v_grass'], 'val':[vars['grass'], -1 * vars['grass']]});
+			if (flags['berry_farm'] == 0) {
+				a.push({'desc':"Dig a Berry", 'val':1, 'cid':'f_berry_farm', 'sr':true, 'sel':false});
+			}
+
 			a.push({'desc':"Sell Cow", 'iid':get_npc_id('doug'),
 					'cid':['v_cows', 'v_gold'],
 					'val':[-1, ((vars['cows'] == 1 && d >= 184) ? 8500 : 7500)]
 			});
+			
+			if (dow == "WED" && is_sunny == 1) {
+				a.push({'desc':"Talk (Ranch)", 'cid':cliff_id, 'val':2, 'sel':(aff[cliff_id] < _PARTY_ATTEND_MIN), 'red':(aff[cliff_id] >= _PARTY_ATTEND_MIN)});
+				a.push({'desc':" Gift", 'cid':cliff_id, 'val':4, 't2':"Egg", 'sr':true, 'sel':(a[a.length - 1]['sel'])});
+				a.push({'desc':"Egg", 'cid':cliff_id, 'val':8, 't2':" Gift", 'sr':true, 'sel':false});
+			}
 		}
 
 		// Cutscene with Cliff + Ann when Cliff >= 143 affection
@@ -131,6 +143,14 @@ function actions_photos_fall_y2(a = [], d = 3, g = 300, is_sunny = 1) {
 		} else if (dow != "TUES") {
 			// Extensions on rainy days to avoid cutscenes if Cliff aff >= 143
 
+			// Grass
+			a.push({'desc':"Equip hoe, Clear Field & Plant Grass"});
+			a.push({'desc':"Plant All Grass", 'sel':false, 'sr':true, 'cid':['v_grass_planted', 'v_grass'], 'val':[vars['grass'], -1 * vars['grass']]});
+			if (flags['berry_farm'] == 0) {
+				a.push({'desc':"Dig a Berry", 'val':1, 'cid':'f_berry_farm', 'sr':true, 'sel':false});
+			}
+
+			// Extensions
 			if (flags['kitchen'] == 0 && vars['gold'] >= 5000) {
 				// Kitchen
 				a.push({'desc':"Buy a Kitchen (5000 G)", 'iid':get_npc_id('mas_carpenter'),
@@ -195,7 +215,8 @@ function actions_photos_fall_y2(a = [], d = 3, g = 300, is_sunny = 1) {
 		// BASIL & CLIFF Aff
 		if (!mtn_visit && ["FRI", "SAT"].includes(dow) && (aff[cliff_id] < _PARTY_ATTEND_MIN || aff[basil_id] < _BASIL_BERRY_MIN)) {
 			if (mtn_visit_fall2(a, d, g, is_sunny).length > 1) {
-				a.push({'desc':"Equip hoe, Clear field or Plant Grass"});
+				a.push({'desc':"Equip hoe, Clear Field & Plant Grass"});
+				a.push({'desc':"Plant All Grass", 'sel':false, 'sr':true, 'cid':['v_grass_planted', 'v_grass'], 'val':[vars['grass'], -1 * vars['grass']]});
 				if (flags['berry_farm'] == 0) {
 					a.push({'desc':"Dig a Berry", 'val':1, 'cid':'f_berry_farm', 'sr':true, 'sel':false});
 				}

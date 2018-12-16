@@ -108,7 +108,9 @@ function get_actions_photos(d = 3, g = 300, is_sunny = 1) {
 	var dow = get_dow(d, true);
 	dontsave = false;
 
-	if (is_festival(d)) {
+	if (flags['baby'] == 2) {
+		a.push({'desc':("<h4>BABY BORN EVENT</h4>")});
+	} else if (is_festival(d)) {
 		a.push({'desc':("<h4>" + festival_name(d).toUpperCase() + "</h4>")});
 	}
 

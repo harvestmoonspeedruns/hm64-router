@@ -222,7 +222,7 @@ function actions_photos_sum_y2(a, d, g, is_sunny) {
 					}
 					if (propose_at_bar) {
 						a.push({'desc':"Equip Grass Seeds"});
-						a.push({'desc':"Plant All Grass", 'sel':false, 'sr':true, 'cid':['v_grass_planted', 'v_grass'], 'val':[tmp_seeds, -1 * tmp_seeds]});
+						a.push({'desc':"Plant All Grass", 'sel':false, 'sr':true, 'cid':['v_grass_planted', 'v_grass'], 'val':[vars['grass'], -1 * vars['grass']]});
 						if (flags['berry_farm'] == 0) {
 							a.push({'desc':"Dig a Berry", 'val':1, 'cid':'f_berry_farm', 'sr':true, 'sel':false});
 						}

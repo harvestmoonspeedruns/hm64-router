@@ -33,16 +33,20 @@ var day_names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday
 				"SUN", "MON", "TUES", "WED", "THURS", "FRI", "SAT",
 				"日", "月", "火", "水", "木", "金", "土"
 ];
+
+// ORDER OF EXTENSIONS IS IMPORTANT!!
+// DO NOT RE-ORDER THIS LIST
+// (See All-Photos Spr Y3)
 var extensions = [
-	["kitchen", 5000, 450],
-	["bathroom", 3000, 300],
-	["stairway", 2000, 250],
-	["greenhouse", 30000, 580],
-	["logterrace", 7000, 350],
-	["babybed", 1000, 150]
+	["greenhouse", 30000, 580, "Greenhouse"],
+	["logterrace", 7000, 350, "Log Terrace"],
+	["stairway", 2000, 250, "Stairway"],
+	["bathroom", 3000, 300, "Bathroom"],
+	["babybed", 1000, 150, "Baby Bed"],
+	["kitchen", 5000, 450, "Kitchen"]
 ];
 
-var route_names = ["All Photos", "Elli", "Karen", "Popuri", "Elli IL Photo"];
+var route_names = ["All Photos (Karen)", "Elli", "Karen", "Popuri", "Elli IL Photo", "All Photos (Elli)", "All Recipes"];
 var bet_colors = ["lightgray", "black", "red", "blue", "yellow", "green"];
 var route_affs = [
 	[], // Placeholder for All Photos

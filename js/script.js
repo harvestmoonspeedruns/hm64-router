@@ -44,7 +44,7 @@ function get_actions(rid = null, d = vars['day'], g = vars['gold'], is_sunny = 1
 	if (reset == true) {
 		return [{'desc':"RESET"}];
 	} else {
-		if (rid == 0) { return get_actions_photos(d, g, is_sunny); }
+		if ([0, 5].includes(rid)) { return get_actions_photos(d, g, is_sunny); }
 		if (rid == 1) { return get_actions_elli(d, g, is_sunny); }
 		if (rid == 2) { return get_actions_karen(d, g, is_sunny); }
 		if (rid == 3) { return get_actions_popuri(d, g, is_sunny); }
@@ -162,7 +162,7 @@ function next_day(jump = false) {
 		flags['yesterday_rain'] = 0;
 		if ($('.rainy').hasClass('selected')) {
 			flags['yesterday_rain'] = 1;
-			if (route_id == 0) {
+			if ([0, 5].includes(route_id)) {
 				if (get_month(vars['day']) == 0 && flags['potato_planted'] == 1) {
 					vars['potato_waters']++;
 				}
@@ -309,7 +309,7 @@ function skip_to(d = 3) {
 	vars['day'] = d;
 
 	if (d == 3) { next_day(true); }
-	if (route_id == 0) { // All Photos
+	if ([0, 5].includes(route_id)) { // All Photos
 		actions_all = {
 			'3':[['f_dog_inside', 1], ['v_openers', 2]]
 		}
@@ -406,7 +406,7 @@ function fish() {
 }
 
 function betting_table(a = []) {
-	var tmp_medals_needed = ((route_id == 0) ? ((vars['day'] < 120) ? 2000 : 1000) : 500);
+	var tmp_medals_needed = (([0, 5].includes(route_id)) ? ((vars['day'] < 120) ? 2000 : 1000) : 500);
 	a.push({'desc':('<div class="ml-3">NEED:&nbsp;&nbsp;<input type="number" id="b_need" onchange="calc_bets()" style="margin-right:20px" value="' + tmp_medals_needed +
 			'" /></div>' + '<div class="ml-3">HAVE:&nbsp;&nbsp;<input type="number" id="b_have" onchange="calc_bets()" value="' + vars['medals'] + '" /></div>')});
 	for (var i = 0; i < 6; i++) {
@@ -877,7 +877,7 @@ function calc_bets(bet_type = 1) {
 		}
 	}
 
-	if (route_id == 0 && buy_amt > 0) { // All Photos
+	if ([0, 5].includes(route_id) && buy_amt > 0) { // All Photos
 		// Not enough to fill all bets to quota, but leftover bets
 		if (odds[5][3] == 0) {
 			var max_zero = -1;
@@ -1127,13 +1127,13 @@ function next_sunday(d = 3) {
 }
 
 function set_affections (rid = 0) {
-	if (rid > route_affs.length - 1) { rid = 0; }
+	if (rid > route_affs.length - 1 ) { rid = 0; }
 	if (!vars['gold']) { vars['gold'] = 300; }
 
 	var tmp_html = '<div class="p-1 display_main">GOLD: <input type="number" id="disp_gold" value="' + vars['gold'] + 
 					'"  onchange="gold_update()" /></div>';
 	var tx = route_affs[rid];
-	if (rid == 0) {
+	if ([0, 5].includes(rid)) {
 		var tmp_day = get_day(vars['day']);
 		tx = [];
 
@@ -1150,7 +1150,7 @@ function set_affections (rid = 0) {
 	}
 	for (var i = 0; i < tx.length; i++) {
 		tmp_html += '<div class="p-1 display_main">';
-		if (route_id == 0) {
+		if ([0, 5].includes(rid)) {
 			tmp_html += get_npc_img(get_npc_id(tx[i]), true);
 		} else {
 			tmp_html += npcs[get_npc_id(tx[i])].toUpperCase() + ': ';
