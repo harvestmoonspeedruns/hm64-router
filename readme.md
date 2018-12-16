@@ -19,6 +19,33 @@
 * **"t2"** - If this action is turned on, turn the action with this description off
 * **"t3"** - If this action is turned on, turn the action with this description on
 
+## CONSTANTS
+* **_SICK_EVENT_MIN** (120) - Minimum affection required for a girl's sick event to occur
+* **_DREAM_EVENT_MIN** (160) - Minimum affection required for a girl's dream event to occur
+* **_ANKLE_EVENT_MIN** (180) - Minimum affection required for a girl's ankle event to occur
+* **_PHOTO_MIN** (200) - Minimum affection required for a girl's photo event to occur
+* **_PROPOSE_MIN** (220) - Minimum affection required for a girl to accept proposal with a blue feather
+* **_PARTY_ATTEND_MIN** (160) - Minimum affection required for an NPC to attend the party
+* **_RICK_FIX_MIN** (31) - Minimum affection required for Rick to fix a broken music box
+* **_SPRITE_WINE_MIN** (50) - Minimum affection required for the sprites to mention the wine and the Goddess
+* **_DUKE_WINE_MIN** (41) - Minimum affection required for the bartender to give the player the wine
+* **_BASIL_BERRY_MIN** (200) - Minimum affection required for Basil to give the player a power berry when he returns in Spring
+* **_SICK_EVENT_AFF** (10) - Affection given for a girl's sick event
+* **_DREAM_EVENT_AFF** (8) - Affection given for a girl's dream event
+* **_ANKLE_EVENT_AFF** (10) - Affection given for a girl's ankle event
+* **_PHOTO_EVENT_AFF** (10) - Affection given for a girl's photo event
+* **_MUS_BOX_AFF** (6) - Affection given for gifting a girl a fixed music box
+* **_POTATO_GROW_DAYS** (6) - Number of days watered for planted potatoes to fully mature from seeds
+* **_CORN_GROW_DAYS** (13) - Number of days watered for planted corn to fully mature from seeds
+* **_BUILD_DAYS** (4) - Number of days the carpenters take to construct an extension
+* **_BABY_BORN_DAYS** (60) - 
+* **_PREGNANT_SLEEPS** (30) - 
+* **_BABY_SLEEPS** (60) - 
+* **_CHICK_BORN_SLEEPS** (3) - Number of sleeps before an egg hatches into a chick
+* **_CHICK_GROW_SLEEPS** (7) - Number of sleeps before a chick matures into an adult
+* **_COW_GROW_SLEEPS** (21) - Number of sleeps before a baby cow matures into an adult
+* **_FUNERAL_AFF_LOSS** (10) - Affection most non-Green Ranch related NPCs lose during a chicken funeral
+
 ## VARS
 * **bridge_days_worked**: Counter for the number of days you have worked on the bridge. If it equals four on Fall 27, the next_day function in script.js will increment affection for villagers
 * **chickens**: The number of adult chickens you have
