@@ -31,7 +31,8 @@ function reset_vars() {
 			"wine_from_duke" : 0, "vineyard_restored" : 0, "baby" : 0,
 			"kitchen" : 0, "bathroom" : 0, "babybed" : 0, "stairway" : 0, "logterrace" : 0, "greenhouse" : 0,
 			"borrow_cows" : 0 , "harvest_king" : 0, "good_weather" : 1, "dontsave" : 0,
-			"cutscene_beach" : 0, "cutscene_rabbit" : 0, "cutscene_watermelon" : 0, "cutscene_bug" : 0, "cutscene_cookfish" : 0,
+			"cutscene_beach" : 0, "cutscene_rabbit" : 0, "cutscene_watermelon" : 0,
+			"cutscene_bug" : 0, "cutscene_cookfish" : 0, "cutscene_vineyard" : 0,
 			"fishing_rod_stored" : 0};
 	aff = {};
 }
@@ -49,6 +50,7 @@ function get_actions(rid = null, d = vars['day'], g = vars['gold'], is_sunny = 1
 		if (rid == 2) { return get_actions_karen(d, g, is_sunny); }
 		if (rid == 3) { return get_actions_popuri(d, g, is_sunny); }
 		if (rid == 4) { return get_actions_elli_photo(d, g, is_sunny); }
+		if (rid == 7) { return get_actions_maria(d, g, is_sunny); }
 	}
 	return [];
 }
@@ -81,6 +83,12 @@ function next_day(jump = false) {
 		if (tmp_actions.length) {
 			actions_all[vars['day']] = [tmp_actions, flags];
 		}
+		if (route_id == 0 && vars['openers'] == 0) {
+			vars['openers'] = 1;
+		}
+
+		// Stumps
+		aff[get_npc_id('stump')] = vars['lumber'];
 
 		// Calculate G from sold items
 		var sell_amt = 0;
@@ -133,6 +141,10 @@ function next_day(jump = false) {
 				if (flags['stairway'] == 2) { flags['dog_inside'] = 0; }
 				flags[key]--;
 			}
+			if (flags[key] < 0) {
+				console.log("ERROR: flags['" + key + "'] is negative (" + flags[key] + "), RESET TO ZERO");
+				flags[key] = 0;
+			}
 		}
 
 		// Married Affection
@@ -168,6 +180,11 @@ function next_day(jump = false) {
 				}
 				if (get_month(vars['day']) == 1 && flags['corn_planted'] == 1) {
 					vars['corn_waters']++;
+				}
+			}
+			if (route_id == 7) {
+				if (flags['cabbage_planted'] == 1) {
+					vars['cabbage_waters']++;
 				}
 			}
 		}
@@ -406,7 +423,7 @@ function fish() {
 }
 
 function betting_table(a = []) {
-	var tmp_medals_needed = (([0, 5].includes(route_id)) ? ((vars['day'] < 120) ? 2000 : 1000) : 500);
+	var tmp_medals_needed = (([0, 5].includes(route_id)) ? 2000 : 500);
 	a.push({'desc':('<div class="ml-3">NEED:&nbsp;&nbsp;<input type="number" id="b_need" onchange="calc_bets()" style="margin-right:20px" value="' + tmp_medals_needed +
 			'" /></div>' + '<div class="ml-3">HAVE:&nbsp;&nbsp;<input type="number" id="b_have" onchange="calc_bets()" value="' + vars['medals'] + '" /></div>')});
 	for (var i = 0; i < 6; i++) {
@@ -415,8 +432,8 @@ function betting_table(a = []) {
 	return a;
 }
 
-function new_game(id = 0) {
-	route_id = id;
+function new_game(rid = 0) {
+	route_id = rid;
 	reset_vars();
 	vars['day'] = 3;
 	document.title = route_names[route_id] + " - HM64 Router";
@@ -446,7 +463,7 @@ function new_game(id = 0) {
 			aff[get_npc_id(route_affs[route_id][i])] = 0;
 		}
 	}
-	
+
 	// Characters listed based on route
 	$("#status_row").html(set_affections(route_id));
 
@@ -472,14 +489,16 @@ function new_game(id = 0) {
 		flags['potato_planted'] = 0;
 		flags['corn_planted'] = 0;
 	}
-
 	if (route_id == 3) { // Popuri marriage
 		flags['moondrops_bought'] = 0;
 		flags['moondrops_planted'] = 0;
 		vars['moondrop_waters'] = 0;
 	}
-	if (route_id == 4) {
-		flags['typhoon'] = 0;
+	if (route_id == 7) { // Maria Marriage
+		vars['cabbages'] = 0;
+		vars['cabbage_waters'] = 0;
+		flags['cabbage_bought'] = 0;
+		flags['cabbage_planted'] = 0;
 	}
 	next_day(true);
 }
@@ -557,7 +576,10 @@ function update_day_gui(d = vars['day'], jump = false) {
 	for (var attr in flags) {
 		flaglist.push(attr);
 	}
-	flaglist.sort();
+	// higher number "b" sorted lower than "a"
+	flaglist.sort( function (a,b) {
+			return ((a.includes('mus_box') || b.includes('mus_box')) ? (a.includes('mus_box') ? -1 : 1) : ((a > b) ? 1 : -1));
+	});
 	var val_html = '<div class="container">';
 	for (var i = 0; i < flaglist.length; i++) {
 		val_html += '<div class="d-flex flex-row"><div class="ml-4">' + flaglist[i].toLowerCase() + '</div><div class="ml-4"><input id="q_f_' + flaglist[i] + '" value="' + flags[flaglist[i]] + '" onchange="flag_update()" /></div></div>';
@@ -569,7 +591,9 @@ function update_day_gui(d = vars['day'], jump = false) {
 	for (var i = 0; i < npcs.length; i++) {
 		afflist.push([aff[i], i]);
 	}
-	afflist.sort(function(a,b){return ((a[0] == undefined || b[0] == undefined) ? ((a[0] === undefined) ? 1 : -1) : b[0] - a[0]) });
+	afflist.sort(function(a,b){
+		return ((a[0] == undefined || b[0] == undefined) ? ((a[0] === undefined) ? 1 : -1) : b[0] - a[0]);
+	});
 	val_html = "";
 	for (var i = 0; i < afflist.length; i++) {
 		val_html += '<div class="d-flex flex-row"><div class="ml-4">' + npcs[afflist[i][1]].toLowerCase() + '</div><div class="ml-4"><input id="q_n_' + afflist[i][1] + '" value="' + afflist[i][0] + '" onchange="npc_update()" /></div></div>';
@@ -806,9 +830,93 @@ function get_npc_img(img_id = null, for_title = false) {
 }
 
 function bet_winner(winner_id = 0) {
+	vars['medals'] = parseInt($('#b_have').val());
 	vars['medals'] += (parseInt($('#b_' + winner_id).val()) * parseInt($('#bg_' + winner_id).val()));
 	$('#b_have').val(vars['medals']);
 	gold_update();
+}
+
+function slow_calc(odds, buy_amt, recursive = false) {
+	/*
+	 * odds[
+	 * 0 - odd
+	 * 1 - original order
+	 * 2 - need
+	 * 3 - actual
+	 * ]
+	 */
+	odds.sort(function(a,b) {
+		return ((a[0] > b[0]) ? 1 : 0);
+	});
+	var sum = 0;
+	for (var i = 0; i < odds.length; i++) {
+		if (!recursive) {
+			odds[i][3] = 0;
+		}
+		sum += (odds[odds.length - 1][0] / odds[i][0]);
+	}
+
+	var new_odds = [];
+	var left_odds = [];
+	var multiplier = buy_amt / sum;
+	for (var i = 0; i < odds.length; i++) {
+		//if (buy_amt > 0) { 26830 G = 536
+			if (buy_amt <= odds.length) {
+				if (buy_amt > 0) {
+					odds[i][3]++;
+					buy_amt--;
+				}
+			} else {
+				var orig_val = odds[i][3];
+				odds[i][3] += Math.floor((odds[odds.length - 1][0] / odds[i][0]) * multiplier);
+				if (odds[i][3] > 99) { odds[i][3] = 99; }
+				if (odds[i][3] > odds[i][2]) { odds[i][3] = odds[i][2]; }
+				if ((odds[i][3] - orig_val) > buy_amt) {
+					odds[i][3] = (orig_val + buy_amt);
+					buy_amt = 0;
+				} else {
+					buy_amt -= (odds[i][3] - orig_val);
+				}
+			}
+			if (odds[i][3] == odds[i][2] || odds[i][3] == 99 || odds[i][3] == orig_val || buy_amt == 0) {
+				new_odds.push(odds[i]);
+			} else {
+				left_odds.push(odds[i]);
+			}
+		//}
+	}
+
+	if (left_odds.length > 0 && buy_amt > 0) {
+		/*
+		console.log('slow');
+
+		console.log("new:");
+		for (var v = 0; v < new_odds.length; v++) {
+			console.log("[" + new_odds[v][0] + ", " + new_odds[v][1] + ", " + new_odds[v][2] + ", " + new_odds[v][3] + "]");
+		}
+		console.log("left:");
+		for (var v = 0; v < left_odds.length; v++) {
+			console.log("[" + left_odds[v][0] + ", " + left_odds[v][1] + ", " + left_odds[v][2] + ", " + left_odds[v][3] + "]");
+		}
+		*/
+		
+		return new_odds.concat(slow_calc(left_odds, buy_amt, true));
+	} else {
+		/*
+		console.log('done');
+		
+		console.log("new:");
+		for (var v = 0; v < new_odds.length; v++) {
+			console.log("[" + new_odds[v][0] + ", " + new_odds[v][1] + ", " + new_odds[v][2] + ", " + new_odds[v][3] + "]");
+		}
+		console.log("left:");
+		for (var v = 0; v < left_odds.length; v++) {
+			console.log("[" + left_odds[v][0] + ", " + left_odds[v][1] + ", " + left_odds[v][2] + ", " + left_odds[v][3] + "]");
+		}
+		*/
+		
+		return new_odds.concat(left_odds);
+	}
 }
 
 function calc_bets(bet_type = 1) {
@@ -820,6 +928,8 @@ function calc_bets(bet_type = 1) {
 	 * 
 	 */
 
+console.log("START:");
+
 	var g = ($('#b_gold').val() === undefined) ? vars['gold'] : $('#b_gold').val();
 	var need = ($('#b_need').val() === undefined) ? 500 : $('#b_need').val();
 	need -= ($('#b_have').val() === undefined) ? 0 : $('#b_have').val();
@@ -829,11 +939,12 @@ function calc_bets(bet_type = 1) {
 		$("input[id^='bg_']").val(0);
 		return;
 	}
+	
+	console.log('hi');
 
 	// Gather odds and calculate max G required
 	var odds = [];
 	var bets = [];
-	var max_required = 0;
 
 	if (parseInt($("#b_have").val()) >= parseInt($('#b_need').val())) {
 		$("input[id^='bg_']").each(function(i) {
@@ -842,6 +953,7 @@ function calc_bets(bet_type = 1) {
 		return;
 	}
 
+	var max_required = 0;
 	for (var i = 0; i < 6; i++) {
 		var cur_need = Math.ceil(need / parseInt($('#b_' + i).val()));
 		max_required += (cur_need > 99) ? 99 : cur_need;
@@ -860,78 +972,34 @@ function calc_bets(bet_type = 1) {
 	var buy_amt = Math.floor(g / 50);
 	odds.sort(function(a, b){ return b[0] - a[0] });
 
-	// Get odds by betting strategy
-	if (bet_type == 1) { // DEMO
-		for (var i = odds.length - 1; i >= 0; i--) {
-			if (odds[i][2] <= 99 && odds[i][2] <= buy_amt) {
-				odds[i][3] = odds[i][2];
-				buy_amt -= odds[i][2];
+	if ([0, 5].includes(route_id)) {
+		// Photos
+		odds = slow_calc(odds, buy_amt);
+	} else {
+		// Get odds by betting strategy
+		if (bet_type == 1) { // DEMO
+			for (var i = odds.length - 1; i >= 0; i--) {
+				if (odds[i][2] <= 99 && odds[i][2] <= buy_amt) {
+					odds[i][3] = odds[i][2];
+					buy_amt -= odds[i][2];
+				}
 			}
-		}
-	} else if (bet_type == 2) { // NILLOWS
-		for (var i = 0; i < odds.length; i++) {
-			if (odds[i][2] <= 99 && odds[i][2] <= buy_amt) {
-				odds[i][3] = odds[i][2];
-				buy_amt -= odds[i][2];
-			}
-		}
-	}
-
-	if ([0, 5].includes(route_id) && buy_amt > 0) { // All Photos
-		// Not enough to fill all bets to quota, but leftover bets
-		if (odds[5][3] == 0) {
-			var max_zero = -1;
-			var extra_medals = 0;
-
+		} else if (bet_type == 2) { // NILLOWS
 			for (var i = 0; i < odds.length; i++) {
-				if (odds[i][3] == 0) {
-					if (max_zero == -1) { max_zero = i; }
-					extra_medals += Math.floor(odds[max_zero][0] / odds[i][0]);
-				}
-			}
-
-			if (extra_medals > 0) {
-				var spread = Math.floor(buy_amt / extra_medals);
-				for (var i = max_zero; i < odds.length; i++) {
-					var tmp_ex = spread * Math.floor(odds[max_zero][0] / odds[i][0]);
-					if ((tmp_ex + odds[i][3]) > 99) {
-						buy_amt -= (99 - odds[i][3]);
-						odds[i][3] = 99;
-					} else {
-						buy_amt -= tmp_ex;
-						odds[i][3] += tmp_ex;
-					}
+				if (odds[i][2] <= 99 && odds[i][2] <= buy_amt) {
+					odds[i][3] = odds[i][2];
+					buy_amt -= odds[i][2];
 				}
 			}
 		}
-
-		// Filled all to quota, but more bets available
-		// Fill from lowest odds to highest
-		var i = 5;
-		while (buy_amt > 0 && i >= 0) {
-			if ((99 - odds[i][3]) <= buy_amt) {
-				buy_amt -= (99 - odds[i][3]);
-				odds[i][3] = 99;
-			} else {
-				var tmp_split = [i];
-				var j = i - 1;
-				while (j >= 0 && odds[j][3] == odds[i][3]) {
-					tmp_split.push(j);
-					j--;
-				}
-				for (var k = 0; k < tmp_split.length; k++) {
-					odds[tmp_split[k]][3] += Math.floor(buy_amt / tmp_split.length);
-				}
-				odds[i][3] += buy_amt % tmp_split.length;
-				buy_amt = 0;
-			}
-			i--;
-		}
-
 	}
+
+	//console.log(odds);
 
 	// Display values
+	console.log("FINAL:");
 	for (var i = 0; i < odds.length; i++) {
+		console.log("[" + odds[i][0] + ", " + odds[i][1] + ", " + odds[i][2] + ", " + odds[i][3] + "]");
 		$("#bg_" + odds[i][1]).val(odds[i][3]);
 	}
 }

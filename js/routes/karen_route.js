@@ -12,14 +12,14 @@ function get_actions_karen (d = 3, g = 300, is_sunny = 1) {
 	if (d == 90) {
 		// Fall 30
 		a.push({'desc':"Enter / Exit House to Clear Cliff", 'iid':get_npc_id('cliff')});
-		a.push({'desc':"Accept Cows", 'cid':"f_borrow_cows", 'val':1, 'iid':get_npc_id('doug')});
+		a.push({'desc':"Accept Cows", 'cid':"f_borrow_cows", 'val':1, 'iid':get_npc_id('doug'), 'imp':true});
 	}
 
 	if (d == 95) {
 		// Winter 5
 		if (flags['borrow_cows'] > 0) {
 			a.push({'desc':"Enter / Exit House to Clear Cliff", 'iid':get_npc_id('cliff')});
-			a.push({'desc':"1000G from Doug", 'cid':["v_gold", "f_borrow_cows"], 'val':[1000, -1]});
+			a.push({'desc':"1000 G from Doug", 'cid':["v_gold", "f_borrow_cows"], 'val':[1000, -1], 'iid':get_npc_id('doug'), 'imp':true});
 		}
 	}
 
@@ -29,7 +29,7 @@ function get_actions_karen (d = 3, g = 300, is_sunny = 1) {
 		if (aff[karen_id] < 220) {
 			a.push({'desc':"Dog to Crossroads"});
 		}
-		a.push({'desc':"Hot Springs", 'cid':["v_gold", "v_springs_days_worked"], 'val':[1000, 1]});
+		a.push({'desc':"Hot Springs", 'cid':["v_gold", "v_springs_days_worked"], 'val':[1000, 1], 'imp':true, 'iid':get_npc_id('mas_carpenter')});
 		if (is_sunny == 1 && aff[karen_id] < 220 && ["TUES", "WED", "FRI", "SAT"].includes(get_day_of_week(vars['day'], true))) {
 			a.push({'desc':"Dog to 220", 'cid':karen_id, 'val':220});
 			a.push({'desc':"25% Beach, 25% Carpenter House (10AM - 5PM)"});
@@ -47,10 +47,10 @@ function get_actions_karen (d = 3, g = 300, is_sunny = 1) {
 			a.push({'desc':'Carpenters finished with Kitchen'});
 		}
 		if (flags['kitchen'] < 1 && get_day_of_week(vars['day'], true) != "TUES") {
-			a.push({'desc':'Buy Kitchen', 'cid':['v_lumber', 'v_gold', 'f_kitchen'], 'val':[-500, -5000, (3 + 1 + 1)]});
+			a.push({'desc':'Buy Kitchen', 'cid':['v_lumber', 'v_gold', 'f_kitchen'], 'val':[-500, -5000, (3 + 1 + 1)], 'imp':true, 'iid':get_npc_id('mas_carpenter')});
 			if (is_sunny == 1 && aff[karen_id] < 220) {
 				a.push({'desc':"Dog to 220", 'cid':karen_id, 'val':220});
-				a.push({'desc':"25% Beach, 25% Carpenter House (10AM - 5PM)"});
+				a.push({'desc':"25% Beach, 25% Carpenter House (10AM - 5PM)", 'imp':true});
 			}
 		}
 		if (is_sunny == 1 && aff[karen_id] < 220 && ["MON", "THURS"].includes(get_day_of_week(vars['day'], true))) {
@@ -60,9 +60,9 @@ function get_actions_karen (d = 3, g = 300, is_sunny = 1) {
 		}
 		if (flags['kitchen'] >= 1 && flags['kitchen'] <= 2 && is_sunny == 1 && aff[karen_id] >= 220 && vars['gold'] >= 980 && flags['propose'] == 0) {
 			if (["TUES", "FRI"].includes(get_day_of_week(vars['day'], true))) {
-				a.push({'desc':"Buy Blue Feather", 'cid':['v_gold', 'f_blue_feather'], 'val':[-980, 1]});
-				a.push({'desc':"Propose", 'cid':['f_blue_feather', 'f_propose'], 'val':[-1, 1]});
-				a.push({'desc':"25% Beach, 25% Carpenter House (10AM - 5PM)"});
+				a.push({'desc':"Buy Blue Feather", 'cid':['v_gold', 'f_blue_feather'], 'val':[-980, 1], 'iid':get_npc_id('rick'), 'imp':true});
+				a.push({'desc':"Propose", 'cid':['f_blue_feather', 'f_propose'], 'val':[-1, 1], 'iid':karen_id, 'imp':true});
+				a.push({'desc':"25% Beach, 25% Carpenter House (10AM - 5PM)", 'imp':true});
 			}
 			if (["MON", "THURS"].includes(get_day_of_week(vars['day'], true)) && flags['ankle_karen'] > 0) {
 				a.push({'desc':"Buy Blue Feather", 'cid':['v_gold', 'f_blue_feather'], 'val':[-980, 1]});

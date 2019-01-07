@@ -6,6 +6,7 @@
 * **4** - Elli Photo
 * **5** - All Photos (Elli marriage)
 * **6** - All Recipes
+* **7** - Maria Marriage
 
 ## ACTION PROPERTIES
 * **"desc"** - (Description) Words that appear on the action button. REQUIRED
@@ -68,7 +69,8 @@
 * **cutscene_bug**: INT [0,1] - Has the cutscene with Maria pulling a bug out of Karens hair near the cave played yet
 * **cutscene_cookfish**: INT [0,1] - Has the cutscene with Elli cooking fish for Maria by the fisherman tent played yet
 * **cutscene_rabbit**: INT [0,1] - Has the cutscene with Ann rescuing a rabbit from Cliff played yet
-* **cutscene_watermelon**: INT [0,1] - Has the cutscene with Ann and Maria discussing the salesman and 
+* **cutscene_watermelon**: INT [0,1] - Has the cutscene with Ann and Maria discussing the salesman and the watermelon played yet
+* **cutscene_vineyard**: INT [0,1] - Has the cutscene with Karen leaving the vineyard played yet
 * **dog_entered**: INT [0,1] - Is the dog entered into the dog race. Resets to zero on Spring 18, Fall 29, and Winter 20 each year.
 * **dog_inside**: INT [0,1] - Is the dog inside
 * **dontsave**: INT [0,1] - Do not save tonight. If the "RESET" button is hit in the top corner, the previous day (or last save) will be loaded.
