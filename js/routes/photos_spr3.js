@@ -5,6 +5,7 @@ function actions_photos_spr_y3(a = [], d = 3, g = 300, is_sunny = 1) {
 	var doug_id = get_npc_id('doug');
 	var karen_id = get_npc_id('karen');
 	var dog_id = get_npc_id('dog');
+	var gotz_id = get_npc_id('gotz');
 	var dow = get_dow(d, true);
 
 	// Married Affection
@@ -54,11 +55,14 @@ function actions_photos_spr_y3(a = [], d = 3, g = 300, is_sunny = 1) {
 	if (flags['yesterday_rain'] == 1 && vars['cows'] > 0) {
 		a.push({'desc':"Hammer Sick Cows Until Mad", 'imp':true, 'iid':cow_id});
 	}
+	if (flags['baby'] == 3) {
+		a.push({'desc':"Baby Born Tomorrow, Have Grass to Plant"});
+	}
 
 	if (flags['baby'] == 2) {
 		// Baby Born
 		if (vars['grass'] > 0 || vars['grass_planted'] < 43) {
-			a.push({'desc':"Equip hoe, Clear Field & Plant Grass"});
+			a.push({'desc':"Equip hoe, Clear Field & Plant Grass", 'imp':true});
 			a.push({'desc':"Plant All Grass", 'sel':false, 'sr':true, 'cid':['v_grass_planted', 'v_grass'], 'val':[vars['grass'], -1 * vars['grass']]});
 			if (flags['berry_farm'] == 0) {
 				a.push({'desc':"Dig a Berry", 'val':1, 'cid':'f_berry_farm', 'sr':true, 'sel':false});
@@ -88,7 +92,7 @@ function actions_photos_spr_y3(a = [], d = 3, g = 300, is_sunny = 1) {
 			var tmp_gseeds = 43 - (vars['grass_planted'] + vars['grass']);
 			var tmp_gseeds = ((tmp_gseeds > 20) ? 20 : tmp_gseeds);
 			tmp_gseeds = ((tmp_gseeds * 500 > vars['gold']) ? Math.floor(vars['gold'] / 500) : tmp_gseeds);
-			a.push({'desc':("Buy " + tmp_gseeds + " Grass Seeds"), 'cid':['v_grass', 'v_gold'], 'val':[tmp_gseeds, -500 * tmp_gseeds], 'iid':get_npc_id('lillia')});
+			a.push({'desc':("Buy " + tmp_gseeds + " Grass Seeds"), 'cid':['v_grass', 'v_gold'], 'val':[tmp_gseeds, -500 * tmp_gseeds], 'iid':get_npc_id('lillia'), 'sel':false});
 		}
 
 		if (dow != "TUES" && !is_festival(d)) {
@@ -117,34 +121,68 @@ function actions_photos_spr_y3(a = [], d = 3, g = 300, is_sunny = 1) {
 				}
 
 				// CLIFF
-				a.push({'desc':("Talk (" + ((is_sunny == 0) ? "In Carp House)" : ((["FRI", "SAT"].includes(dow)) ? "Fish Tent 50%)" : "Carp Screen)"))),
-						'sel':false, 'cid':cliff_id, 'val':2
-				});
-				a.push({'desc':" Gift", 'cid':cliff_id, 'val':4, 't2':" Egg", 'sr':true, 'sel':false});
-				a.push({'desc':" Egg", 'cid':cliff_id, 'val':8, 't2':" Gift", 'sr':true, 'sel':false});
+				if (route_id == 0) {
+					a.push({'desc':("Talk (" + ((is_sunny == 0) ? "In Carp House)" : ((["FRI", "SAT"].includes(dow)) ? "Fish Tent 50%)" : "Carp Screen)"))),
+							'sel':false, 'cid':cliff_id, 'val':2
+					});
+					a.push({'desc':" Gift", 'cid':cliff_id, 'val':4, 't2':" Egg", 'sr':true, 'sel':false});
+					a.push({'desc':" Egg", 'cid':cliff_id, 'val':8, 't2':" Gift", 'sr':true, 'sel':false});
+				}
 			}
 		}
 
-		// Spam Doug with Baby
+		// Baby Spam
 		// If you already have a chicken, otherwise do it when you go to buy one
-		if (dow != "THURS" && flags['baby'] == 1 && aff[doug_id] < 100 && (vars['chickens'] > 0 || flags['new_chick'] != 0 || vars['new_chicken_days'].length > 0)) {
-			a.push({'desc':"Bring Baby to Ranch"});
-			a.push({'desc':"Spam Doug with Baby", 'cid':doug_id, 'val':255});
+		if (flags['baby'] == 1 && (vars['chickens'] > 0 || flags['new_chick'] != 0 || vars['new_chicken_days'].length > 0)) {
+			// DOUG
+			if (aff[doug_id] < 100 && dow != "THURS") {
+				a.push({'desc':"Bring Baby to Ranch"});
+				a.push({'desc':"Spam Doug with Baby", 'cid':doug_id, 'val':255, 'sel':false});
+			}
+
+			// GOTZ
+			if (route_id == 5 && aff[gotz_id] < 100) {
+				a.push({'desc':"Bring Baby to Vineyard"});
+				a.push({'desc':"Spam Gotz with Baby", 'cid':gotz_id, 'val':255, 'sel':false});
+				if (flags['vineyard_cutscene'] == 0) {
+					a.push({'desc':"Vineyard Cutscene", 'val':1, 'cid':'f_cutscene_vineyard', 'sr':true});
+				}
+			}
 		}
 
 		// Buy a Chicken
-		// Wait until all extensions are built or until last possible day (Spr 29)
+		// Wait until all extensions are built or until Spr 27 (to leave time for spams)
 		if (flags['baby'] == 1) {
-			if ((d == 269 && vars['chickens'] == 0) || (vars['chickens'] == 0 && flags['new_chick'] == 0 && vars['new_chicken_days'].length == 0 && flags['logterrace'] == 1 && flags['greenhouse'] == 1)) {
+			if ((d >= 267 && vars['chickens'] == 0) || (vars['chickens'] == 0 && flags['new_chick'] == 0 && vars['new_chicken_days'].length == 0 && flags['logterrace'] == 1 && flags['greenhouse'] == 1)) {
 				// Spr30 is a Thursday
+
+				// GOTZ
+				if (route_id == 5 && aff[gotz_id] < 100) {
+					a.push({'desc':"Bring Baby to Vineyard"});
+					a.push({'desc':"Spam Gotz with Baby", 'cid':gotz_id, 'val':255, 'sel':false});
+					if (flags['vineyard_cutscene'] == 0) {
+						a.push({'desc':"Vineyard Cutscene", 'val':1, 'cid':'f_cutscene_vineyard', 'sr':true});
+					}
+				}
+
+				// DOUG
 				if (aff[doug_id] < 100) {
 					a.push({'desc':"Bring Baby to Ranch"});
-					a.push({'desc':"Spam Doug with Baby", 'cid':doug_id, 'val':255});
+					a.push({'desc':"Spam Doug with Baby", 'cid':doug_id, 'val':255, 'sel':false});
 				}
 				a.push({'desc':"Buy a Chicken", 'sr':(aff[doug_id] < 100), 'cid':['v_chickens', 'v_gold'], 'val':[1, -1500], 'iid':doug_id});
 			} else if (vars['chickens'] >= 1 && aff[doug_id] < 100) {
 				a.push({'desc':"Bring Baby to Ranch"});
 				a.push({'desc':"Spam Doug with Baby", 'cid':doug_id, 'val':255});
+				
+				// GOTZ
+				if (route_id == 5 && aff[gotz_id] < 100) {
+					a.push({'desc':"Bring Baby to Vineyard"});
+					a.push({'desc':"Spam Gotz with Baby", 'cid':gotz_id, 'val':255, 'sel':false});
+					if (flags['vineyard_cutscene'] == 0) {
+						a.push({'desc':"Vineyard Cutscene", 'val':1, 'cid':'f_cutscene_vineyard', 'sr':true});
+					}
+				}
 			}
 		}
 
