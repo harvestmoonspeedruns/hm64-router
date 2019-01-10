@@ -4,6 +4,7 @@ const _ANKLE_EVENT_MIN = 180;
 const _PHOTO_MIN = 200;
 const _PROPOSE_MIN = 220;
 const _PARTY_ATTEND_MIN = 160;
+
 const _RICK_FIX_MIN = 31;
 const _SPRITE_WINE_MIN = 50; // Meet + (14 gift/talk)
 const _DUKE_WINE_MIN = 41;
@@ -15,11 +16,18 @@ const _ANKLE_EVENT_AFF = 10;
 const _PHOTO_EVENT_AFF = 10;
 const _MUS_BOX_AFF = 6;
 
-const _POTATO_GROW_DAYS = 6;
+const _CABBAGE_GROW_DAYS = 8;
 const _CORN_GROW_DAYS = 13;
+const _EGGPLANT_GROW_DAYS = 7;
+const _GRASS_GROW_DAYS = 9;
+const _MOONDROP_GROW_DAYS = 6;
+const _POTATO_GROW_DAYS = 6;
+const _STRAWBERRY_GROW_DAYS = 6;
+const _TOMATO_GROW_DAYS = 9;
+const _TURNIP_GROW_DAYS = 4;
+
 const _BUILD_DAYS = 4;
 const _BABY_BORN_DAYS = 60;
-
 const _PREGNANT_SLEEPS = 30;
 const _BABY_SLEEPS = 60;
 const _CHICK_BORN_SLEEPS = 3;
@@ -46,21 +54,27 @@ var extensions = [
 	["kitchen", 5000, 450, "Kitchen"]
 ];
 
-var route_names = ["All Photos (Karen)", "Elli", "Karen", "Popuri", "Elli IL Photo", "All Photos (Elli)", "All Recipes"];
+var route_names = ["All Photos (Karen)", "Elli", "Karen", "Popuri", "Elli IL Photo", "All Photos (Elli)", "All Recipes", "Maria"];
 var bet_colors = ["lightgray", "black", "red", "blue", "yellow", "green"];
 var route_affs = [
-	[], // Placeholder for All Photos
+	[], // Placeholder for All Photos (Karen)
 	['elli', 'rick'], //Elli marriage
 	['karen'], //Karen marriage
 	['popuri', 'rick'], //Popuri marriage
 	['elli', 'rick'], //Elli IL
+	[], // Placeholder for All Photos (Elli)
+	[], // Placeholder for Recipes
+	['maria', 'rick'] // Maria
 ];
 var skip_to_list = [
-	[3, 17, 64], // Photos
+	[3, 17, 64], // Photos (Karen)
 	[3, 23, 31], // Elli
 	[3, 90, 102, 109, 110], // Karen
 	[3], // Popuri
-	[3, 31] // Elli IL Photo
+	[3, 31], // Elli IL Photo
+	[3, 17, 64], // Photos (Elli)
+	[3], // Recipes
+	[3] // Maria
 ];
 
 // 0 = vars; 1 = flags; 2 = aff
@@ -72,7 +86,7 @@ var npcs = ["ann", "bartender", "basil", "carpenter bot", "carpenter top", "clif
 			"kai", "karen", "kent", "lillia", "maria", "mas carpenter", "may", "mayor", 
 			"mayors wife", "midwife", "old man", "old woman", "pastor", "popuri",
 			"potion master", "rick", "saibara", "salesman", "shipper", "sprite", "stu", "dog",
-			"horse", "_cow", "_baby", "chicken", "kappa", "goddess", "judge", "musbox"];
+			"horse", "cow", "_baby", "chicken", "kappa", "goddess", "judge", "musbox", "stump"];
 var npc_ids = {};
 var not_villagers = [1, 3, 4, 9, 20, 23, 24, 32, 33, 34, 35, 36];
 var recipes = [];
