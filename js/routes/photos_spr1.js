@@ -10,6 +10,7 @@ function actions_photos_spr_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 	var maria_id = get_npc_id('maria');
 	var may_id = get_npc_id('may');
 	var mayor_id = get_npc_id('mayor');
+	var popuri_id = get_npc_id('popuri');
 	var rick_id = get_npc_id('rick');
 	var sprite_id = get_npc_id('sprite');
 
@@ -100,13 +101,16 @@ function actions_photos_spr_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 			a.push({'desc':"Buy a Power Nut", 'cid':['f_berry_flowerfest','v_gold'],
 					'val':[1, -1000], 'iid':get_npc_id('salesman'), 'sel':(vars['gold'] >= 1000)
 			});
-			a.push({'desc':"Talk", 'cid':basil_id, 'val':2});
-			a.push({'desc':"Talk", 'cid':rick_id, 'val':2});
+			if (route_id == 0) {
+				a.push({'desc':"Talk", 'cid':basil_id, 'val':2});
+			}
 			if (aff[cliff_id] >= 50) {
 				a.push({'desc':"Talk", 'cid':cliff_id, 'val':2});
 			}
+			a.push({'desc':"Talk", 'cid':rick_id, 'val':2});
 			a.push({'desc':"Talk", 'cid':mayor_id, 'val':2});
 			a.push({'desc':"Talk", 'cid':elli_id, 'val':2});
+			a.push({'desc':"Talk", 'cid':popuri_id, 'val':2});
 			a.push({'desc':"Talk", 'cid':ann_id, 'val':2});
 			a.push({'desc':"Dance", 'cid':[ann_id, 'f_dontsave'], 'val':[10, 1], 't2':"Dance ", 'sel':false, 'sr':true});
 			a.push({'desc':"Talk", 'cid':maria_id, 'val':2});
@@ -360,33 +364,47 @@ function actions_photos_spr_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 				a.push({'desc':"ed, ber, flower"}); // Quick gifts for villagers
 			}
 
-			// BASIL
-			if (d >= 15 && ["FRI", "SAT"].includes(dow)) {
-				a.push({'desc':"Talk (MTN)", 'cid':basil_id, 'val':3});
-				a.push({'desc':"Gift", 'cid':basil_id, 'val':3, 'sr':true});
-			}
-			
-			// CLIFF
-			// "Gift    " <- 4 spaces
-			// "Egg " <- 1 space
-			if (["FRI", "SAT"].includes(dow) && d > 17 && route_id == 0) {
-				a.push({'desc':"Talk (Fish Tent)", 'cid':cliff_id, 'val':2});
-				a.push({'desc':"Gift    ", 'cid':cliff_id, 'val':4, 't2':"Egg ", 'sr':true});
-				a.push({'desc':"Egg ", 'cid':cliff_id, 'val':8, 'sel':false, 't2':"Gift    ", 'sr':true});
-			}
-			if (["THURS", "SUN"].includes(dow) && d > 17 && route_id == 0) {
-				a.push({'desc':"Talk (Carp House)", 'cid':cliff_id, 'val':2, 'sel':false, 'red':((vars['chickens'] > 0 || g >= 1500) && (dow != "MON" || is_sunny == 0))});
-				a.push({'desc':"Gift    ", 'cid':cliff_id, 'val':4, 't2':"Egg ", 'sr':true, 'sel':false});
-				a.push({'desc':"Egg ", 'cid':cliff_id, 'val':8, 't2':"Gift    ", 'sr':true, 'sel':false});
+			if (route_id == 0) {
+				// BASIL
+				if (d >= 15 && ["FRI", "SAT"].includes(dow)) {
+					a.push({'desc':"Talk (MTN)", 'cid':basil_id, 'val':3});
+					a.push({'desc':"Gift", 'cid':basil_id, 'val':3, 'sr':true});
+				}
+
+				// CLIFF
+				// "Gift    " <- 4 spaces
+				// "Egg " <- 1 space
+				if (d > 17) {
+					if (["FRI", "SAT"].includes(dow)) {
+						a.push({'desc':"Talk (Fish Tent)", 'cid':cliff_id, 'val':2});
+						a.push({'desc':"Gift    ", 'cid':cliff_id, 'val':4, 't2':"Egg ", 'sr':true});
+						a.push({'desc':"Egg ", 'cid':cliff_id, 'val':8, 'sel':false, 't2':"Gift    ", 'sr':true});
+					}
+					if (["THURS", "SUN"].includes(dow)) {
+						a.push({'desc':"Talk (Carp House)", 'cid':cliff_id, 'val':2, 'sel':false, 'red':((vars['chickens'] > 0 || g >= 1500) && (dow != "MON" || is_sunny == 0))});
+						a.push({'desc':"Gift    ", 'cid':cliff_id, 'val':4, 't2':"Egg ", 'sr':true, 'sel':false});
+						a.push({'desc':"Egg ", 'cid':cliff_id, 'val':8, 't2':"Gift    ", 'sr':true, 'sel':false});
+					}
+				}
 			}
 		}
 
 		if (!get_horse && is_sunny == 0) {
 			a.push({'desc':"ed, ber, flower"}); // Quick gifts for villagers
 		}
+		
+		// POPURI
+		if (["MON", "TUES", "WED", "THURS"].includes(dow) && route_id == 5) {
+			if (aff[popuri_id] == 0) {
+				a.push({'desc':"Meet", 'cid':popuri_id, 'val':4});
+			}
+			a.push({'desc':"Talk", 'cid':popuri_id, 'val':1});
+			a.push({'desc':" Gift ", 'cid':popuri_id, 'val':1, 'sel':false, 't2':" Flower "});
+			a.push({'desc':" Flower ", 'cid':popuri_id, 'val':3, 't2':" Gift "});
+		}
 
 		// BASIL
-		if (d >= 15) {
+		if (d >= 15 && route_id == 0) {
 			if (is_sunny == 1 && dow == "THURS") {
 				a.push({'desc':"Talk (Greenhouse)", 'cid':basil_id, 'val':3});
 				a.push({'desc':"Gift", 'cid':basil_id, 'val':3, 'sr':true});
@@ -477,7 +495,7 @@ function actions_photos_spr_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 		}
 
 		// BASIL (in Town Square on SUNDAY)
-		if (d >= 15 && dow == "SUN" && is_sunny == 1) {
+		if (route_id == 0 && d >= 15 && dow == "SUN" && is_sunny == 1) {
 			a.push({'desc':"Talk (Town Square)", 'cid':basil_id, 'val':3});
 			a.push({'desc':"Gift", 'cid':basil_id, 'val':3, 'sr':true});
 
