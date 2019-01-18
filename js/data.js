@@ -9,6 +9,7 @@ const _RICK_FIX_MIN = 31;
 const _SPRITE_WINE_MIN = 50; // Meet + (14 gift/talk)
 const _DUKE_WINE_MIN = 41;
 const _BASIL_BERRY_MIN = 200;
+const _SPRITE_SPAM_MAX = 21;
 
 const _SICK_EVENT_AFF = 10;
 const _DREAM_EVENT_AFF = 8;

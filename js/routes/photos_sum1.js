@@ -431,8 +431,8 @@ function ranch_stuff_sum(tmp_act = [], dow = get_dow(vars['day']), is_sunny = 1)
 			// " Gift" <- -1 spaces
 			tmp_act.push({'desc':(" Talk (" + ((is_sunny == 0) ? "Barn)" : ((dow == "SUN") ? "Ranch 50%)" : "Ranch)"))), 'cid':ann_id, 'val':1, 't2':" MusBox", 'sel':(dow != "SUN" && (aff[get_npc_id('maria')] < _PHOTO_MIN || (flags['new_mus_box'] == 0 && (is_sunny == 0 || ["WED", "SAT", "SUN"].includes(dow)))))});
 			tmp_act.push({'desc':" MusBox", 'cid':[ann_id, 'f_new_mus_box'], 'val':[_MUS_BOX_AFF, -1], 'sr':true, 'sel':(aff[get_npc_id('maria')] >= _PHOTO_MIN && (flags['new_mus_box'] == 1 || (is_sunny == 1 && !["WED", "SAT", "SUN"].includes(dow)))), 't2':tmp_act[tmp_act.length - 1]['desc']});
-			tmp_act.push({'desc':" Gift", 'cid':ann_id, 'val':1, 'sr':true, 'sel':(vars['potatoes'] <= 0 && vars['corn_waters'] < _CORN_GROW_DAYS && dow != "SUN"), 't2':"Corn / Potato"}); 
-			tmp_act.push({'desc':"Corn / Potato", 'cid':[ann_id, 'v_potatoes'], 'val':[3, -1], 'sr':true, 'sel':(dow != "SUN" && (vars['potatoes'] > 0 || vars['corn_waters'] >= _CORN_GROW_DAYS)), 't2':" Gift"});
+			tmp_act.push({'desc':" Gift", 'cid':ann_id, 'val':((vars['day'] == 44) ? 3 : 1), 'sr':true, 'sel':(vars['potatoes'] <= 0 && vars['corn_waters'] < _CORN_GROW_DAYS && dow != "SUN"), 't2':"Corn / Potato"}); 
+			tmp_act.push({'desc':"Corn / Potato", 'cid':[ann_id, 'v_potatoes'], 'val':[((vars['day'] == 44) ? 5 : 3), -1], 'sr':true, 'sel':(dow != "SUN" && (vars['potatoes'] > 0 || vars['corn_waters'] >= _CORN_GROW_DAYS)), 't2':" Gift"});
 
 			if (is_sunny == 1) {
 				// CLIFF

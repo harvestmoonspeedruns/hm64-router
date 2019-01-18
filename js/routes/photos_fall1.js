@@ -13,8 +13,7 @@ function actions_photos_fall_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 	var rick_id = get_npc_id('rick');
 	var sprite_id = get_npc_id('sprite');
 
-	// TODO
-	var sprite_recipe_aff = 3;
+	var sprite_recipe_aff = 5;
 
 	var dow = get_dow(d, true);
 	var restore_vineyard_id = -1;
@@ -151,14 +150,9 @@ function actions_photos_fall_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 				a.push({'desc':"   Talk", 'cid':sprite_id, 'val':1, 'imp':(aff[sprite_id] >= (_SPRITE_WINE_MIN - 1 - 5))});
 				a.push({'desc':"   Gift", 'cid':sprite_id, 'val':1, 'sr':true, 't2':"Mushroom", 'sel':false});
 				a.push({'desc':"Mushroom", 't2':"   Gift", 'sr':true, 'sel':(aff[sprite_id] < (_SPRITE_WINE_MIN - 1)),
-						'cid':((flags['recipe_sprite'] == 0) ? ['f_recipe_sprite', sprite_id] : sprite_id),
-						'val':((flags['recipe_sprite'] == 0) ? [1, 5] : 2)
+						'cid':((flags['recipe_sprite'] == 0 && aff[sprite_id] >= 30) ? ['f_recipe_sprite', sprite_id] : sprite_id),
+						'val':((flags['recipe_sprite'] == 0 && aff[sprite_id] >= 30) ? [1, sprite_recipe_aff] : 2)
 				});
-				/*
-				if (aff[sprite_id] >= (_SPRITE_WINE_MIN - 1 - ((flags['recipe_sprite'] == 0) ? 5 : 2))) {
-					a.push({'desc':"Mention Goddess and Vineyard", 'iid':sprite_id, 'imp':true});
-				}
-				*/
 			}
 
 			// CLIFF
@@ -176,7 +170,7 @@ function actions_photos_fall_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 			}
 
 			// Goddess
-			if (flags['vineyard_restored'] == 0 && aff[sprite_id] >= (_SPRITE_WINE_MIN - ((flags['recipe_sprite'] == 1) ? 2 : sprite_recipe_aff)) && aff[get_npc_id('bartender')] >= _DUKE_WINE_MIN && is_sunny == 1) {
+			if (flags['vineyard_restored'] == 0 && aff[sprite_id] >= (_SPRITE_WINE_MIN - ((flags['recipe_sprite'] == 1 || aff[sprite_id] < 31) ? 2 : sprite_recipe_aff)) && aff[get_npc_id('bartender')] >= _DUKE_WINE_MIN && is_sunny == 1) {
 				// Restore the Vineyard
 				a.push({'desc':"Restore the Vineyard", 'cid':['f_vineyard_restored', 'f_dontsave'], 'val':[1, 1], 'iid':get_npc_id('goddess'), 'sel':false, 'imp':true});
 				restore_vineyard_id = a.length - 1;
@@ -257,10 +251,10 @@ function actions_photos_fall_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 					// RID == 0: Only Dream Event aff needed to hit Photo minimum
 					a.push({'desc':"DREAM (Village)", 'cid':[elli_id, 'f_dream_elli'], 'val':[_DREAM_EVENT_AFF, 1]});
 					a.push({'desc':((dow == "WED") ? "Talk (Flower Shop)" : "Talk "), 'cid':elli_id, 'val':1, 'sel':false});
-					a.push({'desc':"Gift ", 'cid':elli_id, 'val':1, 'sr':true, 't2':"Egg ", 'sel':false});
+					a.push({'desc':"Gift ", 'cid':elli_id, 'val':((d == 61) ? 4 : 1), 'sr':true, 't2':"Egg ", 'sel':false});
 					a.push({'desc':"Egg ", 'sr':true, 't2':"Gift ", 'sel':false,
 						'cid':((vars['chickens'] > 0 && flags['recipe_elli'] == 0) ? ['f_recipe_elli', elli_id] : elli_id),
-						'val':((vars['chickens'] > 0) ? (flags['recipe_elli'] ? 4 : [1, 6]) : 3)
+						'val':((vars['chickens'] > 0) ? (flags['recipe_elli'] ? ((d == 61) ? 7 : 4) : [1, ((d == 61) ? 9 : 6)]) : ((d == 61) ? 6 : 3))
 					});
 				} else {
 					a.push({'desc':((dow == "WED") ? "Talk (Flower Shop)" : "Talk "), 'cid':elli_id, 'val':1,

@@ -398,9 +398,9 @@ function actions_photos_spr_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 			if (aff[popuri_id] == 0) {
 				a.push({'desc':"Meet", 'cid':popuri_id, 'val':4});
 			}
-			a.push({'desc':"Talk", 'cid':popuri_id, 'val':1});
-			a.push({'desc':" Gift ", 'cid':popuri_id, 'val':1, 'sel':false, 't2':" Flower "});
-			a.push({'desc':" Flower ", 'cid':popuri_id, 'val':3, 't2':" Gift "});
+			a.push({'desc':"Talk", 'cid':popuri_id, 'val':1, 'sr':(aff[popuri_id] == 0)});
+			a.push({'desc':" Gift ", 'cid':popuri_id, 'val':1, 'sel':false, 't2':" Flower ", 'sr':true});
+			a.push({'desc':" Flower ", 'cid':popuri_id, 'val':3, 't2':" Gift ", 'sr':true});
 		}
 
 		// BASIL

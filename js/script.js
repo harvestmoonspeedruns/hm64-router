@@ -12,7 +12,7 @@ function reset_vars() {
 			"feed" : 0, "fodder" : 0, "bridge_days_worked" : 0, "springs_days_worked" : 0,
 			"potatoes" : 0, "potato_waters" : 0, "watering_can_fill" : 0, "corn_waters" : 0,
 			"new_chicken_days" : "", "new_cow_days" : "", "cows" : 0, "grass" : 0,
-			"grass_planted" : 0, "happiness" : 0, "days_married" : 0 };
+			"grass_planted" : 0, "happiness" : 0, "days_married" : 0, "inner_sprite_aff" : 0};
 	flags = { "treasure_map" : 0, "new_mus_box" : 0, "old_mus_box" : 0,
 			"fishing_rod" : 0, "dog_inside" : 0, "dog_entered" : 0,
 			"horse" : 0, "horse_brush" : 0, "sustaining_carrot" : 0, "horse_entered" : 0,
