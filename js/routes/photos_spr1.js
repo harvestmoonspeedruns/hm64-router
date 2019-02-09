@@ -118,7 +118,7 @@ function actions_photos_spr_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 		}
 	} else { // Not a Festival
 		if (vars['openers'] == 0) {
-			a.push({'desc':'Till 9 x 9 Spot', 'sr':(d == 3), 'cid':'v_openers', 'val':1});
+			a.push({'desc':'Till 3 x 3 Spot', 'sr':(d == 3), 'cid':'v_openers', 'val':1});
 			has_opener = true;
 		}
 
@@ -176,6 +176,11 @@ function actions_photos_spr_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 					//a.push({'desc':"Scare Birds", 'cid':'v_happiness', 'val':1, 'sel':false, 'sr':true});
 				}
 			}
+		}
+
+		// Lumber for Inner Sprite
+		if (vars['inner_sprite_aff'] < _SPRITE_SPAM_MAX && aff[sprite_id] < _SPRITE_WINE_MIN) {
+			a.push({'desc':"Get 6 Lumber from Bin", 'imp':true, 'iid':get_npc_id('stump')});
 		}
 
 		if (!is_festival(d) && !get_horse && !has_opener) {
@@ -288,8 +293,23 @@ function actions_photos_spr_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 
 			// SPRITE
 			if (aff[sprite_id] == 0) { a.push({'desc':"Meet", 'cid':sprite_id, 'val':5}); }
-			a.push({'desc':"Talk", 'cid':sprite_id, 'val':1, 'sr':(aff[sprite_id] == 0)});
-			a.push({'desc':"Flower", 'cid':sprite_id, 'val':2, 'sr':true});
+			a.push({'desc':"Talk", 'cid':sprite_id, 'val':1, 'sr':(aff[sprite_id] == 0), 'sel':(aff[sprite_id] < _SPRITE_WINE_MIN), 'red':(aff[sprite_id] >= _SPRITE_WINE_MIN)});
+			a.push({'desc':"Flower", 'cid':sprite_id, 'val':2, 'sr':true, 'sel':(a[a.length - 1]['sel'])});
+			if (vars['inner_sprite_aff'] < _SPRITE_SPAM_MAX && aff[sprite_id] < _SPRITE_WINE_MIN) {
+				var lumber_to_sprite = ((_SPRITE_SPAM_MAX - vars['inner_sprite_aff'] >= 6) ? 6 : (_SPRITE_SPAM_MAX - vars['inner_sprite_aff']));
+				lumber_to_sprite = ((lumber_to_sprite > vars['lumber']) ? vars['lumber'] : lumber_to_sprite);
+				if (lumber_to_sprite > 0) {
+					a.push({'desc':(lumber_to_sprite + " Lumber to Inner Sprite"), 'sr':true,
+							'cid':[sprite_id, 'v_inner_sprite_aff', 'v_lumber'],
+							'val':[lumber_to_sprite, lumber_to_sprite, -1 * lumber_to_sprite]
+					});
+				}
+			}
+
+			// Chop Lumber for Inner Sprite Gifts
+			if ((vars['inner_sprite_aff'] + lumber_to_sprite) < _SPRITE_SPAM_MAX && aff[sprite_id] < _SPRITE_WINE_MIN) {
+				a.push({'desc':"Equip Axe, Chop One Stump", 'imp':true, 'val':6, 'cid':'v_lumber', 'iid':get_npc_id('stump')});
+			}
 
 			// Strength Wish Power Berry
 			if (flags['berry_strength'] == 0 && vars['chickens'] > 0 && flags['old_mus_box'] == 1 && (vars['potato_waters'] >= _POTATO_GROW_DAYS || flags['potato_planted'] == 0)) {

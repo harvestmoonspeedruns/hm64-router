@@ -8,29 +8,42 @@ function get_actions_elli_photo (d = 3, g = 300, is_sunny = 1) {
 	var elli_mon_loc = (get_month(d) == 1) ? "BEACH" : "MTN";
 	var dow = get_day_of_week(d, true);
 
-	if (d < 31) {
-		// Spring 3 to Spring 30, Year 1
-
-		if (d == 3) {
-			// Spring 3
-			a.push({'desc':"Greet the Mayor", 'iid':get_npc_id("mayor")});
-		} if (d == 23) {
-			// Flower Festival, Spring 23
-			a.push({'desc':"Go to Town Square", 'iid':get_npc_id('mayor'), 'imp':true});
-			a.push({'desc':"Talk", 'cid':get_npc_id("rick"), 'val':2});
-			a.push({'desc':"Talk", 'cid':elli_id, 'val':2});
-			a.push({'desc':"Dance", 'cid':elli_id, 'val':10, 'sr':true});
-		}
-	}
-
-	if (d == 31) {
+	if (d == 3) {
+		// Spring 3
+		a.push({'desc':"Greet the Mayor", 'iid':get_npc_id("mayor")});
+	} else if (d == 23) {
+		// Flower Festival, Spring 23
+		a.push({'desc':"Go to Town Square", 'iid':get_npc_id('mayor'), 'imp':true});
+		a.push({'desc':"Talk", 'cid':get_npc_id("rick"), 'val':2});
+		a.push({'desc':"Talk", 'cid':elli_id, 'val':2});
+		a.push({'desc':"Dance", 'cid':elli_id, 'val':10, 'sr':true});
+	} else if (d == 31) {
+		/*
 		// Fireworks Fest, Summer 1
-		a.push({'desc':"Fishing Rod, Fish a lot", 'cid':get_npc_id("fisherman")});
+		a.push({'desc':"Get Fishing Rod", 'val':1, 'cid':'f_fishing_rod', 'iid':get_npc_id("fisherman")});
 		a.push({'desc':"Meet", 'cid':elli_id, 'val':4, 't0':"Talk"});
 		a.push({'desc':"Talk", 'cid':elli_id, 'val':1, 'sr':true, 't3':"Meet"});
 		a.push({'desc':"M/L Fish", 'cid':elli_id, 'val':3, 't2':"Gift", 'sr':true});
 		a.push({'desc':"Gift", 'cid':elli_id, 'val':1, 'sr':true, 'sel':false, 't2':"M/L Fish"});
 		a.push({'desc':"Fireworks at 7PM (Bakery)", 'cid':elli_id, 'val':5});
+		*/
+	} else if (d == 90) {
+		// Fall 30
+		a.push({'desc':"Enter / Exit House to Clear Cliff", 'iid':get_npc_id('cliff')});
+		a.push({'desc':"Accept Cows", 'cid':"f_borrow_cows", 'val':1, 'iid':get_npc_id('doug'), 'imp':true});
+		if (flags['fishing_rod'] == 0) {
+			a.push({'desc':"Get Fishing Rod", 'val':1, 'cid':'f_fishing_rod', 'iid':get_npc_id("fisherman")});
+		}
+	} else if (d == 95 && flags['borrow_cows'] == 1) {
+		// Winter 5
+		if (flags['borrow_cows'] > 0) {
+			a.push({'desc':"Enter / Exit House to Clear Cliff", 'iid':get_npc_id('cliff')});
+			a.push({'desc':"1000 G from Doug", 'cid':["v_gold", "f_borrow_cows"], 'val':[1000, -1], 'iid':get_npc_id('doug'), 'imp':true});
+		}
+	} else if (d >= 102 && d <= 106) {
+		// Winter 12 - 16
+		// THURS - FRI - SAT - SUN - MON
+		a.push({'desc':"Hot Springs", 'cid':["v_gold", "v_springs_days_worked"], 'val':[1000, 1], 'imp':true, 'iid':get_npc_id('mas_carpenter')});
 	}
 
 	if (d > 31 && d <= 69) { // Summer to Photo

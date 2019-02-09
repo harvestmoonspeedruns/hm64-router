@@ -51,6 +51,7 @@ function get_actions(rid = null, d = vars['day'], g = vars['gold'], is_sunny = 1
 		if (rid == 3) { return get_actions_popuri(d, g, is_sunny); }
 		if (rid == 4) { return get_actions_elli_photo(d, g, is_sunny); }
 		if (rid == 7) { return get_actions_maria(d, g, is_sunny); }
+		if (rid == 8) { return get_actions_ann_photo(d, g, is_sunny); }
 	}
 	return [];
 }
@@ -174,12 +175,17 @@ function next_day(jump = false) {
 		flags['yesterday_rain'] = 0;
 		if ($('.rainy').hasClass('selected')) {
 			flags['yesterday_rain'] = 1;
-			if ([0, 5].includes(route_id)) {
+			if ([0, 5, 8].includes(route_id)) {
 				if (get_month(vars['day']) == 0 && flags['potato_planted'] == 1) {
 					vars['potato_waters']++;
 				}
 				if (get_month(vars['day']) == 1 && flags['corn_planted'] == 1) {
 					vars['corn_waters']++;
+				}
+			}
+			if (route_id == 8) {
+				if (get_month(vars['day']) == 0 && flags['potato_planted_2'] == 1) {
+					vars['potato_waters_2']++;
 				}
 			}
 			if (route_id == 7) {
@@ -500,6 +506,11 @@ function new_game(rid = 0) {
 		flags['cabbage_bought'] = 0;
 		flags['cabbage_planted'] = 0;
 	}
+	if (route_id == 8) { // Ann Photo
+		flags['potato_planted'] = 0;
+		vars['potato_waters_2'] = 0;
+		flags['potato_planted_2'] = 0;
+	}
 	next_day(true);
 }
 
@@ -787,7 +798,7 @@ function get_toggle (abid = null, a = actions) {
 				}
 			}
 			if (!tmp_res.length) {
-				console.log("WARNING: toggle added to action button, but id doesnt exist - (T" + i + " = " + abid["t" + i] + ' | desc = ' + abid['desc'] + ')');
+				console.log("WARNING: toggle added to action button, but id doesnt exist - (T" + i + " = " + abid["t" + i] + ' | desc = ' + abid['desc'] + ' | ' + get_npc_id(abid) + ')');
 			}
 		}
 		result.push('[' + tmp_res.join(", ") + ']');
@@ -919,7 +930,7 @@ function slow_calc(odds, buy_amt, recursive = false) {
 	}
 }
 
-function calc_bets(bet_type = 1) {
+function calc_bets(bet_type = 1, use_leftover = false) {
 	/*
 	 * BET TYPES:
 	 * 
@@ -927,8 +938,6 @@ function calc_bets(bet_type = 1) {
 	 * 2 - NILLOWS STRAT
 	 * 
 	 */
-
-console.log("START:");
 
 	var g = ($('#b_gold').val() === undefined) ? vars['gold'] : $('#b_gold').val();
 	var need = ($('#b_need').val() === undefined) ? 500 : $('#b_need').val();
@@ -939,8 +948,6 @@ console.log("START:");
 		$("input[id^='bg_']").val(0);
 		return;
 	}
-	
-	console.log('hi');
 
 	// Gather odds and calculate max G required
 	var odds = [];
@@ -994,8 +1001,6 @@ console.log("START:");
 		}
 	}
 
-	//console.log(odds);
-
 	// Display values
 	console.log("FINAL:");
 	for (var i = 0; i < odds.length; i++) {
@@ -1026,11 +1031,19 @@ function toggle_color(t, div_tog = "", t0 = [], t1 = [], t2 = [], t3 = []) {
 }
 
 function get_npc_id(n = "") {
-	n = n.toLowerCase().replace("'", "").replace("_", " ").trim();
+	
+	//console.log(n);
+	
+	if (n.hasOwnProperty('desc')) {
+		return (n.hasOwnProperty('cid') ? get_npc_id(n['cid']) : null);
+	}
 	if (npc_ids[n] !== undefined) { return npc_ids[n]; }
-	for (var i = 0; i < npcs.length; i++) {
-		if (n.localeCompare(npcs[i].toLowerCase().replace("'", "").replace("_", " ").trim()) === 0) {
-			return i;
+	if ((typeof n).localeCompare("string") === 0) {
+		n = n.toLowerCase().replace("'", "").replace("_", " ").trim();
+		for (var i = 0; i < npcs.length; i++) {
+			if (n.localeCompare(npcs[i].toLowerCase().replace("'", "").replace("_", " ").trim()) === 0) {
+				return i;
+			}
 		}
 	}
 	return null;

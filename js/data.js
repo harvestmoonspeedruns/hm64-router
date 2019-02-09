@@ -11,6 +11,8 @@ const _DUKE_WINE_MIN = 41;
 const _BASIL_BERRY_MIN = 200;
 const _SPRITE_SPAM_MAX = 21;
 
+const _CUTSCENE_RICK_ANN_MIN = 40;
+
 const _SICK_EVENT_AFF = 10;
 const _DREAM_EVENT_AFF = 8;
 const _ANKLE_EVENT_AFF = 10;
@@ -55,7 +57,8 @@ var extensions = [
 	["kitchen", 5000, 450, "Kitchen"]
 ];
 
-var route_names = ["All Photos (Karen)", "Elli", "Karen", "Popuri", "Elli IL Photo", "All Photos (Elli)", "All Recipes", "Maria"];
+var route_names = ["All Photos (Karen)", "Elli", "Karen", "Popuri", "Elli IL Photo",
+					"All Photos (Elli)", "All Recipes", "Maria", "Ann Photo"];
 var bet_colors = ["lightgray", "black", "red", "blue", "yellow", "green"];
 var route_affs = [
 	[], // Placeholder for All Photos (Karen)
@@ -65,7 +68,8 @@ var route_affs = [
 	['elli', 'rick'], //Elli IL
 	[], // Placeholder for All Photos (Elli)
 	[], // Placeholder for Recipes
-	['maria', 'rick'] // Maria
+	['maria', 'rick'], // Maria
+	['ann', 'rick'] // Ann Photo
 ];
 var skip_to_list = [
 	[3, 17, 64], // Photos (Karen)
@@ -75,7 +79,8 @@ var skip_to_list = [
 	[3, 31], // Elli IL Photo
 	[3, 17, 64], // Photos (Elli)
 	[3], // Recipes
-	[3] // Maria
+	[3], // Maria
+	[3] // Ann Photo
 ];
 
 // 0 = vars; 1 = flags; 2 = aff

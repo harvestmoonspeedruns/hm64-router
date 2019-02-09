@@ -7,6 +7,7 @@
 * **5** - All Photos (Elli marriage)
 * **6** - All Recipes
 * **7** - Maria Marriage
+* **8** - Ann Photo
 
 ## ACTION PROPERTIES
 * **"desc"** - (Description) Words that appear on the action button. REQUIRED
