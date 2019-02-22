@@ -70,7 +70,8 @@ var route_affs = [
 	[], // Placeholder for Recipes
 	['maria', 'rick'], // Maria
 	['ann', 'rick'], // Ann Photo
-	['karen', 'bartender', 'sprite'] // Karen Photo
+	['karen', 'bartender', 'sprite'], // Karen Photo
+	['grey', 'cliff', 'gotz', 'sprite'] // All Recipes
 ];
 var skip_to_list = [
 	[3, 17, 64], // Photos (Karen)
@@ -81,7 +82,8 @@ var skip_to_list = [
 	[3, 17, 64], // Photos (Elli)
 	[3], // Recipes
 	[3], // Maria
-	[3] // Ann Photo
+	[3], // Ann Photo
+	[3] // All Recipes
 ];
 
 // 0 = vars; 1 = flags; 2 = aff
