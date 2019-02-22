@@ -53,6 +53,7 @@ function get_actions(rid = null, d = vars['day'], g = vars['gold'], is_sunny = 1
 		if (rid == 7) { return get_actions_maria(d, g, is_sunny); }
 		if (rid == 8) { return get_actions_ann_photo(d, g, is_sunny); }
 		if (rid == 9) { return get_actions_karen_photo(d, g, is_sunny); }
+		if (rid == 10) { return get_actions_all_recipes(d, g, is_sunny); }
 	}
 	return [];
 }
@@ -495,27 +496,25 @@ function new_game(rid = 0) {
 		vars['openers'] = 0;
 		flags['potato_planted'] = 0;
 		flags['corn_planted'] = 0;
-	}
-	if (rid == 3) { // Popuri marriage
+	} else if (rid == 3) { // Popuri marriage
 		flags['moondrops_bought'] = 0;
 		flags['moondrops_planted'] = 0;
 		vars['moondrop_waters'] = 0;
-	}
-	if (rid == 7) { // Maria Marriage
+	} else if (rid == 7) { // Maria Marriage
 		vars['cabbages'] = 0;
 		vars['cabbage_waters'] = 0;
 		flags['cabbage_bought'] = 0;
 		flags['cabbage_planted'] = 0;
-	}
-	if (rid == 8) { // Ann Photo
+	} else if (rid == 8) { // Ann Photo
 		flags['potato_planted'] = 0;
 		vars['potato_waters_2'] = 0;
 		flags['potato_planted_2'] = 0;
-	}
-	if (rid == 9) { // Karen Photo
+	} else if (rid == 9) { // Karen Photo
 		flags['turnips_planted'] = 0;
 		vars['turnip_waters'] = 0;
 		vars['r_sprite_aff'] = 0;
+	} else if (rid == 10) { // All Recipes
+		flags['recipe_ellen'] = 0;
 	}
 	next_day(true);
 }
