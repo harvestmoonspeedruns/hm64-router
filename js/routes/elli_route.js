@@ -17,7 +17,7 @@ function get_actions_elli (d = 3, g = 300, is_sunny = 1) {
 	} else if ((d % 120) == 23 && aff[elli_id] < _PROPOSE_MIN) {
 		// Flower Festival, Spring 23
 		a.push({'desc':"Flower Festival (Town Square)", 'imp':true});
-		a.push({'desc':"Talk", 'cid':get_npc_id("rick"), 'val':2, 'sel':(aff[rick_id] < _RICK_FIX_MIN - 3), 'red':(aff[rick_id] >= _RICK_FIX_MIN - 3)});
+		a.push({'desc':"Talk", 'cid':rick_id, 'val':2, 'sel':(aff[rick_id] < _RICK_FIX_MIN - 3), 'red':(aff[rick_id] >= _RICK_FIX_MIN - 3)});
 		a.push({'desc':"Talk", 'cid':elli_id, 'val':2});
 		a.push({'desc':"Dance", 'cid':elli_id, 'val':10, 'sr':true});
 		today_aff += 12;
@@ -34,16 +34,20 @@ function get_actions_elli (d = 3, g = 300, is_sunny = 1) {
 		today_aff += 11;
 		*/
 	} else if ((d % 120) == 72 && aff[elli_id] < _PROPOSE_MIN) {
-		// Harest Festival, Fall 12
+		// Harvest Festival, Fall 12
 		a.push({'desc':"Harvest Festival (Town Square)", 'imp':true});
-		a.push({'desc':"Talk", 'cid':rick_id, 'val':2, 'sel':(aff[rick_id] < _RICK_FIX_MIN - 3), 'red':(aff[rick_id] >= _RICK_FIX_MIN - 3)});
 		a.push({'desc':"Talk", 'cid':elli_id, 'val':2});
 		a.push({'desc':"Dance", 'cid':elli_id, 'val':10, 'sr':true});
+		a.push({'desc':'Win Harvest King', 'iid':get_npc_id('mayor'), 'sel':false, 'val':[1, 5], 'cid':['f_harvest_king', 'v_happiness']});
 		today_aff += 12;
 	} else if (d == 109) {
 		// Dog Race
 		a = betting_table(a);
 		a.push({'desc':"Win 500 Lumber at Dog Race", 'cid':"v_lumber", 'val':500});
+	} else if (d == 128 && flags['harvest_king'] == 1) {
+		// Planting Festival + Harvest King
+		a.push({'desc':"Go to Town Square", 'iid':get_npc_id('mayor'), 'cid':['v_happiness', 'f_dontsave'], 'val':[5, 1], 'imp':true});
+		a.push({'desc':"Ride with Elli", 'val':[1, 8, -1], 'cid':['f_photo_harvest', elli_id, 'f_harvest_king']});
 		
 /*
 	} else if (d == 90) { a.push({'desc':"Accept Cows", 'cid':"f_borrow_cows", 'val':1, 'iid':get_npc_id('doug')}); }
@@ -59,9 +63,6 @@ function get_actions_elli (d = 3, g = 300, is_sunny = 1) {
 			// 83,  84,  85,  86,  87
 			// SAT, SUN, MON, TUE, WED
 			a.push({'desc':"Bridge Work", 'cid':['v_gold', 'v_bridge_days_worked'], 'val':[1000, 1], 'iid':get_npc_id('mas_carpenter'), 'imp':true});
-			if (flags['fishing_rod'] == 0) {
-				a.push({'desc':"Get Fishing Rod", 'val':1, 'cid':'f_fishing_rod', 'iid':get_npc_id("fisherman")});
-			}
 			a.push({'desc':((aff[rick_id] < _RICK_FIX_MIN - 3) ? "Gifts for Elli and Rick" : "Gift for Elli")});
 		} else if ([102, 103, 104, 106].includes(d)) {
 			// Hot Springs Work (Win 12 - 16)
@@ -77,68 +78,78 @@ function get_actions_elli (d = 3, g = 300, is_sunny = 1) {
 			}
 		}
 
-		if (aff[elli_id] < _PROPOSE_MIN && (a.length > 0 || (d > 121 && !["SUN", "WED"].includes(dow) && !(aff[elli_id] >= (_PROPOSE_MIN - 13 - _MUS_BOX_AFF) && d <= 143)))) {
+		if (!is_festival(d) && aff[elli_id] < _PROPOSE_MIN && ((d == 61 && is_sunny) || a.length > 0 || (d > 121 && !["SUN", "WED"].includes(dow) && !(aff[elli_id] >= (_PROPOSE_MIN - 13 - _MUS_BOX_AFF) && d <= 143)))) {
 			// Music Box
-			if (d > 121 && !["SUN", "WED"].includes(dow) && flags['old_mus_box'] == 0) {
+			if ((d == 61 || d > 121) && !["SUN", "WED"].includes(dow) && flags['old_mus_box'] == 0) {
 				a.push({'desc':"Equip hoe"});
 				if (flags['treasure_map'] == 0) {
+					a.push({'desc':"Enter / Exit House to Clear Cliff", 'iid':get_npc_id('cliff')});
 					a.push({'desc':"Treasure Map", 'cid':'f_treasure_map', 'val':1, 'iid':get_npc_id("musbox")});
 				}
-				a.push({'desc':"Dig Up Music Box", 'cid':'f_old_mus_box', 'val':1, 'sr':(flags['treasure_map'] == 0), 'sel':(aff['elli_id'] < (_PROPOSE_MIN - 1 - 4))});
+				a.push({'desc':"Dig Up Music Box", 'cid':'f_old_mus_box', 'val':1, 'sr':(flags['treasure_map'] == 0), 'sel':(aff[elli_id] < (_PROPOSE_MIN - 1 - 4))});
 				if (flags['treasure_map'] == 1) {
 					a[a.length - 1]['iid'] = get_npc_id("musbox");
 				}
 			}
 
+			if (d > 109 && !is_festival(d))
 			// Buy a Chicken
-			if (vars['chickens'] == 0 && vars['gold'] >= 1500) {
+			if (vars['chickens'] == 0 && dow != "THURS" && vars['gold'] >= 1500) {
 				a.push({'desc':"Buy a Chicken", 'cid':['v_chickens', 'v_gold'], 'val':[1, -1500], 'iid':get_npc_id('doug')});
 			}
 
 			// Kitchen
-			if (flags['kitchen'] < 1 && dow != "TUES" && !is_festival(d) && vars['gold'] >= 5000 && vars['lumber'] >= 500) {
-				a.push({'desc':'Buy Kitchen', 'cid':['v_lumber', 'v_gold', 'f_kitchen'], 'val':[-500, -5000, (3 + 1 + 1)], 'iid':get_npc_id('mas_carpenter')});
+			if (flags['kitchen'] < 1 && dow != "TUES" && vars['gold'] >= 5000 && vars['lumber'] >= 500) {
+				a.push({'desc':'Buy Kitchen', 'cid':['v_lumber', 'v_gold', 'f_kitchen'], 'val':[-500, -5000, 6], 'iid':get_npc_id('mas_carpenter')});
+			}
+
+			if (d == 61) { // Elli birthday
+				a.push({'desc':"Fill up on Gifts"});
+				if (flags['fishing_rod'] == 0) {
+					a.push({'desc':"Get Fishing Rod", 'val':1, 'cid':'f_fishing_rod', 'iid':get_npc_id("fisherman")});
+				}
 			}
 
 			// Elli
 			if (is_sunny == 1 && (["MON", "TUES", "THURS", "FRI", "SAT"].includes(dow) || d == 87)) {
 				if (aff[elli_id] < 13) {
-					a.push({'desc':"Meet ", 'cid':elli_id, 'val':4, 't0':"Talk"});
+					a.push({'desc':"Meet ", 'cid':elli_id, 'val':4});
 					today_aff += 4;
 				}
-				a.push({'desc':("Talk" + ((dow == "MON") ? " (" + elli_mon_loc + ")" : ((dow == "WED" ? " (Flower Shop)" : "")))), 'cid':elli_id, 'val':1, 'sel':(aff[rick_id] < _RICK_FIX_MIN - 3), 't2':"MusBox", 'sr':(aff[elli_id] == 0)});
-				a.push({'desc':"MusBox", 'cid':elli_id, 'val':_MUS_BOX_AFF, 'sel':(aff[rick_id] >= _RICK_FIX_MIN - 3), 'sr':true, 't2':a[a.length - 1]['desc']});
 				a.push({
-					'desc':("Elli-egg" + ((dow == "MON") ? " (" + elli_mon_loc + ")" : "")),
+					'desc':("Talk " + ((dow == "MON") ? "(" + elli_mon_loc + ")" : ((dow == "WED" ? "(Flower Shop)" : "")))),
+					'cid':elli_id, 'val':1, 'sel':(aff[rick_id] < _RICK_FIX_MIN - 3 || get_month(vars['day']) == 3), 't2':"MusBox", 'sr':(aff[elli_id] < 13)
+				});
+				if (aff[elli_id] < 13) {
+					a[a.length - 1]['t3'] = "Meet ";
+					a[a.length - 2]['t0'] = a[a.length - 1]['desc'];
+				}
+				a.push({'desc':"MusBox", 'cid':[elli_id, 'f_new_mus_box'], 'val':[_MUS_BOX_AFF, -1], 'sel':(aff[rick_id] >= _RICK_FIX_MIN - 3 && get_month(vars['day']) != 3), 'sr':true, 't2':a[a.length - 1]['desc']});
+				a.push({
+					'desc':"Egg", 'sel':(vars['chickens'] > 0),
 					'cid':((flags['recipe_elli'] == 1) ? elli_id : [elli_id, "f_recipe_elli"]),
-					'val':((flags['recipe_elli'] == 1) ? 4 : [6, 1]), 'sr':true,
-					'sel':(vars['chickens'] > 0),
-					't2':("Elli-gift" + ((dow == "MON") ? " (" + elli_mon_loc + ")" : ""))
+					'val':((flags['recipe_elli'] == 1) ? 4 : [6, 1]), 'sr':true, 't2':"Gift "
 				});
 				a.push({
-					'desc':("Elli-gift" + ((dow == "MON") ? " (" + elli_mon_loc + ")" : "")),
-					'cid':elli_id, 'val':1, 'sr':true, 'sel':(vars['chickens'] == 0), 't2':a[a.length - 1]['desc']
+					'desc':"Gift ", 'cid':elli_id, 'val':(((d % 120) == 61) ? 2 : 1), 'sr':true, 'sel':(vars['chickens'] == 0), 't2':a[a.length - 1]['desc']
 				});
 				today_aff += (((aff[rick_id] >= (_RICK_FIX_MIN - 3) && ["MON", "TUES", "THURS", "FRI"].includes(dow)) ? _MUS_BOX_AFF : 1) + ((vars['chickens'] > 0) ? 4 : 1));
-			}
-
-			if (is_sunny == 0 && dow != "MON") {
+			} else if (is_sunny == 0 && dow != "MON") {
 				if (aff[elli_id] >= _SICK_EVENT_MIN && flags['sick_elli'] == 0) {
 					// SICK EVENT
 					a.push({'desc':"Sick Event", 'cid':[elli_id, "f_sick_elli"], 'val':[_SICK_EVENT_AFF, 1]});
 					today_aff += _SICK_EVENT_AFF;
 				} else {
-					a.push({'desc':"Talk", 'cid':elli_id, 'val':1, 'sel':(d >= 83 && d <= 87)});
+					a.push({'desc':"Talk ", 'cid':elli_id, 'val':1, 'sel':(flags['new_mus_box'] == 0)});
+					a.push({'desc':"MusBox", 'cid':[elli_id, 'f_new_mus_box'], 'val':[_MUS_BOX_AFF, -1], 'sel':(flags['new_mus_box'] == 1), 'sr':true, 't2':a[a.length - 1]['desc']});
 					a.push({
-						'desc':"Elli-egg", 't2':"Elli-gift",
+						'desc':"Egg ", 't2':"Gift ",
 						'cid':((flags['recipe_elli'] == 1) ? elli_id : [elli_id, "f_recipe_elli"]),
-						'val':((flags['recipe_elli'] == 1) ? 4 : [6, 1]), 'sr':true,
-						'sel':(vars['chickens'] > 0 && d >= 83 && d <= 87),
+						'val':((flags['recipe_elli'] == 1) ? 4 : [6, 1]), 'sr':true, 'sel':(vars['chickens'] > 0)
 					});
 					a.push({
-						'desc':"Elli-gift", 't2':a[a.length - 1]['desc'],
-						'cid':elli_id, 'val':1, 'sr':true,
-						'sel':(vars['chickens'] == 0 && d >= 83 && d <= 87)
+						'desc':"Gift ", 't2':a[a.length - 1]['desc'],
+						'cid':elli_id, 'val':1, 'sr':true, 'sel':(vars['chickens'] == 0)
 					});
 					today_aff += (((aff[rick_id] >= (_RICK_FIX_MIN - 3) && ["MON", "TUES", "THURS", "FRI"].includes(dow)) ? _MUS_BOX_AFF : 1) + ((vars['chickens'] > 0) ? 4 : 1));
 				}
@@ -150,13 +161,15 @@ function get_actions_elli (d = 3, g = 300, is_sunny = 1) {
 					a.push({'desc':"DONT TALK TO RICK WITH A FIXED MUSIC BOX!", 'imp':true, 'iid':rick_id});
 				}
 				if (aff[rick_id] < 5) {
-					a.push({'desc':"Meet ", 'cid':rick_id, 'val':4, 't0':"Talk ", 'sel':(dow != "SAT")});
-					a.push({'desc':"Talk ", 'cid':rick_id, 'val':3, 'sr':true, 't3':"Meet ", 'sel':(dow != "SAT")});
-				} else {
-					a.push({'desc':"Talk ", 'cid':rick_id, 'val':3, 'sel':(dow != "SAT")});
+					a.push({'desc':"Meet", 'cid':rick_id, 'val':4, 't0':"Talk", 'sel':(dow != "SAT")});
+				}
+				a.push({'desc':"Talk", 'cid':rick_id, 'val':3, 'sr':(aff[rick_id] < 5), 'sel':(dow != "SAT")});
+				if (aff[rick_id] < 5) {
+					a[a.length - 1]['t3'] = "Meet";
 				}
 				if (aff[rick_id] >= _RICK_FIX_MIN - 6) {
-					a.push({'desc':"MusBox Fix", 'cid':['f_new_mus_box', 'f_old_mus_box'], 'val':[1, -1], 'sr':true, 'sel':(aff[rick_id] >= _RICK_FIX_MIN - 3 && dow != "SAT")});
+					a.push({'desc':"MusBox Fix", 'cid':['f_new_mus_box', 'f_old_mus_box'], 'val':[1, -1], 'sr':true,
+							'sel':(aff[rick_id] >= _RICK_FIX_MIN - 3 && dow != "SAT" && (get_month(vars['day']) != 3 || flags['old_mus_box'] == 1))});
 				}
 				a.push({'desc':"Gift", 'cid':rick_id, 'val':3, 'sr':true,  'sel':(aff[rick_id] < _RICK_FIX_MIN - 3 && dow != "SAT")});
 			}
@@ -173,7 +186,7 @@ function get_actions_elli (d = 3, g = 300, is_sunny = 1) {
 		}
 
 		// Propose
-		if (flags['kitchen'] >= 1 && flags['kitchen'] <= 2 && is_sunny == 1 && (aff[elli_id] + today_aff) >= 220 && vars['gold'] >= 980
+		if (!is_festival(d) && flags['kitchen'] >= 1 && flags['kitchen'] <= 2 && is_sunny == 1 && (aff[elli_id] + today_aff) >= 220 && vars['gold'] >= 980
 			&& flags['propose'] == 0 && ["MON", "TUES", "THURS", "FRI"].includes(dow)) {
 				a.push({'desc':"Buy Blue Feather", 'cid':['v_gold', 'f_blue_feather'], 'val':[-980, 1], 'iid':rick_id, 'imp':true});
 				a.push({'desc':"Propose", 'cid':['f_blue_feather', 'f_propose'], 'val':[-1, 1], 'iid':elli_id, 'imp':true});

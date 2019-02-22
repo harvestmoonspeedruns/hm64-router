@@ -52,6 +52,7 @@ function get_actions(rid = null, d = vars['day'], g = vars['gold'], is_sunny = 1
 		if (rid == 4) { return get_actions_elli_photo(d, g, is_sunny); }
 		if (rid == 7) { return get_actions_maria(d, g, is_sunny); }
 		if (rid == 8) { return get_actions_ann_photo(d, g, is_sunny); }
+		if (rid == 9) { return get_actions_karen_photo(d, g, is_sunny); }
 	}
 	return [];
 }
@@ -111,8 +112,8 @@ function next_day(jump = false) {
 		sell_stuff = (sell_amt > 0);
 
 		// Affection from 4 days bridge work or hot springs work
-		if ((vars['day'] == 87 && flags['bridge_days_worked'] == 4) ||
-			(vars['day'] == 106 && flags['springs_days_worked'] == 4)) {
+		if ((vars['day'] == 87 && vars['bridge_days_worked'] == 4) ||
+			(vars['day'] == 106 && vars['springs_days_worked'] == 4)) {
 			for (var i = 0; i < npcs.length; i++) {
 				if (aff[i] !== undefined && !not_villagers.includes(i)) {
 					aff[i] = ((aff[i] >= 253) ? 255 : (aff[i] + 3));
@@ -183,15 +184,14 @@ function next_day(jump = false) {
 					vars['corn_waters']++;
 				}
 			}
-			if (route_id == 8) {
-				if (get_month(vars['day']) == 0 && flags['potato_planted_2'] == 1) {
-					vars['potato_waters_2']++;
-				}
+			if (route_id == 8 && get_month(vars['day']) == 0 && flags['potato_planted_2'] == 1) {
+				vars['potato_waters_2']++;
 			}
-			if (route_id == 7) {
-				if (flags['cabbage_planted'] == 1) {
-					vars['cabbage_waters']++;
-				}
+			if (route_id == 7 && flags['cabbage_planted'] == 1) {
+				vars['cabbage_waters']++;
+			}
+			if (route_id == 9 && flags['turnips_planted'] == 1) {
+				vars['turnip_waters']++;
 			}
 		}
 		if (vars['potato_waters'] == _POTATO_GROW_DAYS) {
@@ -337,9 +337,10 @@ function skip_to(d = 3) {
 			'3':[['f_dog_inside', 1], ['v_openers', 2]]
 		}
 	}
-	if (route_id == 1 || route_id == 4) { // Elli marriage & IL Photo
+	if (route_id == 1) { // Elli marriage
 		actions_all = {
-			'23' : [[get_npc_id('elli'), 12], [get_npc_id('rick'), 2]]
+			'23' : [[get_npc_id('elli'), 12], [get_npc_id('rick'), 2]],
+			'91' : [[get_npc_id('elli'), 7], [get_npc_id('rick'), 10]]
 		};
 	}
 	if (route_id == 2) { // Karen marriage
@@ -442,7 +443,7 @@ function new_game(rid = 0) {
 	route_id = rid;
 	reset_vars();
 	vars['day'] = 3;
-	document.title = route_names[route_id] + " - HM64 Router";
+	document.title = route_names[rid] + " - HM64 Router";
 
 	// 0 = vars; 1 = flags; 2 = aff
 	cur_slot = 0;
@@ -462,27 +463,27 @@ function new_game(rid = 0) {
 	$("input[id^='for_']").val(0);
 
 	// Set affection of included characters to 0
-	if ([0, 5].includes(route_id)) {
+	if ([0, 5].includes(rid)) {
 		for (var i = 0; i < 38; i++) { aff[i] = 0; }
 	} else {
-		for (var i = 0; i < route_affs[route_id].length; i++) {
-			aff[get_npc_id(route_affs[route_id][i])] = 0;
+		for (var i = 0; i < route_affs[rid].length; i++) {
+			aff[get_npc_id(route_affs[rid][i])] = 0;
 		}
 	}
 
 	// Characters listed based on route
-	$("#status_row").html(set_affections(route_id));
+	$("#status_row").html(set_affections(rid));
 
 	// Custom skip options
 	var html_list = [];
 	html_list.push('<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Skip to</a>');
 	html_list.push('<div class="dropdown-menu" aria-labelledby="navbarDropdown2">');
-	if (route_id < skip_to_list.length) {
-		for (var i = 0; i < skip_to_list[route_id].length; i++) {
-			html_list.push('<span class="dropdown-item ' + get_month_name(skip_to_list[route_id][i]).toLowerCase() +
-				'" onclick="skip_to(' + skip_to_list[route_id][i] +
-				')">' + get_month_name(skip_to_list[route_id][i], true) + ' ' + get_day(skip_to_list[route_id][i]) +
-				' (' + get_day_of_week(skip_to_list[route_id][i], true).toUpperCase() + ')</span>');
+	if (rid < skip_to_list.length) {
+		for (var i = 0; i < skip_to_list[rid].length; i++) {
+			html_list.push('<span class="dropdown-item ' + get_month_name(skip_to_list[rid][i]).toLowerCase() +
+				'" onclick="skip_to(' + skip_to_list[rid][i] +
+				')">' + get_month_name(skip_to_list[rid][i], true) + ' ' + get_day(skip_to_list[rid][i]) +
+				' (' + get_day_of_week(skip_to_list[rid][i], true).toUpperCase() + ')</span>');
 		}
 	}
 	if (html_list.length > 2) {
@@ -490,26 +491,31 @@ function new_game(rid = 0) {
 	}
 
 	// Custom flags for particular run
-	if ([0, 5].includes(route_id)) { // All Photos
+	if ([0, 5].includes(rid)) { // All Photos
 		vars['openers'] = 0;
 		flags['potato_planted'] = 0;
 		flags['corn_planted'] = 0;
 	}
-	if (route_id == 3) { // Popuri marriage
+	if (rid == 3) { // Popuri marriage
 		flags['moondrops_bought'] = 0;
 		flags['moondrops_planted'] = 0;
 		vars['moondrop_waters'] = 0;
 	}
-	if (route_id == 7) { // Maria Marriage
+	if (rid == 7) { // Maria Marriage
 		vars['cabbages'] = 0;
 		vars['cabbage_waters'] = 0;
 		flags['cabbage_bought'] = 0;
 		flags['cabbage_planted'] = 0;
 	}
-	if (route_id == 8) { // Ann Photo
+	if (rid == 8) { // Ann Photo
 		flags['potato_planted'] = 0;
 		vars['potato_waters_2'] = 0;
 		flags['potato_planted_2'] = 0;
+	}
+	if (rid == 9) { // Karen Photo
+		flags['turnips_planted'] = 0;
+		vars['turnip_waters'] = 0;
+		vars['r_sprite_aff'] = 0;
 	}
 	next_day(true);
 }
@@ -936,6 +942,7 @@ function calc_bets(bet_type = 1, use_leftover = false) {
 	 * 
 	 * 1 - DEMO STRAT
 	 * 2 - NILLOWS STRAT
+	 * 3 - PHOTOS STRAT
 	 * 
 	 */
 
@@ -999,6 +1006,16 @@ function calc_bets(bet_type = 1, use_leftover = false) {
 				}
 			}
 		}
+		/*
+		console.log(odds);
+		
+		if (use_leftover) {
+			var tmp_arr = [];
+			for (var b = 0; b < odds.length; b++) {
+				
+			}
+		}
+		*/
 	}
 
 	// Display values
@@ -1231,11 +1248,11 @@ function set_affections (rid = 0) {
 	}
 	for (var i = 0; i < tx.length; i++) {
 		tmp_html += '<div class="p-1 display_main">';
-		if ([0, 5].includes(rid)) {
+		//if ([0, 5].includes(rid)) { // All Photos
 			tmp_html += get_npc_img(get_npc_id(tx[i]), true);
-		} else {
-			tmp_html += npcs[get_npc_id(tx[i])].toUpperCase() + ': ';
-		}
+		//} else {
+		//	tmp_html += npcs[get_npc_id(tx[i])].toUpperCase() + ': ';
+		//}
 		tmp_html += '<span id="npc_' + get_npc_id(tx[i]) + '">' + aff[tx[i]] + '</span></div>';
 	}
 	return tmp_html;

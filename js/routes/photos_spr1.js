@@ -200,7 +200,7 @@ function actions_photos_spr_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 			a.push({'desc':"Whistle / Pick up Dog", 'cid':dog_id, 'val':2, 'sr':true});
 		}
 
-		if (!flags['fishing_rod']) {
+		if (flags['fishing_rod'] == 0) {
 			a.push({'desc':"Get Fishing Rod", 'val':1, 'cid':'f_fishing_rod', 'iid':get_npc_id('fisherman')});
 		}
 

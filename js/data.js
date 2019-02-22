@@ -58,7 +58,7 @@ var extensions = [
 ];
 
 var route_names = ["All Photos (Karen)", "Elli", "Karen", "Popuri", "Elli IL Photo",
-					"All Photos (Elli)", "All Recipes", "Maria", "Ann Photo"];
+					"All Photos (Elli)", "All Recipes", "Maria", "Ann Photo", "Karen Photo"];
 var bet_colors = ["lightgray", "black", "red", "blue", "yellow", "green"];
 var route_affs = [
 	[], // Placeholder for All Photos (Karen)
@@ -69,7 +69,8 @@ var route_affs = [
 	[], // Placeholder for All Photos (Elli)
 	[], // Placeholder for Recipes
 	['maria', 'rick'], // Maria
-	['ann', 'rick'] // Ann Photo
+	['ann', 'rick'], // Ann Photo
+	['karen', 'bartender', 'sprite'] // Karen Photo
 ];
 var skip_to_list = [
 	[3, 17, 64], // Photos (Karen)
@@ -88,7 +89,6 @@ var save_slots = [[{}, {}, {}], [{}, {}, {}], [{}, {}, {}], [{}, {}, {}]];
 var actions = [];
 
 var npcs = ["ann", "bartender", "basil", "carpenter bot", "carpenter top", "cliff", "doug",
-			"elli", "ellen", "fisherman", "gotz", "gotz wife", "grey", "harris", "jeff",
 			"kai", "karen", "kent", "lillia", "maria", "mas carpenter", "may", "mayor", 
 			"mayors wife", "midwife", "old man", "old woman", "pastor", "popuri",
 			"potion master", "rick", "saibara", "salesman", "shipper", "sprite", "stu", "dog",
