@@ -86,6 +86,12 @@ var skip_to_list = [
 	[3] // All Recipes
 ];
 
+var recipe_flags = [
+	['Cream of Turnip Stew', 'turnip', 'mayors wife', 0],
+	['Easy Tomato Soup', 'tomato', 'shipper', 0],
+	['Tomato Rice', ', 0],
+];
+
 // 0 = vars; 1 = flags; 2 = aff
 var save_slots = [[{}, {}, {}], [{}, {}, {}], [{}, {}, {}], [{}, {}, {}]];
 var actions = [];
