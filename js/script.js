@@ -514,6 +514,7 @@ function new_game(rid = 0) {
 		vars['turnip_waters'] = 0;
 		vars['r_sprite_aff'] = 0;
 	} else if (rid == 10) { // All Recipes
+		flags['cliff_intro'] == 0;
 		flags['recipe_ellen'] = 0;
 	}
 	next_day(true);
