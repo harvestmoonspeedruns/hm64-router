@@ -278,7 +278,7 @@ function actions_photos_win_y1(a = [], d = 3, g = 300, is_sunny = 1) {
 		}
 
 		// Feed Dog
-		a.push({'desc':"Feed Dog", 'cid':get_npc_id('dog'), 'val':2, 'sel':false});
+		a.push({'desc':"Feed Dog", 'cid':dog_id, 'val':2, 'sel':false});
 	}
 	return a;
 }

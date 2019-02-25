@@ -5,10 +5,11 @@
 * **3** - Popuri Marriage
 * **4** - Elli Photo
 * **5** - All Photos (Elli marriage)
-* **6** - All Recipes
+* **6** - All Berries
 * **7** - Maria Marriage
 * **8** - Ann Photo
 * **9** - Karen Photo
+* **10** - All Recipes
 
 ## ACTION PROPERTIES
 * **"desc"** - (Description) Words that appear on the action button. REQUIRED

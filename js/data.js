@@ -11,6 +11,8 @@ const _DUKE_WINE_MIN = 41;
 const _BASIL_BERRY_MIN = 200;
 const _SPRITE_SPAM_MAX = 21;
 
+const _PRICE_MILKER = 1800;
+
 const _CUTSCENE_RICK_ANN_MIN = 40;
 
 const _SICK_EVENT_AFF = 10;
@@ -57,8 +59,9 @@ var extensions = [
 	["kitchen", 5000, 450, "Kitchen"]
 ];
 
-var route_names = ["All Photos (Karen)", "Elli", "Karen", "Popuri", "Elli IL Photo",
-					"All Photos (Elli)", "All Recipes", "Maria", "Ann Photo", "Karen Photo"];
+var route_names = ["All Photos (Karen)", "Elli", "Karen", "Popuri", "Elli Photo",
+					"All Photos (Elli)", "All Berries", "Maria", "Ann Photo", "Karen Photo",
+					"All Recipes"];
 var bet_colors = ["lightgray", "black", "red", "blue", "yellow", "green"];
 var route_affs = [
 	[], // Placeholder for All Photos (Karen)
@@ -67,7 +70,7 @@ var route_affs = [
 	['popuri', 'rick'], //Popuri marriage
 	['elli', 'rick'], //Elli IL
 	[], // Placeholder for All Photos (Elli)
-	[], // Placeholder for Recipes
+	[], // Placeholder for Berries
 	['maria', 'rick'], // Maria
 	['ann', 'rick'], // Ann Photo
 	['karen', 'bartender', 'sprite'], // Karen Photo
@@ -75,21 +78,53 @@ var route_affs = [
 ];
 var skip_to_list = [
 	[3, 17, 64], // Photos (Karen)
-	[3, 23, 31], // Elli
-	[3, 90, 102, 109, 110], // Karen
-	[3], // Popuri
-	[3, 31], // Elli IL Photo
+	[3, 23, 31], // Elli Marriage
+	[3, 90, 102, 109, 110], // Karen Marriage
+	[3], // Popuri Marriage
+	[3, 31], // Elli Photo
 	[3, 17, 64], // Photos (Elli)
-	[3], // Recipes
-	[3], // Maria
+	[3], // Berries
+	[3], // Maria Marriage
 	[3], // Ann Photo
-	[3] // All Recipes
+	[3], // Karen Photo
+	[3, 83] // All Recipes
 ];
 
 var recipe_flags = [
 	['Cream of Turnip Stew', 'turnip', 'mayors wife', 0],
 	['Easy Tomato Soup', 'tomato', 'shipper', 0],
-	['Tomato Rice', ', 0],
+	['Tomato Rice', 'tomato', 'gotz wife', 0],
+	['Tomato Soup', 'tomato', 'pastor', 0],
+	['Corn Fritter', 'corn', 'doug', 0],
+	['Corn Pasta', 'corn', 'basil', 0],
+	['Mashed Potatoes', 'potato', 'ann', 0],
+	['Fried Potatoes & Bacon', 'potato', 'mayor', 0],
+	['Vegetable Tomato Stew', 'tomato', 'lillia', 0],
+	['Garlic Potato Beef', 'potato', 'harris', 0],
+	['Eggplant with Miso Paste', 'eggplant', 'midwife', 0],
+	['Rolled Cabbage', 'cabbage', 'maria', 0],
+	['Stuffed Omelet', 'egg', 'grey', 0],
+	['Spa Poached Egg', 'egg', 'kent', 0],
+	['Handmade Butter', ['milk s', 'milk m', 'milk l', 'milk g'], 'rick', 0],
+	['Mushroom Rice', 'Mushroom', 'mas carpenter', 0],
+	['Fried Char', 'Fish L', 'fisherman', 0],
+	['Grilled Trout Cheese', ['Fish M', 'Fish L'], 'carpenter bot', 0],
+	['Mushroom Stuffed Char', 'Mushroom', 'carpenter top', 0],
+	['Steamed Clam with Wine', 'Grapes', 'gotz', 0],
+	['Miso Soup with Sprouts', 'Edible', 'potion master', 0],
+	['Sesame Dandelion Greens', 'Clover', 'saibara', 0],
+	['Mushroom Salsa', 'Mushroom', 'sprite', 0],
+	['Strawberry Dog', 'strawberry', 'stu', 0],
+	['Walnut Cake', 'walnut', 'ellen', 0],
+	['Bread Pudding', ['egg', 'milk s', 'milk m', 'milk l', 'milk g'], 'elli', 0],
+	['Herb Rice Cake', 'Edible', 'old woman', 0],
+	['Strawberry Jam', 'strawberry', 'popuri', 0],
+	['Strawberry Champagne', 'strawberry', 'karen', 0],
+	['Veryberry Wine', 'Berry', 'kai', 0],
+	['Spice Tea', ['egg', 'milk s', 'milk m', 'milk l', 'milk g'], 'cliff', 0],
+	['Hot Spicy Wine', 'Grapes', 'bartender', 0],
+	['Cinnamon Milk Tea', ['milk s', 'milk m', 'milk l', 'milk g'], 'jeff', 0],
+	['Pickled Turnips & Cabbage', 'turnip', 'old man', 0]
 ];
 
 // 0 = vars; 1 = flags; 2 = aff
@@ -97,7 +132,8 @@ var save_slots = [[{}, {}, {}], [{}, {}, {}], [{}, {}, {}], [{}, {}, {}]];
 var actions = [];
 
 var npcs = ["ann", "bartender", "basil", "carpenter bot", "carpenter top", "cliff", "doug",
-			"kai", "karen", "kent", "lillia", "maria", "mas carpenter", "may", "mayor", 
+			"ellen", "elli", "fisherman", "grey", "gotz", "gotz wife", "grey", "harris", "jeff",
+			"kai", "karen", "kent", "lillia", "maria", "mas carpenter", "may", "mayor",
 			"mayors wife", "midwife", "old man", "old woman", "pastor", "popuri",
 			"potion master", "rick", "saibara", "salesman", "shipper", "sprite", "stu", "dog",
 			"horse", "cow", "_baby", "chicken", "kappa", "goddess", "judge", "musbox", "stump"];

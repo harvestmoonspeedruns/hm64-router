@@ -40,8 +40,8 @@ function get_actions_karen_photo (d = 3, g = 300, is_sunny = 1) {
 		if (is_sunny == 0 || flags['vineyard_restored'] == 0) {
 			a.push({'desc':"RESET (Vineyard not restored)", 'red':true});
 		} else {
-			a.push({'desc':"Clear Mailbox", 'imp':true});
-			a.push({'desc':"DREAM (Wine Cellar)", 'cid':karen_id, 'val':_DREAM_EVENT_AFF});
+			a.push({'desc':"Enter Wine Cellar 55 seconds after leaving house", 'imp':true});
+			a.push({'desc':"DREAM", 'cid':karen_id, 'val':_DREAM_EVENT_AFF});
 			a.push({'desc':"PHOTO", 'cid':karen_id, 'val':_PHOTO_EVENT_AFF});
 		}
 	} else if (d == 61) {
@@ -59,6 +59,8 @@ function get_actions_karen_photo (d = 3, g = 300, is_sunny = 1) {
 		a.push({'desc':"Talk", 'cid':duke_id, 'val':3});
 		a.push({'desc':"Grapes", 'cid':duke_id, 'val':7, 'sr':true});
 	} else if (d == 62) {
+		a.push({'desc':"Clear Mailbox", 'imp':true});
+
 		// SPRITE
 		a.push({'desc':"Enter cave 35 seconds after leaving house"});
 		a.push({'desc':"Talk", 'cid':sprite_id, 'val':1});
@@ -66,24 +68,24 @@ function get_actions_karen_photo (d = 3, g = 300, is_sunny = 1) {
 
 		if (aff[karen_id] < 100) {
 			a.push({'desc':"Dog to MTNS"});
-			a.push({'desc':"Dog Karen in MTNS after 10 AM (25%)", 'cid':karen_id, 'val':200, 'sel':false});
+			a.push({'desc':"Dog Karen (Shows up at 10 AM)", 'cid':karen_id, 'val':200, 'sel':false});
 		}
 
 		// DUKE
 		a.push({'desc':"Talk", 'cid':duke_id, 'val':3});
 		a.push({'desc':"Grapes", 'cid':duke_id, 'val':5, 'sr':true});
 		a.push({'desc':"Get Wine", 'cid':'f_wine_from_duke', 'val':1, 'sr':true, 'sel':(aff[duke_id] >= 35)});
-	} else if (d > 62 && flags['vineyard_restored'] == 0) {
+	} else if (d > 62 && flags['vineyard_restored'] == 0 && d != 64) {
 		// SPRITE
 		a.push({'desc':"Enter cave 35 seconds after leaving house"});
 		a.push({'desc':"Talk", 'cid':sprite_id, 'val':1});
 		a.push({'desc':"Mushroom", 'cid':sprite_id, 'val':2, 'sr':true, 'sel':(a[a.length - 1]['sel'])});
 		a.push({'desc':"Restore Vineyard with Turnip", 'cid':"f_vineyard_restored", 'val':1, 'iid':get_npc_id('goddess')});
-	} else if ((d == 3 || d == 30 || (d > 31 && d < 61)) && ["TUES", "WED", "FRI", "SAT"].includes(dow) && !is_festival(d) && is_sunny == 1) {
+	} else if (([3, 30].includes(d) || (d > 31 && d < 61)) && ["TUES", "WED", "FRI", "SAT"].includes(dow) && !is_festival(d) && is_sunny == 1) {
 		if (d == 3) {
-			a.push({'desc':"Equip hoe"});
+			a.push({'desc':"Equip axe"});
 			a.push({'desc':"Greet the Mayor", 'iid':get_npc_id('mayor')});
-			a.push({'desc':"Till 3 x 3 Spot"});
+			a.push({'desc':"Chop 2 Stumps, Collect 9 Lumber from Bin", 'iid':get_npc_id('stump')});
 		}
 		
 		if (d == 30) {
@@ -91,34 +93,34 @@ function get_actions_karen_photo (d = 3, g = 300, is_sunny = 1) {
 			a.push({'desc':"Gather Turnips", 'imp':true, 'cid':'v_turnip_waters', 'val':99});
 		}
 
-		if (aff[karen_id] < 100 && aff[sprite_id] < 41 && aff[duke_id] < 23) {
+		if (d != 3 && aff[karen_id] < 100 && aff[sprite_id] < 41 && aff[duke_id] < 23 && d != 3) {
 			a.push({'desc':"Dog to Mtns"});
+		}
+
+		// RIGHT SPRITE SPAM
+		if (d == 3) {
+			a.push({'desc':"9 Lumber to Inner Sprite", 'val':9, 'cid':sprite_id});
+			a.push({'desc':"Goddess Pond all, Flow, Ber to Inner Sprite", 'val':9, 'cid':sprite_id});
+			a.push({'desc':"2 Cave Clover, Edible to Inner Sprite", 'val':3, 'cid':sprite_id});
 		}
 
 		// SPRITE
 		if (aff[sprite_id] < 41 && (d > 60 || aff[duke_id] < 23)) {
-			a.push({'desc':"Enter cave 35 seconds after leaving house"});
+			if (d != 3) { a.push({'desc':"Enter cave 35 seconds after leaving house"}); }
 			if (aff[sprite_id] == 0) { a.push({'desc':"Meet", 'cid':sprite_id, 'val':5}); }
 			a.push({'desc':"Talk", 'cid':sprite_id, 'val':1, 'sr':(aff[sprite_id] == 0), 'sel':(aff[sprite_id] < _SPRITE_WINE_MIN), 'red':(aff[sprite_id] >= _SPRITE_WINE_MIN)});
-			a.push({'desc':"Gift", 'cid':sprite_id, 'val':2, 'sr':true, 'sel':(a[a.length - 1]['sel'])});
-		}
-
-		// RIGHT SPRITE SPAM
-		if (vars['r_sprite_aff'] < 13) {
-			a.push({'desc':"Right Sprite Gift:", 'iid':sprite_id});
-			a.push({'desc':"6", 'cid':[sprite_id, 'v_r_sprite_aff'], 'val':[6, 6], 't2':["7", "8"], 'sr':true, 'sel':(vars['day'] == 3)});
-			a.push({'desc':"7", 'cid':[sprite_id, 'v_r_sprite_aff'], 'val':[7, 7], 't2':["6", "8"], 'sr':true, 'sel':(vars['day'] < 31 && vars['day'] != 3)});
-			a.push({'desc':"8", 'cid':[sprite_id, 'v_r_sprite_aff'], 'val':[8, 8], 't2':["7", "6"], 'sr':true, 'sel':(vars['day'] >= 31)});
-		} else if (vars['r_sprite_aff'] < 21) {
-			a.push({'desc':"Right Sprite Gift:", 'iid':sprite_id});
-			a.push({'desc':(21 - vars['r_sprite_aff']), 'cid':[sprite_id, 'v_r_sprite_aff'], 'val':[(21 - vars['r_sprite_aff']), (21 - vars['r_sprite_aff'])], 'sr':true});
+			if (d > 3) { a.push({'desc':"Edible", 'cid':sprite_id, 'val':2, 'sr':true, 'sel':(a[a.length - 1]['sel'])}); }
 		}
 
 		if (aff[duke_id] < 23) {
 			a.push({'desc':"Gift for Duke", 'imp':true});
-			if (aff[karen_id] < 100) {
+			if (aff[karen_id] < 100 && d > 3) {
 				a.push({'desc':"Dog Karen (Shows up at 10 AM)", 'cid':karen_id, 'val':200, 'sel':false});
 			}
+		}
+
+		if (d == 3) {
+			a.push({'desc':"Equip hoe, till 9 x 9 spot"});
 		}
 
 		if (flags['turnips_planted'] == 0) {

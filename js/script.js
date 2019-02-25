@@ -741,7 +741,8 @@ function to_html(a = actions, show_red = true) {
 				if (a[i]['b_table']) {
 					// Bet table
 					// {'desc':'odds', 'b_table':true, 'b_id':i}
-					
+
+					html += '<span class="dogracex" style="width:30px;height:30px;margin:3px;">X</span>';
 					html += '<span style="border:3px solid ' + bet_colors[a[i]['b_id']];
 					html += ';width:30px;height:30px;margin:5px;text-align:center">' + (parseInt(a[i]['b_id']) + 1) + '</span>';
 					html += 'x&nbsp;<input class="oddsInput" type="number" id="b_' + a[i]['b_id'] + '" value="1" onchange="calc_bets()" />';
