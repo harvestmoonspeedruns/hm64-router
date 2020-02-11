@@ -50,9 +50,9 @@ function get_actions_karen_photo (d = 3, g = 300, is_sunny = 1) {
 		a.push({'desc':"Talk", 'cid':sprite_id, 'val':1});
 		a.push({'desc':"Mushroom", 'cid':sprite_id, 'val':7, 'sr':true});
 		
-		if (aff[karen_id] < 100) {
+		if (aff[karen_id] < 100 && is_sunny == 1) {
 			a.push({'desc':"Dog to MTNS"});
-			a.push({'desc':"Dog Karen (Shows up at 10 AM)", 'cid':karen_id, 'val':200, 'sel':false});
+			a.push({'desc':"Dog Karen (MTN / BEACH) 50% [10 AM]", 'cid':karen_id, 'val':200, 'sel':false});
 		}
 		
 		// DUKE
@@ -66,7 +66,7 @@ function get_actions_karen_photo (d = 3, g = 300, is_sunny = 1) {
 		a.push({'desc':"Talk", 'cid':sprite_id, 'val':1});
 		a.push({'desc':"Mushroom", 'cid':sprite_id, 'val':5, 'sr':true});
 
-		if (aff[karen_id] < 100) {
+		if (aff[karen_id] < 100 && is_sunny == 1) {
 			a.push({'desc':"Dog to MTNS"});
 			a.push({'desc':"Dog Karen (Shows up at 10 AM)", 'cid':karen_id, 'val':200, 'sel':false});
 		}
@@ -87,13 +87,13 @@ function get_actions_karen_photo (d = 3, g = 300, is_sunny = 1) {
 			a.push({'desc':"Greet the Mayor", 'iid':get_npc_id('mayor')});
 			a.push({'desc':"Chop 2 Stumps, Collect 9 Lumber from Bin", 'iid':get_npc_id('stump')});
 		}
-		
+
 		if (d == 30) {
 			a.push({'desc':"Reset if Turnips are not done", 'red':true});
 			a.push({'desc':"Gather Turnips", 'imp':true, 'cid':'v_turnip_waters', 'val':99});
 		}
 
-		if (d != 3 && aff[karen_id] < 100 && aff[sprite_id] < 41 && aff[duke_id] < 23 && d != 3) {
+		if (d != 3 && aff[karen_id] < 100 && aff[sprite_id] < 41 && aff[duke_id] < 23 && is_sunny == 1) {
 			a.push({'desc':"Dog to Mtns"});
 		}
 

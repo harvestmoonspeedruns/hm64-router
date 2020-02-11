@@ -177,11 +177,11 @@ function get_actions_elli (d = 3, g = 300, is_sunny = 1) {
 			// DREAM
 			if (aff[elli_id] >= _DREAM_EVENT_MIN && flags['dream_elli'] == 0 && is_sunny == 1) {
 				a.push({'desc':"DREAM", 'cid':[elli_id, 'f_dream_elli'], 'val':[_DREAM_EVENT_AFF, 1]});
-				today_aff += _DREAM_EVENT_MIN;
+				today_aff += _DREAM_EVENT_AFF;
 			} else if (aff[elli_id] >= _ANKLE_EVENT_MIN && is_sunny == 1 && flags['ankle_elli'] == 0) {
 				// ANKLE
 				a.push({'desc':"ANKLE", 'cid':[elli_id, 'f_ankle_elli'], 'val':[_ANKLE_EVENT_AFF, 1], sel:(flags['fishing_rod'] == 1)});
-				//today_aff += _ANKLE_EVENT_MIN;
+				//today_aff += _ANKLE_EVENT_AFF;
 			}
 		}
 

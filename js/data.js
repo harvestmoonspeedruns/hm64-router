@@ -1,3 +1,4 @@
+// GIRL / PARTY PHOTO EVENTS
 const _SICK_EVENT_MIN = 120;
 const _DREAM_EVENT_MIN = 160;
 const _ANKLE_EVENT_MIN = 180;
@@ -5,32 +6,90 @@ const _PHOTO_MIN = 200;
 const _PROPOSE_MIN = 220;
 const _PARTY_ATTEND_MIN = 160;
 
-const _RICK_FIX_MIN = 31;
+// NPC EVENTS
+const _RICK_FIX_MIN = 31; // Meet + (5 gift/talk)
 const _SPRITE_WINE_MIN = 50; // Meet + (14 gift/talk)
-const _DUKE_WINE_MIN = 41;
+const _DUKE_WINE_MIN = 41; // Meet + (4 gift/talk) + (2 Grapes/talk)
 const _BASIL_BERRY_MIN = 200;
-const _SPRITE_SPAM_MAX = 21;
+const _SPRITE_SPAM_MAX = 21; 27
 
+// RICK SHOP
+const _PRICE_BLUE_FEATHER = 980;
+const _PRICE_BOTTLE = 200;
+const _PRICE_BRUSH = 500;
+const _PRICE_CABINET = 2000;
+const _PRICE_CARPET = 500;
+const _PRICE_CLIPPERS = 1000;
 const _PRICE_MILKER = 1800;
+const _PRICE_OCARINA = 1200;
+const _PRICE_VASE = 2000;
 
-const _CUTSCENE_RICK_ANN_MIN = 40;
+// BAKERY
+const _PRICE_CAKE = 300;
+const _PRICE_PIE = 350;
+const _PRICE_COOKIE = 300;
+const _PRICE_TEA = 200;
 
+// BAR
+const _PRICE_WINE = 300;
+const _PRICE_LIQUOR = 300;
+const _PRICE_BEER = 350;
+const _PRICE_MILK = 150;
+
+// POTION SHOP
+const _PRICE_CURE_ALL = 1500;
+const _PRICE_VITAMIN = 1000;
+const _PRICE_VITAMIN_STRONG = 2000;
+
+// FLOWER SHOP
+const _PRICE_SEED_BLUE_MIST = 500;
+const _PRICE_SEED_CABBAGE = 200;
+const _PRICE_SEED_CORN = 300;
+const _PRICE_SEED_EGGPLANT = 300;
+const _PRICE_SEED_GRASS = 500;
+const _PRICE_SEED_MOONDROP = 300;
+const _PRICE_SEED_POTATO = 200;
+const _PRICE_SEED_PINK_CAT_MINT = 300;
+const _PRICE_SEED_STRAWBERRY = 500;
+const _PRICE_SEED_TOMATO = 300;
+const _PRICE_SEED_TURNIP = 200;
+
+// RANCH
+const _PRICE_COW = 6000;
+const _PRICE_CHICKEN = 1500;
+const _PRICE_FEED = 10;
+const _PRICE_FODDER = 30;
+const _PRICE_MEDICINE = 1000;
+const _PRICE_MIRACLE_POTION = 3000;
+const _PRICE_SHEEP = 4000;
+
+// CUTSCENE AFFS
+const _CUTSCENE_RICK_ANN_MIN = 40; // RICK
+const _CUTSCENE_COOKFISH_MIN = 142; // ELLI
+const _CUTSCENE_BEACH_MIN = 150; // ELLI
+const _CUTSCENE_WATERMELON_MIN = 150; // ANN
+const _CUTSCENE_RABBIT_MIN = 139; // CLIFF
+
+// GIRL AFFS
 const _SICK_EVENT_AFF = 10;
 const _DREAM_EVENT_AFF = 8;
 const _ANKLE_EVENT_AFF = 10;
 const _PHOTO_EVENT_AFF = 10;
 const _MUS_BOX_AFF = 6;
 
+// CROP GROW DAYS
 const _CABBAGE_GROW_DAYS = 8;
 const _CORN_GROW_DAYS = 13;
 const _EGGPLANT_GROW_DAYS = 7;
 const _GRASS_GROW_DAYS = 9;
 const _MOONDROP_GROW_DAYS = 6;
+const _PINK_CAT_MINT_GROW_DAYS = 8;
 const _POTATO_GROW_DAYS = 6;
 const _STRAWBERRY_GROW_DAYS = 6;
 const _TOMATO_GROW_DAYS = 9;
 const _TURNIP_GROW_DAYS = 4;
 
+// VARIOUS MULTI-DAY LENGTHS
 const _BUILD_DAYS = 4;
 const _BABY_BORN_DAYS = 60;
 const _PREGNANT_SLEEPS = 30;
@@ -61,33 +120,55 @@ var extensions = [
 
 var route_names = ["All Photos (Karen)", "Elli", "Karen", "Popuri", "Elli Photo",
 					"All Photos (Elli)", "All Berries", "Maria", "Ann Photo", "Karen Photo",
-					"All Recipes"];
+					"All Recipes", "Maria Photo", "Ann", "Extensions Photo", "Balloon Photo",
+					"Horse Race", "Cow Photo", "Swim Photo", "Dog Race", "Party Photo"
+];
 var bet_colors = ["lightgray", "black", "red", "blue", "yellow", "green"];
 var route_affs = [
-	[], // Placeholder for All Photos (Karen)
-	['elli', 'rick'], //Elli marriage
-	['karen'], //Karen marriage
-	['popuri', 'rick'], //Popuri marriage
-	['elli', 'rick'], //Elli IL
-	[], // Placeholder for All Photos (Elli)
-	[], // Placeholder for Berries
-	['maria', 'rick'], // Maria
-	['ann', 'rick'], // Ann Photo
-	['karen', 'bartender', 'sprite'], // Karen Photo
-	['grey', 'cliff', 'gotz', 'sprite'] // All Recipes
+	[], // 0 - Placeholder for All Photos (Karen) OBSOLETE
+	['elli', 'rick'], // 1 - Elli marriage
+	['karen'], // 2 - Karen marriage
+	['popuri', 'rick'], // 3 - Popuri marriage
+	['elli', 'rick'], // 4 - Elli Photo
+	[3, 6, 8, 22, 23, 24, 32], // 5 - Placeholder for All Photos (Elli)
+	[], // 6 - Placeholder for Berries
+	['maria', 'rick'], // 7 - Maria marriage
+	['ann', 'rick'], // 8 - Ann Photo
+	['karen', 'bartender', 'sprite'], // 9 - Karen Photo
+	['grey', 'cliff', 'gotz', 'sprite'], // 10 - All Recipes
+	['maria', 'rick'], // 11 - Maria Photo
+	['ann', 'rick'], // 12 - Ann marriage
+	[], // 13 - Extensions Photo
+	[], // 14 - Balloon Photo
+	['horse'], // 15 - Horse Race Photo
+	['cow'], // 16 - Cow Photo
+	[], // 17 - Swim Fest Photo
+	['dog'], // 18 - Dog Race Photo
+	[] // 19 - Placeholder for Party Photo ONLY
 ];
 var skip_to_list = [
-	[3, 17, 64], // Photos (Karen)
+	[3, 17, 64], // Photos (Karen) [OBSOLETE]
 	[3, 23, 31], // Elli Marriage
 	[3, 90, 102, 109, 110], // Karen Marriage
 	[3], // Popuri Marriage
 	[3, 31], // Elli Photo
-	[3, 17, 64], // Photos (Elli)
+	[4, 6, 8, 22, 23, 43, 44, 45], // Photos (Elli)
 	[3], // Berries
 	[3], // Maria Marriage
 	[3], // Ann Photo
 	[3], // Karen Photo
-	[3, 83] // All Recipes
+	[3, 83], // All Recipes
+	[3], // 11 - Maria Photo
+	[3], // 12 - Ann marriage
+	[3], // 13 - Extensions Photo
+	[3], // 14 - Balloon Photo
+	[3], // 15 - Horse Race Photo
+	[3], // 16 - Cow Photo
+	[3], // 17 - Swim Fest Photo
+	[3], // 18 - Dog Race Photo
+	[3], // 19 - Placeholder for Party Photo ONLY
+	[3], // 20 - Hot Springs Photo
+	[3] // 21 - All Festivals
 ];
 
 var recipe_flags = [
@@ -136,7 +217,8 @@ var npcs = ["ann", "bartender", "basil", "carpenter bot", "carpenter top", "clif
 			"kai", "karen", "kent", "lillia", "maria", "mas carpenter", "may", "mayor",
 			"mayors wife", "midwife", "old man", "old woman", "pastor", "popuri",
 			"potion master", "rick", "saibara", "salesman", "shipper", "sprite", "stu", "dog",
-			"horse", "cow", "_baby", "chicken", "kappa", "goddess", "judge", "musbox", "stump"];
+			"horse", "cow", "_baby", "chicken", "kappa", "goddess", "judge", "musbox", "stump",
+			"cow1", "cow2", "cow3", "cow4", "cow5", "cow6"];
 var npc_ids = {};
 var not_villagers = [1, 3, 4, 9, 20, 23, 24, 32, 33, 34, 35, 36];
 var recipes = [];
@@ -146,22 +228,26 @@ var crops = ["Edible", "Berry", "Clover", "Walnut", "Mango", "Grapes", "Mushroom
 				"Fish S", "Fish M", "Fish L", "turnip", "potato", "cabbage",
 				"tomato", "corn", "eggplant", "strawberry",
 				"egg", "milk s", "milk m", "milk l", "milk g"];
+// SELL Prices
 var crop_prices = [30, 40, 70, 40, 70, 50, 60, 100,
 					100, 500, 700, 800, 1000,
 					30, 100, 180, 60, 80, 90,
 					90, 120, 300, 500,
 					50, 100, 150, 300, 500];
+// Seasons these crops appear
 var crop_seasons =
  [[0, 1, 2], [0, 2, 3, 4], [0, 2, 5, 6, 7], [8, 9, 10, 11, 12]];
 
 var vars = {};
 var flags = {};
 var aff = {};
+var checklist = [];
 var cur_slot = 0;
 
-var route_id = 0;
+var route_id = 5;
 var reset = false;
 var sell_stuff = false;
+var names_eng = ['Momoko', 'Moiti', 'Mota', "A", "5"];
 
 var ucfirst = function (str) {
 	return str.toLowerCase().replace(/^\w/, c => c.toUpperCase());

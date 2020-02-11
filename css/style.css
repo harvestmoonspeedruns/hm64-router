@@ -92,6 +92,15 @@ nav {
 	text-align: center;
 }
 
+.w3-theme-border {
+	background-color:white;
+	border:4px solid black;
+	padding:7px;
+	position:fixed;
+	right:0;
+	width:110px;
+}
+
 .sunny { background-color: yellow; }
 .rainy { background-color: lightblue; }
 .typhoon { background-color: orange; }

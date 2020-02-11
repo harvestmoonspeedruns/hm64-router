@@ -1,5 +1,5 @@
 ## ROUTE IDS
-* **0** - All Photos (Karen marriage)
+* **0** - All Photos (Karen marriage) OBSOLETE
 * **1** - Elli Marriage
 * **2** - Karen Marriage
 * **3** - Popuri Marriage
@@ -10,20 +10,80 @@
 * **8** - Ann Photo
 * **9** - Karen Photo
 * **10** - All Recipes
+* **11** - Maria Photo
+* **12** - Ann Marriage
+* **13** - Extensions Photo
+* **14** - Balloon Photo
+* **15** - Horse Race Photo
+* **16** - Cow Festival Photo
+* **17** - Swimming Photo
+* **18** - Dog Race Photo
+* **19** - Party Photo
+* **20** - Hot Springs Photo
+* **21** - All Festivals
+* **22** - Baby Photo
+* **23** - 100%
 
 ## ACTION PROPERTIES
 * **"desc"** - (Description) Words that appear on the action button. REQUIRED
-* **"cid"** - (Char ID) Variable, flag, or npc id that changes by the value if this button is selected. "v_" precedes variables and "f_" precedes flags.
+* **"cid"** - (Char ID) Variable, flag, or npc id that changes by the value if this button is selected. "v_" precedes variables, "f_" precedes flags, and "c_" precedes cow related actions.
 * **"val"** - (Value) Value that the item indicated by the CID changes by if this button is selected
 * **"sr"** - (Same Row) If true, this action will appear on the same row as the previous action. Default: false
-* **"iid"** - (Image ID) ID of NPC whose image will appear to the left of the text. Overwrites an npc ID "cid" value
 * **"sel"** - (Selected) If true, action starts as selected. If false, action will start deselected. Default is true.
+* **"imp"** - (Important) If true, action is highlighted in yellow. Usually depicts an action required that day. Default is false.
+* **"red"** - (Warning) If true, action is highlighted in red. Usually depicts an action that is technically possible, but should not be done. Default is false.
+* **"iid"** - (Image ID) ID of NPC whose image will appear to the left of the text. Overwrites an npc ID "cid" value
 * **"t0"** - If this action is turned off, turn the action with this description off
 * **"t1"** - If this action is turned off, turn the action with this description on
 * **"t2"** - If this action is turned on, turn the action with this description off
 * **"t3"** - If this action is turned on, turn the action with this description on
 
 ## CONSTANTS
+* **_PRICE_BLUE_FEATHER** (980) - Price of a Blue Feather at Ricks Shop
+* **_PRICE_BOTTLE** (200) - Price of a Bottle at a Festival
+* **_PRICE_BRUSH** (500) - Price of a Brush at Ricks Shop
+* **_PRICE_CABINET** (2000) - Price of a Cabinet at Ricks Shop
+* **_PRICE_CARPET** (500) - Price of a Carpet at Ricks Shop
+* **_PRICE_CLIPPERS** (1000) - Price of Clippers at Ricks Shop
+* **_PRICE_MILKER** (1800) - Price of a Milker at Ricks Shop
+* **_PRICE_OCARINA** (1200) - Price of an Ocarina at Saibaras Shop
+* **_PRICE_VASE** (2000) - Price of a Vase at Saibaras Shop
+* **_PRICE_CAKE** (300) - Price of Cake at the Bakery
+* **_PRICE_PIE** (350) - Price of Pie at the Bakery
+* **_PRICE_COOKIE** (300) - Price of a Cookie at the Bakery
+* **_PRICE_TEA** (200) - Price of Tea at the Bakery
+* **_PRICE_WINE** (300) - Price of Wine at the Bar
+* **_PRICE_LIQUOR** (300) - Price of Liquor at the Bar
+* **_PRICE_BEER** (350) - Price of Beer at the Bar
+* **_PRICE_MILK** (150) - Price of Milk at the Bar or Bakery
+* **_PRICE_CURE_ALL** (1500) - Price of Cure-All at the Potion Shop
+* **_PRICE_VITAMIN** (1000) - Price of Vitamins at the Potion Shop
+* **_PRICE_VITAMIN_STRONG** (2000) - Price of Strong Vitamins at the Potion Shop
+* **_PRICE_SEED_BLUE_MIST** (500) - Price of a Blue Mist seed at the Flower Shop
+* **_PRICE_SEED_CABBAGE** (200) - Price of Cabbage seeds at the Flower Shop
+* **_PRICE_SEED_CORN** (300) - Price of Corn seeds at the Flower Shop
+* **_PRICE_SEED_EGGPLANT** (300) - Price of Eggplant seeds at the Flower Shop
+* **_PRICE_SEED_GRASS** (500) - Price of Grass seeds at the Flower Shop
+* **_PRICE_SEED_MOONDROP** (300) - Price of Moondrop Flower seeds at the Flower Shop
+* **_PRICE_SEED_POTATO** (200) - Price of Potato seeds at the Flower Shop
+* **_PRICE_SEED_PINK_CAT_MINT** (300) - Price of Pink Cat Mint seeds at a Festival
+* **_PRICE_SEED_STRAWBERRY** (500) - Price of Strawberry seeds at the Flower Shop
+* **_PRICE_SEED_TOMATO** (300) - Price of Tomato seeds at the Flower Shop
+* **_PRICE_SEED_TURNIP** (200) - Price of Turnip seeds at the Flower Shop
+* **_PRICE_CHICKEN** (1500) - Price of a Chicken at the Ranch
+* **_PRICE_COW** (6000) - Price of a Cow at the Ranch
+* **_PRICE_SHEEP** (4000) - Price of a Sheep at the Ranch
+* **_PRICE_FEED** (10) - Price of Feed at the Ranch
+* **_PRICE_FODDER** (30) - Price of Fodder at the Ranch
+* **_PRICE_MEDICINE** (1000) - Price of Cow/Sheep Medicine at the Ranch
+* **_PRICE_MIRACLE_POTION** (3000) - Price of Miracle Potion at the Ranch
+
+* **_CUTSCENE_RICK_ANN_MIN** (40) - Minimum Rick affection to trigger cutscene in his shop with Ann
+* **_CUTSCENE_BEACH_MIN** (159) - Minimum Elli affection to trigger cutscene at the beach with Karen
+* **_CUTSCENE_WATERMELON_MIN** (150) - Minimum Ann affection to trigger cutscene with watermelons outside the library
+* **_CUTSCENE_RABBIT_MIN** (139) - Minimum Cliff affection to trigger rabbit cutscene by Carpenter House
+* **_CUTSCENE_COOKFISH_MIN** (142) - Minimum Elli affection to trigger cooking fish cutscene by the Fisherman Tent
+
 * **_SICK_EVENT_MIN** (120) - Minimum affection required for a girl sick event to occur
 * **_DREAM_EVENT_MIN** (160) - Minimum affection required for a girl dream event to occur
 * **_ANKLE_EVENT_MIN** (180) - Minimum affection required for a girl ankle event to occur
@@ -34,13 +94,25 @@
 * **_SPRITE_WINE_MIN** (50) - Minimum affection required for the sprites to mention the wine and the Goddess
 * **_DUKE_WINE_MIN** (41) - Minimum affection required for the bartender to give the player the wine
 * **_BASIL_BERRY_MIN** (200) - Minimum affection required for Basil to give the player a power berry when he returns in Spring
+* **_SPRITE_SPAM_MAX** (21) - Maximum affection where a sprite will gain affection from multiple gifts in a single day
+
 * **_SICK_EVENT_AFF** (10) - Affection given for a girl sick event
 * **_DREAM_EVENT_AFF** (8) - Affection given for a girl dream event
 * **_ANKLE_EVENT_AFF** (10) - Affection given for a girl ankle event
 * **_PHOTO_EVENT_AFF** (10) - Affection given for a girl photo event
 * **_MUS_BOX_AFF** (6) - Affection given for gifting a girl a fixed music box
-* **_POTATO_GROW_DAYS** (6) - Number of days watered for planted potatoes to fully mature from seeds
+
+* **_CABBAGE_GROW_DAYS** (8) - Number of days watered for planted cabbages to fully mature from seeds
 * **_CORN_GROW_DAYS** (13) - Number of days watered for planted corn to fully mature from seeds
+* **_EGGPLANT_GROW_DAYS** (7) - Number of days watered for planted eggplants to fully mature from seeds
+* **_GRASS_GROW_DAYS** (9) - Number of days watered for planted grass to fully mature from seeds
+* **_MOONDROP_GROW_DAYS** (6) - Number of days watered for planted moondrop flowers to fully mature from seeds
+* **_PINK_CAT_MINT_GROW_DAYS** (8) - Number of days watered for planted pink cat mint flowers to fully mature from seeds
+* **_POTATO_GROW_DAYS** (6) - Number of days watered for planted potatoes to fully mature from seeds
+* **_STRAWBERRY_GROW_DAYS** (6) - Number of days watered for planted strawberries to fully mature from seeds
+* **_TOMATO_GROW_DAYS** (9) - Number of days watered for planted tomatoes to fully mature from seeds
+* **_TURNIP_GROW_DAYS** (4) - Number of days watered for planted turnips to fully mature from seeds
+
 * **_BUILD_DAYS** (4) - Number of days the carpenters take to construct an extension
 * **_BABY_BORN_DAYS** (60) - 
 * **_PREGNANT_SLEEPS** (30) - 
@@ -51,9 +123,11 @@
 * **_FUNERAL_AFF_LOSS** (10) - Affection most non-Green Ranch related NPCs lose during a chicken funeral
 
 ## VARS
+* **alcohol_tolerance**: Number of alcoholic drinks consumed. Used at the New Year Festival
 * **bridge_days_worked**: Counter for the number of days you have worked on the bridge. If it equals four on Fall 27, the next_day function in script.js will increment affection for villagers
 * **chickens**: The number of adult chickens you have
 * **corn_waters**: The number of times your corn has been watered. This number never resets, but is used to determine if you have corn available if the value is >= CORN_GROW_DAYS variable in data.js. Currently used primarily in the All Photos route for Ann and Basil.
+* **cow_status**: The status of your cows, expressed with a letter and number for each cow for current status and number of days in that status.
 * **cows**: The combined number of small and adult cows you have
 * **day**: The current day, from 3 onward. This number will increment past 30, but the get_day() and get_dow() functions can be used to get the day of the month and day of the week, respectively.
 * **days_married**: Total number of sleeps since the wedding day.
@@ -87,6 +161,7 @@
 * **berry_flowerfest**: INT [0,1] - Has the player bought a berry at the Flower Festival
 * **berry_kappa**: INT [0,1] - Has the player gotten a berry from Kappa by throwing a large fish into the pond
 * **berry_mine**: INT [0,1] - Has the player dug up a berry in the mine
+* **berry_ocean**: INT [0,1] - Has the player fished out a berry from the ocean
 * **berry_pond**: INT [0,1] - Has the player gotten a berry by crossing the frozen pond during winter and smashing the rock with a golden hammer
 * **berry_strength**: INT [0,1] - Has the player gotten a berry by wishing for strength from the goddess while at full stamina and no fatigue
 * **blue_feather**: INT [0,1] - Has the player bought a blue feather from Rick
@@ -94,10 +169,13 @@
 * **chicken_funeral**: INT [0,1] - Is a chicken funeral held today
 * **chicken_outside**: INT [0,1] - Are the chickens / chicks outside the barn
 * **cow_entered**: INT [0,1] - Did the player enter a cow into the Cow Festival
+* **cow_steal_glitch**: INT [0,1] - Has the player borrowed the cows, then skipped the return day
 * **cows_outside**: INT [0,1] - Is there a cow outside the barn / are the cows outside the barn
 * **cutscene_beach**: INT [0,1] - Has the cutscene with Elli and Karen played at the beach
 * **cutscene_bug**: INT [0,1] - Has the cutscene with Maria pulling a bug out of Karens hair near the cave played yet
 * **cutscene_cookfish**: INT [0,1] - Has the cutscene with Elli cooking fish for Maria by the fisherman tent played yet
+* **cutscene_elli**: INT [0,1] - 
+* **cutscene_kent**: INT [0,1] - 
 * **cutscene_rabbit**: INT [0,1] - Has the cutscene with Ann rescuing a rabbit from Cliff played yet
 * **cutscene_watermelon**: INT [0,1] - Has the cutscene with Ann and Maria discussing the salesman and the watermelon played yet
 * **cutscene_vineyard**: INT [0,1] - Has the cutscene with Karen leaving the vineyard played yet
@@ -107,6 +185,7 @@
 * **dream_ann**: INT [0,1] - Has Anns dream sequence been triggered
 * **dream_elli**: INT [0,1] - Has Ellis dream sequence been triggered
 * **dream_maria**: INT [0,1] - Has Marias dream sequence been triggered
+* **dream_karen**: INT [0,1] - Has Karens dream sequence been triggered
 * **dream_popuri**: INT [0,1] - Has Popuris dream sequence been triggered
 * **fishing_rod**: INT [0,1] - Did you get the fishing rod from the fisherman
 * **fishing_rod_stored**: INT [0,1] - Is the fishing rod stored in the tool box
@@ -139,12 +218,14 @@
 * **propose**: INT [0,1] - Has the player used a blue feather on anyone
 * **recipe_ann**: INT [0,1] - Has the player received Anns recipe from a potato
 * **recipe_basil**: INT [0,1] - Has the player received Basils recipe from corn
+* **recipe_duke**: INT [0,1] - Has the player received Dukes recipe from Grapes
 * **recipe_elli**: INT [0,1] - Has the player received Ellis recipe from an egg
 * **recipe_maria**: INT [0,1] - Has the player received Marias recipe from cabbage
 * **recipe_popuri**: INT [0,1] - Has the player received Popuris recipe from a strawberry
 * **recipe_sprite**: INT [0,1] - Has the player received the sprites recipe from a mushroom
 * **sick_ann**: INT [0,1] - Has Anns sick event been triggered
 * **sick_elli**: INT [0,1] - Has Ellis sick event been triggered
+* **sick_karen**: INT [0,1] - Has Karens sick event been triggered
 * **sick_maria**: INT [0,1] - Has Marias sick event been triggered
 * **sick_popuri**: INT [0,1] - Has Popuris sick event been triggered
 * **stairway**: INT [0, _BUILD_DAYS + 1] - Has the stairway been contracted. 0 is no, 1 is fully built, and anything above 1 is being built.
