@@ -6,6 +6,7 @@ function get_actions_ann_photo (d = 3, g = 300, is_sunny = 1) {
 	 * 
 	 * AFFECTION:
 	 * Ann: Meet = 4, Talk = 1, Gift = 1, Corn/Potato = 3, Recipe Boost = +3 (6 total)
+	 * - Birthday: Summer 14 (+2 gift boost)
 	 * Rick: Meet = 4, Talk/Musbox Fix = 3, Gift = 3
 	 *
 	 * Sick Event  - MIN: 120 | AFF: +10
@@ -72,8 +73,7 @@ function get_actions_ann_photo (d = 3, g = 300, is_sunny = 1) {
 	} else if (d > 90 && flags['photo_ann'] == 0) {
 		a.push({'desc':"Photo", 'cid':[ann_id, 'f_photo_ann'], 'val':[_PHOTO_EVENT_AFF, 1], 'sel':(aff[ann_id] >= _PHOTO_EVENT_AFF)});
 	} else if (d == 3) {
-		a.push({'desc':"Equip hoe"});
-		//a.push({'desc':"Equip hoe - [Start Down A A Up A A B]"});
+		a.push({'desc':"Equip hoe - [Start Down A A Up A A B]"});
 		a.push({'desc':"Greet the Mayor", 'iid':get_npc_id("mayor")});
 		a.push({'desc':"Till 3x3 spot"});
 	} else if (d == 4) {
@@ -83,7 +83,6 @@ function get_actions_ann_photo (d = 3, g = 300, is_sunny = 1) {
 			a.push({'desc':"Start Timer on House-Farm loading screen", 'imp':true});
 			a.push({'desc':"Equip Watering Can, Fill Watering Can", 'imp':true});
 			a.push({'desc':"forage to goddess pond"});
-			//a.push({'desc':"Get Fishing Rod, Go Fishing", 'iid':get_npc_id('fisherman')});
 			a.push({'desc':"Enter Carp Screen 54 seconds after leaving house [9 AM]"});
 
 			// Potatoes
@@ -142,15 +141,6 @@ function get_actions_ann_photo (d = 3, g = 300, is_sunny = 1) {
 				a.push({'desc':"Ann is on the Farm Today (Horse Cutscene)", 'red':true, 'iid':ann_id});
 			}
 		}
-
-/*
-		// First Three Potatoes
-		if (d > 4 && d < 11 && is_sunny == 1) {
-			a.push({'desc':"Water 3 Potatoes", 'imp':true});
-		} else if (dow == "THURS" && d >= 11) {
-			a.push({'desc':"Get POTATO for ANN", 'imp':true});
-		}
-*/
 
 		// Find Ann on Spring Thursdays
 		if ((dow == "THURS" && is_sunny == 1) || (d == 30 && is_sunny == 0)) {
@@ -239,6 +229,7 @@ function get_actions_ann_photo (d = 3, g = 300, is_sunny = 1) {
 			}
 /*
 			// Anns Birthday
+			// OBSOLETE [kept for reference]
 			if (d == 44) {
 				a.push({'desc':"Ann's BIRTHDAY", 'imp':true, 'iid':ann_id});
 				if (flags['cake_for_ann'] == 1 || g >= _PRICE_CAKE) {
@@ -271,6 +262,7 @@ function get_actions_ann_photo (d = 3, g = 300, is_sunny = 1) {
 				});
 /*
 				// Anns Birthday
+				// OBSOLETE [kept for reference]
 				if (d == 44 && (flags['cake_for_ann'] == 1 || g >= _PRICE_CAKE)) {
 					a.push({'desc':"CAKE", 't2':["Corn/Potato", "Gift"], 'sr':true, 'cid':ann_id, 'val':5});
 				}
@@ -280,6 +272,7 @@ function get_actions_ann_photo (d = 3, g = 300, is_sunny = 1) {
 		}
 /*
 		// Forage for CAKE and CORN money
+		// OBSOLETE [kept for reference]
 		if (d == 31 && g < (_PRICE_SEED_CORN + _PRICE_CAKE)) {
 			a.push({'desc':"FORAGE:", 'imp':true});
 			a.push(forage((_PRICE_SEED_CORN + _PRICE_CAKE), g, d));
@@ -295,6 +288,7 @@ function get_actions_ann_photo (d = 3, g = 300, is_sunny = 1) {
 
 /*
 		// Cake for Ann's BDAY
+		// OBSOLETE [kept for reference]
 		if (dow != "MON" && d > 32 && d < 45 && flags['cake_for_ann'] == 0 && (g >= (_PRICE_CAKE + ((flags['potato_planted'] == 0) ? _PRICE_SEED_CORN : 0)))) {
 			// Buy Cake for Ann
 			a.push({'desc':"Buy Cake for Ann", 'iid':get_npc_id('jeff'), 'imp':(d > 42), 'cid':['f_cake_for_ann', 'v_gold'], 'val':[1, (-1 * _PRICE_CAKE)]});
@@ -348,6 +342,7 @@ function get_actions_ann_photo (d = 3, g = 300, is_sunny = 1) {
 	a.push({'desc':("Aff Left: " + aff_left), 'iid':ann_id, 'dev':true});
 /*
 	// Fireworks if foraging
+	// OBSOLETE [kept for reference]
 	if (d == 31 && g < (_PRICE_SEED_CORN + _PRICE_CAKE)) {
 		a.push({'desc':"TEXT GLITCH (Examine Axe in Start Menu)", 'imp':true});
 		a.push({'desc':"Enter Ranch after 6 PM", 'iid':ann_id});
